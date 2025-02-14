@@ -9,20 +9,17 @@ class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['project_id', 'employee_id', 'name', 'description', 'start_date', 'end_date', 'status'];
+    protected $fillable = ['project_id', 'assigned_to', 'title', 'description', 'status', 'start_date', 'end_date'];
 
-    // Task belongs to a project
     public function project()
     {
         return $this->belongsTo(Project::class);
     }
 
-    // Task is assigned to one employee
-    public function employee()
+    public function assignedEmployee()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'assigned_to');
     }
-
     // Task has multiple time logs
     public function timeLogs()
     {

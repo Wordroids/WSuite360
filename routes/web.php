@@ -7,6 +7,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
 use Illuminate\Support\Facades\Route;
@@ -28,14 +29,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Company Routes
-    Route::resource('companies', CompanyController::class);
+    //admin routes
+    Route::middleware('role:admin')->group(function () {
+        // Company Routes
+        Route::resource('companies', CompanyController::class);
 
-    // Clients Routes
-    Route::resource('clients', ClientController::class);
+        // Clients Routes
+        Route::resource('clients', ClientController::class);
 
-    // Projects Routes
-    Route::resource('projects', ProjectController::class);
+        // Projects Routes
+        Route::resource('projects', ProjectController::class);
+    });
+
+
+
 
     // Employee Routes (Time Logs & Break Logs)
     Route::middleware('role:employee')->group(function () {
@@ -60,6 +67,7 @@ Route::middleware('auth')->group(function () {
 
         // Manager Dashboard
         Route::get('dashboard/manager', [TimeLogApprovalController::class, 'dashboard'])->name('dashboard.manager');
+        Route::resource('tasks', TaskController::class)->except(['destroy']);
     });
 });
 
