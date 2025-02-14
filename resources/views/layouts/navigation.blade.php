@@ -15,7 +15,56 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index')">
+                        {{ __('Company') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.index')">
+                        {{ __('Clients') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index')">
+                        {{ __('Projects') }}
+                    </x-nav-link>
+
+                    @if(auth()->check() && optional(auth()->user()->role)->name === 'employee')
+                    <x-nav-link :href="route('time_logs.index')" :active="request()->routeIs('time_logs.index')">
+                        {{ __('My Time Logs') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('employee.dashboard')" :active="request()->routeIs('employee.dashboard')">
+                        {{ __('My Dashboard') }}
+                    </x-nav-link>
+
+
+                    <x-nav-link :href="route('time_logs.create')" :active="request()->routeIs('time_logs.create')">
+                        {{ __('Log Time') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('break_logs.index')" :active="request()->routeIs('break_logs.index')">
+                        {{ __('My Break Logs') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('break_logs.create')" :active="request()->routeIs('break_logs.create')">
+                        {{ __('Log Break Time') }}
+                    </x-nav-link>
+                    @endif
+
+
+                    @if(auth()->check() && optional(auth()->user()->role)->name === 'project_manager')
+                    <x-nav-link :href="route('time_logs.approvals')" :active="request()->routeIs('time_logs.approvals')">
+                        {{ __('Time Log Approvals') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('dashboard.manager')" :active="request()->routeIs('dashboard.manager')">
+                        {{ __('Manager Dashboard') }}
+                    </x-nav-link>
+                    @endif
+
+
                 </div>
+
             </div>
 
             <!-- Settings Dropdown -->
@@ -43,7 +92,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -89,7 +138,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
