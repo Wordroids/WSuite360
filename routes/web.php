@@ -77,7 +77,8 @@ Route::middleware('auth')->group(function () {
 
     // Routes For admin and ProjectManger Role
     Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
-        Route::resource('tasks', TaskController::class)->except(['destroy']);
+        Route::get('tasks/create/{project_id}', [TaskController::class, 'create'])->name('tasks.create');
+        Route::resource('tasks', TaskController::class)->except(['create']);
         Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
 
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Task;
@@ -10,26 +11,29 @@ class TaskController extends Controller
 {
     public function index()
     {
-        // Fetch all tasks for Project Managers
-        if (auth()->user()->role->name === 'project_manager') {
-            $tasks = Task::with(['project', 'assignedEmployee'])->orderBy('start_date', 'asc')->get();
-        } 
-        // Employees see only assigned tasks
-        else {
-            $tasks = Task::where('assigned_to', auth()->id())->with(['project'])->orderBy('start_date', 'asc')->get();
+        $IsAdmin = auth()->user()->hasRole('admin');
+        $IsProjectManager = auth()->user()->hasRole('project_manager');
+
+        if ($IsAdmin) {
+            $tasks = Task::with('project','assignedEmployee')->get();
+        } elseif ($IsProjectManager) {
+            $tasks = Task::with('project', 'assignedTo')->whereHas('project', function ($query) {
+                $query->where('manager_id', auth()->id());
+            })->get();
+        } else {
+            $tasks = Task::with('project', 'assignedTo')->where('assigned_to', auth()->id())->get();
         }
 
+        
         return view('pages.tasks.index', compact('tasks'));
     }
 
-    public function create()
+    public function create(Project $project_id = null)
     {
-        $projects = Project::all(); // List of projects
-        $employees = User::whereHas('role', function ($query) {
-            $query->where('name', 'employee');
-        })->get(); // List of employees
+        $project = $project_id; // List of projects
+        $allUsers = User::all();
 
-        return view('pages.tasks.create', compact('projects', 'employees'));
+        return view('pages.tasks.create', compact('project', 'allUsers'));
     }
 
     public function store(Request $request)

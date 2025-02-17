@@ -14,7 +14,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('client')->latest()->paginate(10);
+        $projects = Project::withCount('members')->with('client')->latest()->paginate(10);
         return view('pages.projects.index', compact('projects'));
     }
 
@@ -41,13 +41,30 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        // Get assigned employees
-        $assignedEmployees = $project->members()->with('user')->get();
+        // Fetch assigned employees along with their role
+        $assignedEmployees = ProjectMembers::where('project_id', $project->id)
+            ->with(['user' => function ($query) {
+                $query->with('role'); // Load the user's role
+            }])->get();
+
+        // Separate Project Managers, Developers, and Employees
+        $projectManagers = $assignedEmployees->filter(function ($member) {
+            return optional($member->user->role)->name === 'project_manager';
+        });
+
+        $developers = $assignedEmployees->filter(function ($member) {
+            return optional($member->user->role)->name === 'developer';
+        });
+
+        $employees = $assignedEmployees->filter(function ($member) {
+            return optional($member->user->role)->name === 'employee';
+        });
+
 
         // Get unassigned employees (role: employee)
         $unassignedEmployees = User::whereNotIn('id', $assignedEmployees->pluck('user_id'))->get();
 
-        return view('pages.projects.show', compact('project', 'assignedEmployees', 'unassignedEmployees'));
+        return view('pages.projects.show', compact('project', 'employees', 'developers', 'projectManagers', 'unassignedEmployees'));
     }
 
     public function edit(Project $project)

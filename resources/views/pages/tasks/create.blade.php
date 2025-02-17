@@ -17,9 +17,9 @@
             <div class="mb-4">
                 <label for="project_id" class="block text-sm font-medium text-gray-700">Project</label>
                 <select name="project_id" id="project_id" class="mt-1 p-2 w-full border rounded-lg">
-                    @foreach($projects as $project)
+                    
                         <option value="{{ $project->id }}">{{ $project->name }}</option>
-                    @endforeach
+                   
                 </select>
             </div>
 
@@ -27,7 +27,7 @@
                 <label for="assigned_to" class="block text-sm font-medium text-gray-700">Assign to Employee</label>
                 <select name="assigned_to" id="assigned_to" class="mt-1 p-2 w-full border rounded-lg">
                     <option value="">Unassigned</option>
-                    @foreach($employees as $employee)
+                    @foreach($allUsers as $employee)
                         <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                     @endforeach
                 </select>

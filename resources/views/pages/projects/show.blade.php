@@ -13,31 +13,65 @@
         <p><strong>End Date:</strong> {{ $project->end_date ?? 'Not set' }}</p>
         <p><strong>Status:</strong> {{ ucfirst($project->status) }}</p>
 
+        <!-- Assigned Project Managers -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold">Project Managers</h3>
+            @if($projectManagers->isEmpty())
+                <p class="text-gray-500">No Project Managers assigned.</p>
+            @else
+                <ul class="list-disc ml-5">
+                    @foreach($projectManagers as $member)
+                        <li>{{ $member->user->name }} ({{ $member->user->email }})</li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+
+        <!-- Assigned Developers -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold">Developers</h3>
+            @if($developers->isEmpty())
+                <p class="text-gray-500">No Developers assigned.</p>
+            @else
+                <ul class="list-disc ml-5">
+                    @foreach($developers as $member)
+                        <li>{{ $member->user->name }} ({{ $member->user->email }})</li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+
         <!-- Assigned Employees -->
         <div class="mt-6">
             <h3 class="text-lg font-semibold">Assigned Employees</h3>
-            <ul class="list-disc ml-5">
-                @foreach($assignedEmployees as $member)
-                    <li>{{ $member->user->name }} ({{ $member->user->email }})</li>
-                @endforeach
-            </ul>
+            @if($employees->isEmpty())
+                <p class="text-gray-500">No Employees assigned.</p>
+            @else
+                <ul class="list-disc ml-5">
+                    @foreach($employees as $member)
+                        <li>{{ $member->user->name }} ({{ $member->user->email }})</li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
 
-        <!-- Assign Employee Form -->
+        <!-- Assign User Form -->
         <div class="mt-6">
-            <h3 class="text-lg font-semibold">Assign Employees</h3>
+            <h3 class="text-lg font-semibold">Assign Users</h3>
             <form action="{{ route('projects.assign', $project->id) }}" method="POST">
                 @csrf
                 <div class="mb-4">
-                    <label for="user_id" class="block text-sm font-medium text-gray-700">Select Employee</label>
+                    <label for="user_id" class="block text-sm font-medium text-gray-700">Select User</label>
                     <select name="user_id" id="user_id" class="mt-1 p-2 w-full border rounded-lg">
-                        @foreach($unassignedEmployees as $employee)
-                            <option value="{{ $employee->id }}">{{ $employee->name }} ({{ $employee->email }})</option>
+                        @foreach($unassignedEmployees as $user)
+                            <option value="{{ $user->id }}">
+                                {{ $user->name }} ({{ $user->email }}) - {{ ucfirst(optional($user->role)->name ?? 'No Role') }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Assign Employee
+                    Assign User
                 </button>
             </form>
         </div>
