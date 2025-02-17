@@ -11,20 +11,29 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $IsAdmin = auth()->user()->hasRole('admin');
-        $IsProjectManager = auth()->user()->hasRole('project_manager');
+        $user = auth()->user();
+        $IsAdmin = $user->role->name === 'admin';
+        $IsProjectManager = $user->role->name === 'project_manager';
 
         if ($IsAdmin) {
-            $tasks = Task::with('project','assignedEmployee')->get();
-        } elseif ($IsProjectManager) {
-            $tasks = Task::with('project', 'assignedTo')->whereHas('project', function ($query) {
-                $query->where('manager_id', auth()->id());
-            })->get();
-        } else {
-            $tasks = Task::with('project', 'assignedTo')->where('assigned_to', auth()->id())->get();
+            // Admins see all tasks
+            $tasks = Task::with(['project', 'assignedEmployee'])->latest()->paginate(10);
+
+        } else if ($IsProjectManager) {
+            // Project Managers only see tasks from projects they are assigned to
+            $tasks = Task::whereHas('project.members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->with(['project', 'assignedEmployee'])->latest()->paginate(10);
+        } 
+        else {
+            // Employees & Developers see only their assigned tasks
+            $tasks = Task::where('assigned_to', $user->id)
+                ->with(['project', 'assignedEmployee'])
+                ->latest()
+                ->paginate(10);
         }
 
-        
+
         return view('pages.tasks.index', compact('tasks'));
     }
 
