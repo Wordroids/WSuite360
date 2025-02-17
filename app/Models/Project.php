@@ -11,7 +11,12 @@ class Project extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'description', 'client_id', 'start_date', 'end_date', 'status'
+        'name',
+        'description',
+        'client_id',
+        'start_date',
+        'end_date',
+        'status'
     ];
 
     /**
@@ -20,5 +25,10 @@ class Project extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function members()
+    {
+        return $this->hasMany(ProjectMembers::class);
     }
 }

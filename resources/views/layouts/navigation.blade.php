@@ -62,6 +62,10 @@
                     </x-nav-link>
                     @endif
 
+                    <x-nav-link :href="route('tasks.index')" :active="request()->routeIs('tasks.index')">
+                        {{ __('Tasks') }}
+                    </x-nav-link>
+
 
                 </div>
 

@@ -39,6 +39,9 @@ Route::middleware('auth')->group(function () {
 
         // Projects Routes
         Route::resource('projects', ProjectController::class);
+
+       
+
     });
 
 
@@ -67,7 +70,17 @@ Route::middleware('auth')->group(function () {
 
         // Manager Dashboard
         Route::get('dashboard/manager', [TimeLogApprovalController::class, 'dashboard'])->name('dashboard.manager');
+
+       
+
+    });
+
+    // Routes For admin and ProjectManger Role
+    Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
         Route::resource('tasks', TaskController::class)->except(['destroy']);
+        Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
+
+
     });
 });
 

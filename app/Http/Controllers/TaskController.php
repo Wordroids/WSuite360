@@ -1,64 +1,79 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Task;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        // Fetch all tasks for Project Managers
+        if (auth()->user()->role->name === 'project_manager') {
+            $tasks = Task::with(['project', 'assignedEmployee'])->orderBy('start_date', 'asc')->get();
+        } 
+        // Employees see only assigned tasks
+        else {
+            $tasks = Task::where('assigned_to', auth()->id())->with(['project'])->orderBy('start_date', 'asc')->get();
+        }
+
+        return view('pages.tasks.index', compact('tasks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $projects = Project::all(); // List of projects
+        $employees = User::whereHas('role', function ($query) {
+            $query->where('name', 'employee');
+        })->get(); // List of employees
+
+        return view('pages.tasks.create', compact('projects', 'employees'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'project_id' => 'required|exists:projects,id',
+            'assigned_to' => 'nullable|exists:users,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+
+        $task = Task::create($request->all());
+
+
+        return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Task $task)
     {
-        //
+        return view('pages.tasks.show', compact('task'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Task $task)
     {
-        //
+        $projects = Project::all();
+        $employees = User::whereHas('role', function ($query) {
+            $query->where('name', 'employee');
+        })->get();
+
+        return view('pages.tasks.edit', compact('task', 'projects', 'employees'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task)
     {
-        //
-    }
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'status' => 'required|in:pending,in_progress,completed',
+            'assigned_to' => 'nullable|exists:users,id',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $task->update($request->all());
+
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 }
