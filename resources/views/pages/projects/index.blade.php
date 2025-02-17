@@ -6,7 +6,12 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
-       
+        <div class="flex justify-between mb-4">
+            <h3 class="text-lg font-semibold">Project List</h3>
+            <a href="{{ route('projects.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                + Create Project
+            </a>
+        </div>
 
         <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
             <thead class="bg-gray-100">
