@@ -37,9 +37,6 @@ Route::middleware('auth')->group(function () {
         // Clients Routes
         Route::resource('clients', ClientController::class);
 
-        // Projects Routes
-        Route::resource('projects', ProjectController::class);
-
        
 
     });
@@ -80,8 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::get('tasks/create/{project_id}', [TaskController::class, 'create'])->name('tasks.create');
         Route::resource('tasks', TaskController::class)->except(['create']);
         Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
-
-
+        Route::resource('projects', ProjectController::class);
     });
 });
 

@@ -8,19 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!auth()->check()) {
-            abort(403, 'Not Logged In');
-        }
-
-        // Debugging: Check assigned role
-        if (!auth()->user()->role) {
-            abort(403, 'User has no role assigned');
-        }
-
-        if (auth()->user()->role->name !== $role) {
-            abort(403, 'You do not have the required role: ' . $role . ' (Your Role: ' . auth()->user()->role->name . ')');
+        // Check if the user is authenticated and has one of the allowed roles
+        if (!auth()->check() || !in_array(auth()->user()->role->name, $roles)) {
+            return abort(403, "You do not have the required role: " . implode(', ', $roles) . " (Your Role: " . auth()->user()->role->name . ")");
         }
 
         return $next($request);

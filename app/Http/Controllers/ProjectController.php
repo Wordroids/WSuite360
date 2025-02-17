@@ -14,7 +14,22 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::withCount('members')->with('client')->latest()->paginate(10);
+        $user = auth()->user();
+
+        // Admins can see all projects
+        if ($user->role->name === 'admin') {
+            $projects = Project::withCount('members')->with('client')->latest()->paginate(10);
+        }
+        // Project Managers can only see assigned projects
+        else if ($user->role->name === 'project_manager') {
+            $projects = Project::whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->withCount('members')->with('client')->latest()->paginate(10);
+        }
+        // Other roles see nothing
+        else {
+            $projects = collect(); // Empty collection
+        }
         return view('pages.projects.index', compact('projects'));
     }
 
