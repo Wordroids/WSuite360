@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 
 
     // Employee Routes (Time Logs & Break Logs)
-    Route::middleware('role:employee')->group(function () {
+    Route::middleware('role:developer')->group(function () {
         Route::resource('time_logs', TimeLogController::class)->except(['destroy']);
         Route::resource('break_logs', BreakLogController::class)->except(['destroy']);
         Route::get('employee/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');

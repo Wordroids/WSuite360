@@ -23,7 +23,7 @@ class TimeLogController extends Controller
     public function create()
     {
         // Fetch only tasks assigned to the logged-in user
-        $tasks = Task::where('employee_id', auth()->id())->get();
+        $tasks = Task::where('assigned_to', auth()->id())->get();
         return view('pages.time_logs.create', compact('tasks'));
     }
 

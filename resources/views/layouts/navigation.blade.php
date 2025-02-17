@@ -16,6 +16,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @if (auth()->check() && optional(auth()->user()->role)->name === 'admin')
                     <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index')">
                         {{ __('Company') }}
                     </x-nav-link>
@@ -27,8 +28,9 @@
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.index')">
                         {{ __('Projects') }}
                     </x-nav-link>
+                    @endif
 
-                    @if(auth()->check() && optional(auth()->user()->role)->name === 'employee')
+                    @if(auth()->check() && (optional(auth()->user()->role)->name === 'employee' || optional(auth()->user()->role)->name === 'developer'))
                     <x-nav-link :href="route('time_logs.index')" :active="request()->routeIs('time_logs.index')">
                         {{ __('My Time Logs') }}
                     </x-nav-link>
