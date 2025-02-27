@@ -16,9 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'employee']);
-        Role::create(['name' => 'project_manager']);
-        Role::create(['name' => 'developer']);
+        // Call the RoleSeeder to seed roles
+        $this->call(RoleSeeder::class);
     }
 }
