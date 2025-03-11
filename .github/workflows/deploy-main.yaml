@@ -17,7 +17,7 @@ jobs:
         php-version: '8.3'
 
     - name: Use production env
-      run: cp .env.production .env
+      run: cp .env.prod .env
 
     - name: Update .env
       run: |
