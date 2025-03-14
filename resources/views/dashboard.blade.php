@@ -1,70 +1,71 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Timesheet') }}
-        </h2>
-    </x-slot>
+    <div class="flex h-screen">
+        <!-- Main Content -->
+        <div class="flex-1 bg-white p-6 rounded-lg shadow-lg mt-10 mx-auto overflow-auto">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Timesheet') }}
+            </h2>
 
-    <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
-        <!-- Header Section -->
-        <div class="flex items-center justify-between mb-4">
-            <button id="prevWeek" class="px-3 py-2 bg-gray-200 rounded">&larr;</button>
-            <h3 class="text-lg font-semibold">This week: <span id="weekRange"></span></h3>
-            <button id="nextWeek" class="px-3 py-2 bg-gray-200 rounded">&rarr;</button>
-            <div>
-                <button id="dayView" class="px-3 py-2 border rounded">Day</button>
-                <button id="weekView" class="px-3 py-2 border rounded bg-orange-500 text-white">Week</button>
+            <!-- Header Section -->
+            <div class="flex items-center justify-between mb-4">
+                <button id="prevWeek" class="px-3 py-2 bg-gray-200 rounded">&larr;</button>
+                <h3 class="text-lg font-semibold">This week: <span id="weekRange"></span></h3>
+                <button id="nextWeek" class="px-3 py-2 bg-gray-200 rounded">&rarr;</button>
+                <div>
+                    <button id="dayView" class="px-3 py-2 border rounded">Day</button>
+                    <button id="weekView" class="px-3 py-2 border rounded bg-orange-500 text-white">Week</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Timesheet Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full border border-gray-200" id="timesheetTable">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-2 border">Project / Task</th>
-                        <th class="px-4 py-2 border">Mon</th>
-                        <th class="px-4 py-2 border">Tue</th>
-                        <th class="px-4 py-2 border">Wed</th>
-                        <th class="px-4 py-2 border">Thu</th>
-                        <th class="px-4 py-2 border">Fri</th>
-                        <th class="px-4 py-2 border">Sat</th>
-                        <th class="px-4 py-2 border">Sun</th>
-                        <th class="px-4 py-2 border">Total</th>
-                        <th class="px-4 py-2 border"></th>
-                    </tr>
-                </thead>
-                <tbody id="timesheetBody">
-                    <!-- Rows will be added dynamically -->
-                </tbody>
-                <tfoot>
-                    <tr class="border-t font-semibold">
-                        <td class="px-4 py-2">Total</td>
-                        <td class="px-4 py-2 text-center" id="totalMon">0</td>
-                        <td class="px-4 py-2 text-center" id="totalTue">0</td>
-                        <td class="px-4 py-2 text-center" id="totalWed">0</td>
-                        <td class="px-4 py-2 text-center" id="totalThu">0</td>
-                        <td class="px-4 py-2 text-center" id="totalFri">0</td>
-                        <td class="px-4 py-2 text-center" id="totalSat">0</td>
-                        <td class="px-4 py-2 text-center" id="totalSun">0</td>
-                        <td class="px-4 py-2 text-center" id="grandTotal">0</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+            <!-- Timesheet Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full border border-gray-200" id="timesheetTable">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 border">Project / Task</th>
+                            <th class="px-4 py-2 border">Mon</th>
+                            <th class="px-4 py-2 border">Tue</th>
+                            <th class="px-4 py-2 border">Wed</th>
+                            <th class="px-4 py-2 border">Thu</th>
+                            <th class="px-4 py-2 border">Fri</th>
+                            <th class="px-4 py-2 border">Sat</th>
+                            <th class="px-4 py-2 border">Sun</th>
+                            <th class="px-4 py-2 border">Total</th>
+                            <th class="px-4 py-2 border"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="timesheetBody">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="border-t font-semibold">
+                            <td class="px-4 py-2">Total</td>
+                            <td class="px-4 py-2 text-center" id="totalMon">0</td>
+                            <td class="px-4 py-2 text-center" id="totalTue">0</td>
+                            <td class="px-4 py-2 text-center" id="totalWed">0</td>
+                            <td class="px-4 py-2 text-center" id="totalThu">0</td>
+                            <td class="px-4 py-2 text-center" id="totalFri">0</td>
+                            <td class="px-4 py-2 text-center" id="totalSat">0</td>
+                            <td class="px-4 py-2 text-center" id="totalSun">0</td>
+                            <td class="px-4 py-2 text-center" id="grandTotal">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
 
-        <!-- Actions -->
-        <div class="flex items-center gap-4 mt-4">
-            <button id="addRow" class="px-4 py-2 bg-gray-200 rounded">+ Add row</button>
-            <button id="saveButton" class="px-4 py-2 bg-green-500 text-white rounded">Save</button>
+            <!-- Actions -->
+            <div class="flex items-center gap-4 mt-4">
+                <button id="addRow" class="px-4 py-2 bg-gray-200 rounded">+ Add row</button>
+                <button id="saveButton" class="px-4 py-2 bg-green-500 text-white rounded">Save</button>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Submit week for approval</button>
         </div>
-        <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Submit week for approval</button>
     </div>
 
     <!-- JavaScript for Functionality -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const weekRange = document.getElementById("weekRange");
             const timesheetBody = document.getElementById("timesheetBody");
 
@@ -80,7 +81,11 @@
             }
 
             function formatDate(date) {
-                return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                return date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
             }
 
             function prevWeek() {
@@ -115,7 +120,7 @@
                 });
 
                 document.querySelectorAll(".removeRow").forEach(button => {
-                    button.addEventListener("click", function () {
+                    button.addEventListener("click", function() {
                         this.closest("tr").remove();
                         updateTotals();
                     });
