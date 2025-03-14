@@ -2,7 +2,7 @@
     <div class="flex h-screen overflow-hidden">
         <!-- Main Content -->
         <div class="flex-1 flex flex-col items-center justify-start bg-gray-100">
-            <div class="w-3/4 bg-white p-6 rounded-lg shadow-lg mt-10">
+            <div class=" bg-white p-6 rounded-lg shadow-lg mt-10">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Clients List') }}
                 </h2>

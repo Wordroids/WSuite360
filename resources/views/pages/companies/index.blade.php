@@ -2,7 +2,7 @@
     <div class="flex h-screen overflow-hidden">
         <!-- Main Content -->
         <div class="flex-1">
-            <div class="w-3/4 mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
+            <div class=" mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Companies List') }}
                 </h2>
