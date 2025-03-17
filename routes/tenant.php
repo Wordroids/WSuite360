@@ -47,7 +47,12 @@ Route::middleware([
         return view('welcome');
     });
 
-    // Auth Routes
+    // Dashboard Route (Only Authenticated Users)
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+
+    // Authentication routes
     Route::middleware('guest')->group(function () {
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
@@ -94,11 +99,6 @@ Route::middleware([
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
     });
-
-    // Dashboard Route (Only Authenticated Users)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
 
     // Authenticated Routes Group
     Route::middleware('auth')->group(function () {
