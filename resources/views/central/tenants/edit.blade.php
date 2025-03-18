@@ -46,21 +46,21 @@
     <div>
       <label for="name" class="block text-sm/6 font-medium text-gray-900 dark:text-gray-200">Tenant Name</label>
       <div class="mt-2 flex">
-        <input type="text" name="name" value="{{old('name', $tenant->name ?? '')}}" id="name" class="block w-full grow rounded-md bg-white dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm/6" placeholder="Exampleco, LLC">
+        <input type="text" name="name" value="{{old('name', $tenant->name ?? '')}}" id="name" class="block w-full grow rounded-md bg-gray-100 dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm/6" placeholder="Exampleco, LLC">
       </div>
       @error('name')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
     </div>
     <div>
       <label for="id" class="block text-sm/6 font-medium text-gray-900 dark:text-gray-200">Tenant ID</label>
       <div class="mt-2 flex">
-        <input type="text" name="id" value="{{old('id', $tenant->id ?? '')}}" id="id" class="block w-full grow rounded-md bg-white dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm/6" placeholder="exampleco">
+        <input type="text" name="id" value="{{old('id', $tenant->id ?? '')}}" id="id" class="block w-full grow rounded-md bg-gray-100 dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm/6" placeholder="exampleco">
       </div>
       @error('id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
     </div>
     <div>
       <label for="tier" class="block text-sm/6 font-medium text-gray-900 dark:text-gray-200">Tier</label>
       <div class="mt-2 flex">
-        <select name="tier" id="tier" class="block w-full grow rounded-md bg-white dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200">
+        <select name="tier" id="tier" class="block w-full grow rounded-md bg-gray-100 dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200">
             <option value="" disabled {{ old('tier') ?? $tenant->tier == '' ? 'selected' : '' }}>Select</option>
             <option value="free" {{ old('tier') ?? $tenant->tier == 'free' ? 'selected' : '' }}>Free</option>
             <option value="basic" {{ old('tier') ?? $tenant->tier == 'basic' ? 'selected' : '' }}>Basic</option>
@@ -76,8 +76,8 @@
         </label>
         <div class="mt-2 flex">
             <input type="hidden" name="domain" x-bind:value="`${domain}.${root}`">
-            <input type="text" x-model="domain" id="display-domain" class="block w-full grow rounded-l-md bg-white dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm">
-            <div class="flex shrink-0 items-center rounded-r-md bg-white dark:bg-gray-600 px-3 text-base text-gray-500 dark:text-gray-200 sm:text-sm">
+            <input type="text" x-model="domain" id="display-domain" class="block w-full grow rounded-l-md bg-gray-100 dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm">
+            <div class="flex shrink-0 items-center rounded-r-md bg-gray-100 dark:bg-gray-600 px-3 text-base text-gray-500 dark:text-gray-200 sm:text-sm">
                 .{{ explode('//', env('APP_URL'))[1] }}
             </div>
         </div>

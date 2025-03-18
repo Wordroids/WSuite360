@@ -35,8 +35,8 @@
         </div>
       </div>
       <div class="flex flex-none items-center gap-x-4">
-        <a href="http://{{$tenant->domains()->first()->domain}}{{$port}}/dashboard" class="rounded-md bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600">Dashboard</a>
-        <a href="{{route('tenants.edit', compact('tenant'))}}" class="rounded-md bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-600">Edit</a>
+        <a href="http://{{$tenant->domains()->first()->domain}}{{$port}}/dashboard" class="rounded-md bg-gray-300 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-400 hover:dark:bg-gray-600">Dashboard</a>
+        <a href="{{route('tenants.edit', compact('tenant'))}}" class="rounded-md bg-gray-300 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-400 hover:dark:bg-gray-600">Edit</a>
       </div>
     </li>
     @endforeach
