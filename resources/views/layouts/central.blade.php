@@ -28,7 +28,7 @@
             <div class="ml-6">
               <div class="flex space-x-4">
                 <x-menu-item route="dashboard" name="Dashboard"/>
-                <x-menu-item route="tenants" name="Tenants"/>
+                <x-menu-item route="tenants.index" name="Tenants"/>
                 <x-menu-item route="#" name="Transcations"/>
               </div>
             </div>
@@ -47,7 +47,7 @@
       @isset($header)
       <header>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-5">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-800 dark:text-gray-200">{{$header}}</h1>
+          {{$header}}
         </div>
       </header>
       @endisset

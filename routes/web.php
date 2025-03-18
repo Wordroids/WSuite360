@@ -16,7 +16,7 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             // Admin only routes
             Route::middleware('role:admin')->group(function () {
-                Route::resource('tenants', TenantController::class)->name('index', 'tenants');
+                Route::resource('tenants', TenantController::class);
             });
         });
     });
