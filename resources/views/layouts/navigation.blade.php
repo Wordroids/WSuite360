@@ -87,7 +87,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ route('timesheet.calendarView') }}"
                                         class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                         <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white"
                                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -97,7 +97,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
                                         </svg>
-                                        Reports
+                                        Timesheet
                                     </a>
                                 </li>
                             </ul>
@@ -228,7 +228,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a href="{{ route('timesheet.calendarView') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
@@ -238,7 +238,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
                                 </svg>
-                                Reports
+                                Timesheet
                             </a>
                         </li>
                     </ul>
@@ -280,7 +280,7 @@
 
                     <div
                         class=" relative group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
-                        <button type="button" class="flex items-center space-x-2 text-gray-900"
+                        <button type="button" class="flex items-center space-x-2 text-indigo-200"
                             onclick="toggleDropdown()">
                             <span class="text-sm font-semibold">{{ Auth::user()->name }}</span>
                             <svg class="h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg"

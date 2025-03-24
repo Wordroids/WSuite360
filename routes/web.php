@@ -10,6 +10,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
+use App\Http\Controllers\TimeSheetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,9 +37,6 @@ Route::middleware('auth')->group(function () {
 
         // Clients Routes
         Route::resource('clients', ClientController::class);
-
-       
-
     });
 
 
@@ -67,9 +65,6 @@ Route::middleware('auth')->group(function () {
 
         // Manager Dashboard
         Route::get('dashboard/manager', [TimeLogApprovalController::class, 'dashboard'])->name('dashboard.manager');
-
-       
-
     });
 
     // Routes For admin and ProjectManger Role
@@ -80,6 +75,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('projects', ProjectController::class);
     });
 });
+
+//Timesheet
+Route::get('/listView', [TimeSheetController::class, 'listView'])->name('timesheet.listView');
+Route::get('/calendarView', [TimeSheetController::class, 'calendarView'])->name('timesheet.calendarView');
+Route::get('/add', [TimeSheetController::class, 'add'])->name('timesheet.add');
+Route::get('/edit', [TimeSheetController::class, 'edit'])->name('timesheet.edit');
+Route::get('/view', [TimeSheetController::class, 'view'])->name('timesheet.view');
 
 // Include Authentication Routes
 require __DIR__ . '/auth.php';
