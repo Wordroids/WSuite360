@@ -24,6 +24,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
+use App\Http\Controllers\TimeSheetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,6 +108,13 @@ Route::middleware([
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        // Timesheet
+        Route::get('/listView', [TimeSheetController::class, 'listView'])->name('timesheet.listView');
+        Route::get('/calendarView', [TimeSheetController::class, 'calendarView'])->name('timesheet.calendarView');
+        Route::get('/add', [TimeSheetController::class, 'add'])->name('timesheet.add');
+        Route::get('/edit', [TimeSheetController::class, 'edit'])->name('timesheet.edit');
+        Route::get('/view', [TimeSheetController::class, 'view'])->name('timesheet.view');
 
         //admin routes
         Route::middleware('role:admin')->group(function () {
