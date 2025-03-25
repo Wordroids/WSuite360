@@ -1,10 +1,6 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Create Company') }}
-        </h2>
-    </x-slot>
     <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
+        <h1 class="text-2xl font-bold mb-4">Add a Company</h1>
         <!-- Company Form -->
         <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -43,7 +39,7 @@
             <!-- Submit Button -->
             <div class="flex justify-end">
                 <button type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+                    class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200">
                     Create Company
                 </button>
             </div>
