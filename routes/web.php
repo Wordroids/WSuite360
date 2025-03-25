@@ -24,4 +24,3 @@ foreach (config('tenancy.central_domains') as $domain) {
 
 // Include Authentication Routes
 require __DIR__ . '/auth.php';
-
