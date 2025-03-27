@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ProjectMembersController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -116,6 +117,8 @@ Route::middleware([
         Route::get('/edit', [TimeSheetController::class, 'edit'])->name('timesheet.edit');
         Route::get('/view', [TimeSheetController::class, 'view'])->name('timesheet.view');
 
+        //Team Members
+        Route::resource('project_members', ProjectMembersController::class);
         //admin routes
         Route::middleware('role:admin')->group(function () {
             // Company Routes
