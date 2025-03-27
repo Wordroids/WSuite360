@@ -2,10 +2,6 @@
     <div class="flex h-screen overflow-hidden">
         <!-- Main Content -->
         <div class="flex-1">
-            <div class="mx-auto bg-white p-6 rounded-lg shadow-lg mt-10 min-h-[75vh]">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight mb-4">
-                    {{ __('Companies List') }}
-                </h2>
 
                 <!-- Success Message -->
                 @if (session('success'))
@@ -15,7 +11,10 @@
                 @endif
 
                 <!-- Add New Company Button -->
-                <div class="mb-4 flex justify-end">
+                <div class="mt-5 mb-4 flex justify-between items-center">
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight mb-4">
+                        {{ __('Companies List') }}
+                    </h2>
                     <a href="{{ route('companies.create') }}"
                         class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200">
                         + Add Company
@@ -95,7 +94,6 @@
                 <div class="mt-4">
                     {{ $companies->links() }}
                 </div>
-            </div>
         </div>
     </div>
 </x-app-layout>
