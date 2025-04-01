@@ -116,7 +116,9 @@ Route::middleware([
         Route::get('/add', [TimeSheetController::class, 'add'])->name('timesheet.add');
         Route::get('/edit', [TimeSheetController::class, 'edit'])->name('timesheet.edit');
         Route::get('/view', [TimeSheetController::class, 'view'])->name('timesheet.view');
-
+        Route::get('/chartsView', [TimeSheetController::class, 'chartsView'])->name('timesheet.chartsView');
+        Route::get('/detailedReport', [TimeSheetController::class, 'detailedReport'])->name('timesheet.detailedReport');
+        Route::get('/weeklyReport', [TimeSheetController::class, 'weeklyReport'])->name('timesheet.weeklyReport');
         //Team Members
         Route::resource('project_members', ProjectMembersController::class);
         //admin routes
