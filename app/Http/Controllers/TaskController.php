@@ -4,45 +4,50 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\ProjectMembers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
-        $IsAdmin = $user->role->name === 'admin';
-        $IsProjectManager = $user->role->name === 'project_manager';
+        $isAdmin = $user->role->name === 'admin';
+        $isProjectManager = $user->role->name === 'project_manager';
 
-        if ($IsAdmin) {
+        $projectId = $request->input('project_id');
+        $projects = Project::all();
+
+        if ($isAdmin) {
             // Admins see all tasks
-            $tasks = Task::with(['project', 'assignedEmployee'])->latest()->paginate(10);
-
-        } else if ($IsProjectManager) {
+            $tasksQuery = Task::query();
+        } elseif ($isProjectManager) {
             // Project Managers only see tasks from projects they are assigned to
-            $tasks = Task::whereHas('project.members', function ($query) use ($user) {
+            $tasksQuery = Task::whereHas('project.members', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
-            })->with(['project', 'assignedEmployee'])->latest()->paginate(10);
-        } 
-        else {
+            });
+        } else {
             // Employees & Developers see only their assigned tasks
-            $tasks = Task::where('assigned_to', $user->id)
-                ->with(['project', 'assignedEmployee'])
-                ->latest()
-                ->paginate(10);
+            $tasksQuery = Task::where('assigned_to', $user->id);
+        }
+        // Filter by selected project if provided
+        if ($projectId) {
+            $tasksQuery->where('project_id', $projectId);
         }
 
+        $tasks = $tasksQuery->with(['project', 'assignedEmployee'])->latest()->paginate(10);
 
-        return view('pages.tasks.index', compact('tasks'));
+        return view('pages.tasks.index', compact('tasks', 'projects', 'projectId'));
     }
 
-    public function create(Project $project_id = null)
+    public function create()
     {
-        $project = $project_id; // List of projects
-        $allUsers = User::all();
+        $projects = Project::all();
 
-        return view('pages.tasks.create', compact('project', 'allUsers'));
+        $members = ProjectMembers::all();
+
+        return view('pages.tasks.create', compact('projects', 'members'));
     }
 
     public function store(Request $request)
@@ -50,7 +55,8 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'project_id' => 'required|exists:projects,id',
-            'assigned_to' => 'nullable|exists:users,id',
+            //'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'required|exists:project_members,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -67,26 +73,45 @@ class TaskController extends Controller
         return view('pages.tasks.show', compact('task'));
     }
 
-    public function edit(Task $task)
+    public function edit($id)
     {
+        $task = Task::findOrFail($id);
         $projects = Project::all();
-        $employees = User::whereHas('role', function ($query) {
-            $query->where('name', 'employee');
-        })->get();
+        $members = ProjectMembers::all();
 
-        return view('pages.tasks.edit', compact('task', 'projects', 'employees'));
+        return view('pages.tasks.edit', compact('task', 'projects', 'members'));
     }
-
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'status' => 'required|in:pending,in_progress,completed',
-            'assigned_to' => 'nullable|exists:users,id',
+            'project_id' => 'required|exists:projects,id',
+            'assigned_to' => 'required|exists:project_members,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $task->update($request->all());
+        $task = Task::findOrFail($id);
+
+        $task->update([
+            'title' => $request->input('title'),
+            'project_id' => $request->input('project_id'),
+            'assigned_to' => $request->input('assigned_to'),
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+        ]);
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
+    }
+
+    // to delete 
+
+    public function destroy($id)
+    {
+        $tasks = Task::findOrFail($id);
+        $tasks->delete();
+
+
+        return redirect()->route('tasks.index')->with('success', 'Tasks deleted successfully!');
     }
 }
