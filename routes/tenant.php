@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TimeEntryApprovalController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
 use App\Http\Controllers\TimeSheetController;
@@ -130,6 +132,14 @@ Route::middleware([
             Route::resource('clients', ClientController::class);
         });
 
+        //Activity log
+        Route::get('/logs', [ActivityLogController::class, 'logs'])->name('pages.activity_log.logs');
+
+        //Time Entry Approval
+        Route::get('/index', [TimeEntryApprovalController::class, 'index'])->name('pages.time_entry_approval.index');
+        Route::get('/pending', [TimeEntryApprovalController::class, 'pending'])->name('pages.time_entry_approval.pending');
+        Route::get('/approved', [TimeEntryApprovalController::class, 'approved'])->name('pages.time_entry_approval.approved');
+        Route::get('/rejected', [TimeEntryApprovalController::class, 'rejected'])->name('pages.time_entry_approval.rejected');
         // Employee Routes (Time Logs & Break Logs)
         Route::middleware('role:developer')->group(function () {
             Route::resource('time_logs', TimeLogController::class)->except(['destroy']);
