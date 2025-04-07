@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->enum('priority', ['high', 'medium', 'low'])->default('high');
-            $table->decimal('budget', 10, 2);
+            $table->decimal('budget', 10, 2)->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

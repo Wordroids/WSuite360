@@ -41,15 +41,16 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'client_id'   => 'required|exists:clients,id',
             'start_date'  => 'nullable|date',
             'end_date'    => 'nullable|date|after_or_equal:start_date',
+            'budget'    => 'nullable|min:0',
         ]);
 
-        Project::create($request->all());
+        Project::create($validated);
 
         return redirect()->route('projects.index')->with('success', 'Project created successfully!');
     }
