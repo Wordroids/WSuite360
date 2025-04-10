@@ -92,6 +92,24 @@
                     <div class="text-xs/6 font-semibold text-indigo-200">Your teams</div>
                     <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li>
+
+                            <a href="#"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Project Members</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('invoice.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Invoice</span>
+                            </a>
+                        </li>
+
+                        <li>
                             <a href="{{ route('pages.activity_log.logs') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
