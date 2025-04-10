@@ -29,7 +29,7 @@
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Start Date</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">End Date</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Status</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Assigned Users</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Project Members</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Actions</th>
                         </tr>
                     </thead>
@@ -43,8 +43,12 @@
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ ucfirst($project->status) }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $project->members_count }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800 flex space-x-2 justify-center">
+                                    <a href="{{ route('projects.users.index', $project->id) }}"
+                                        class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
+                                        Users
+                                    </a>
                                     <a href="{{ route('projects.edit', $project->id) }}"
-                                        class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">
+                                        class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
                                         Edit
                                     </a>
                                     <!-- Delete Button -->
@@ -55,15 +59,14 @@
                                         @method('DELETE')
                                     </form>
                                     <button type="button"
+                                        class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-500 transition"
+                                        onclick="#">
+                                        Add task
+                                    </button>
+                                    <button type="button"
                                         class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
                                         onclick="confirmDeletion({{ $project->id }})">
                                         Delete
-                                    </button>
-
-                                    <button type="button"
-                                        class="bg-indigo-700 text-white px-3 py-1 rounded-lg hover:bg-indigo-700 transition"
-                                        onclick="#">
-                                        Add a task
                                     </button>
                                 </td>
                             </tr>

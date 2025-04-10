@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\API\ProjectUserController as APIProjectUserController;
+use App\Http\Controllers\API\UserController as APIUserController; 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -12,7 +14,6 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\ProjectMembersController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -23,6 +24,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TimeEntryApprovalController;
 use App\Http\Controllers\TimeLogController;
@@ -121,9 +123,8 @@ Route::middleware([
         Route::get('/chartsView', [TimeSheetController::class, 'chartsView'])->name('timesheet.chartsView');
         Route::get('/detailedReport', [TimeSheetController::class, 'detailedReport'])->name('timesheet.detailedReport');
         Route::get('/weeklyReport', [TimeSheetController::class, 'weeklyReport'])->name('timesheet.weeklyReport');
-        //Team Members
-        Route::resource('project_members', ProjectMembersController::class);
-        //admin routes
+
+        // Admin routes
         Route::middleware('role:admin')->group(function () {
             // Company Routes
             Route::resource('companies', CompanyController::class);
@@ -140,6 +141,7 @@ Route::middleware([
         Route::get('/pending', [TimeEntryApprovalController::class, 'pending'])->name('pages.time_entry_approval.pending');
         Route::get('/approved', [TimeEntryApprovalController::class, 'approved'])->name('pages.time_entry_approval.approved');
         Route::get('/rejected', [TimeEntryApprovalController::class, 'rejected'])->name('pages.time_entry_approval.rejected');
+
         // Employee Routes (Time Logs & Break Logs)
         Route::middleware('role:developer')->group(function () {
             Route::resource('time_logs', TimeLogController::class)->except(['destroy']);
@@ -148,7 +150,7 @@ Route::middleware([
         });
 
         // Project Manager Routes (Approvals & Manager Dashboard)
-        Route::middleware('role:project_manager')->group(function () {
+        Route::middleware('role:project_manager,admin')->group(function () {
 
             // Time Log Approvals
             Route::get('time_logs/approvals', [TimeLogApprovalController::class, 'index'])->name('time_logs.approvals');
@@ -162,6 +164,9 @@ Route::middleware([
 
             // Manager Dashboard
             Route::get('dashboard/manager', [TimeLogApprovalController::class, 'dashboard'])->name('dashboard.manager');
+
+            // Project member assingment
+            Route::resource('projects.users', ProjectUserController::class)->only(['index', 'store', 'destroy']);
         });
 
         // Routes For admin and ProjectManger Role
@@ -170,6 +175,19 @@ Route::middleware([
             Route::resource('tasks', TaskController::class)->except(['create']);
             Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
             Route::resource('projects', ProjectController::class);
+        });
+    });
+});
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->prefix('/api')->name('api.')->group(function () {
+    Route::middleware('auth')->group(function () {
+        Route::middleware('role:project_manager,admin')->group(function () {            
+            Route::apiResource('users', APIUserController::class)->names([]);
+            Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
         });
     });
 });
