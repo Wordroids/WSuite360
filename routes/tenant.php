@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\API\ProjectUserController as APIProjectUserController;
+use App\Http\Controllers\API\UserController as APIUserController; 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -173,6 +175,19 @@ Route::middleware([
             Route::resource('tasks', TaskController::class)->except(['create']);
             Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
             Route::resource('projects', ProjectController::class);
+        });
+    });
+});
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->prefix('/api')->name('api.')->group(function () {
+    Route::middleware('auth')->group(function () {
+        Route::middleware('role:project_manager,admin')->group(function () {            
+            Route::apiResource('users', APIUserController::class)->names([]);
+            Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
         });
     });
 });
