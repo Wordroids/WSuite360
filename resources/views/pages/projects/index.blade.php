@@ -1,49 +1,79 @@
 <x-app-layout>
-
     <div class="flex h-screen overflow-hidden">
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col bg-white p-6 rounded-lg shadow-lg mt-10">
-            @if (auth()->user()->role->name === 'admin')
+        <div class="flex-1 flex flex-col mt-5">
+            <!-- Success message -->
+            @if (session('success'))
+                <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (auth()->user()->role && auth()->user()->role->name === 'admin')
                 <div class="flex justify-between mb-4">
                     <h3 class="text-lg font-semibold">Project List</h3>
                     <a href="{{ route('projects.create') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                         + Create Project
                     </a>
                 </div>
             @endif
 
             <!-- Projects Table -->
-            <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-                <table class="min-w-full border border-gray-200">
-                    <thead class="bg-gray-100">
+            <div class="overflow-x-auto rounded-lg shadow-lg">
+                <table class="min-w-full table-auto border-collapse border border-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-2 border">Project Name</th>
-                            <th class="px-4 py-2 border">Client</th>
-                            <th class="px-4 py-2 border">Start Date</th>
-                            <th class="px-4 py-2 border">End Date</th>
-                            <th class="px-4 py-2 border">Status</th>
-                            <th class="px-4 py-2 border">Assigned Users</th>
-                            <th class="px-4 py-2 border">Actions</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Project Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Client</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Start Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">End Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Assigned Users</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($projects as $project)
-                            <tr class="border-t">
-                                <td class="px-4 py-2">{{ $project->name }}</td>
-                                <td class="px-4 py-2">{{ $project->client->name }}</td>
-                                <td class="px-4 py-2">{{ $project->start_date ?? 'N/A' }}</td>
-                                <td class="px-4 py-2">{{ $project->end_date ?? 'N/A' }}</td>
-                                <td class="px-4 py-2">{{ ucfirst($project->status) }}</td>
-                                <td class="px-4 py-2 text-center font-semibold">{{ $project->members_count }}</td>
-                                <td class="px-4 py-2 flex space-x-2">
-                                    <a href="{{ route('projects.edit', $project->id) }}" class="text-blue-500">Edit</a>
-                                    <a href="{{ route('projects.show', $project->id) }}" class="text-green-500">View</a>
-                                    <a href="{{ route('tasks.create', ['project_id' => $project->id]) }}"
-                                        class="text-purple-500 font-semibold">+ Create Task</a>
+                        @forelse ($projects as $project)
+                            <tr class="bg-white hover:bg-gray-50">
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $project->name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $project->client?->name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $project->start_date ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $project->end_date ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ ucfirst($project->status) }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $project->members_count }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800 flex space-x-2 justify-center">
+                                    <a href="{{ route('projects.edit', $project->id) }}"
+                                        class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">
+                                        Edit
+                                    </a>
+                                    <!-- Delete Button -->
+                                    <form id="delete-form-{{ $project->id }}"
+                                        action="{{ route('projects.destroy', $project->id) }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <button type="button"
+                                        class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
+                                        onclick="confirmDeletion({{ $project->id }})">
+                                        Delete
+                                    </button>
+
+                                    <button type="button"
+                                        class="bg-indigo-700 text-white px-3 py-1 rounded-lg hover:bg-indigo-700 transition"
+                                        onclick="#">
+                                        Add a task
+                                    </button>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                    No projects available.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -55,3 +85,24 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    //to delete
+    function confirmDeletion(projectId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#4338CA',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                document.getElementById(`delete-form-${projectId}`).submit();
+            }
+        });
+    }
+</script>

@@ -107,27 +107,36 @@
                             <ul role="list" class="-mx-2 mt-2 space-y-1">
                                 <li>
 
-                                    <a href="{{ route('project_members.index') }}"
+                                    <a href="#"
                                         class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                         <span
                                             class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
                                         <span class="truncate">Project Members</span>
                                     </a>
                                 </li>
+                                <!--invoice-->
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ route('invoice.index') }}"
                                         class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                         <span
-                                            class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">T</span>
-                                        <span class="truncate">Tailwind Labs</span>
+                                            class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                        <span class="truncate">Invoice</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ route('pages.activity_log.logs') }}"
+                                        class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                        <span
+                                            class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">T</span>
+                                        <span class="truncate">Activity Log</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('pages.time_entry_approval.index') }}"
                                         class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                         <span
                                             class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">W</span>
-                                        <span class="truncate">Workcation</span>
+                                        <span class="truncate">Time Entry Approval</span>
                                     </a>
                                 </li>
                             </ul>
@@ -248,7 +257,7 @@
                     <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li>
 
-                            <a href="{{ route('project_members.index') }}"
+                            <a href="#"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
@@ -256,19 +265,28 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a href="{{ route('invoice.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Invoice</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('pages.activity_log.logs') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">T</span>
-                                <span class="truncate">Tailwind Labs</span>
+                                <span class="truncate">Activity Log</span>
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a href="{{ route('pages.time_entry_approval.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">W</span>
-                                <span class="truncate">Workcation</span>
+                                <span class="truncate">Time Entry Approval</span>
                             </a>
                         </li>
                     </ul>
