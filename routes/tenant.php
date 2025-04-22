@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\API\ProjectUserController as APIProjectUserController;
-use App\Http\Controllers\API\UserController as APIUserController; 
+use App\Http\Controllers\API\UserController as APIUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -22,6 +22,7 @@ use App\Http\Controllers\BreakLogController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeDashboardController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectUserController;
@@ -169,6 +170,16 @@ Route::middleware([
             Route::resource('projects.users', ProjectUserController::class)->only(['index', 'store', 'destroy']);
         });
 
+
+        //Routes for Invoice
+        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('pages.invoice.index');
+        Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
+        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.viewInvoice');
+
+
+        //time entry approval
+        Route::get('index', [TimeEntryApprovalController::class, 'index'])->name('pages.time_entry_approval.index');
+
         // Routes For admin and ProjectManger Role
         Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
             Route::get('tasks/create/{project_id}', [TaskController::class, 'create'])->name('tasks.create');
@@ -185,7 +196,7 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->prefix('/api')->name('api.')->group(function () {
     Route::middleware('auth')->group(function () {
-        Route::middleware('role:project_manager,admin')->group(function () {            
+        Route::middleware('role:project_manager,admin')->group(function () {
             Route::apiResource('users', APIUserController::class)->names([]);
             Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
         });
