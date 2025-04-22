@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 
 class ProjectUserController extends Controller
 {
-    public function index(Project $project)
+    public function index(Project $project, Request $request)
     {
         return response()->json([
             'success' => true,
-            'users' => $project->users
+            'users' => $project->users()->paginate(5, ['*'], 'page', $request->page ?? 1)
         ]);
     }
 

@@ -20,7 +20,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template x-for="user in projectUsers">
+                    <template x-for="user in projectUsers.data">
                         <tr class="bg-white border-t">
                             <td class="px-6 py-4 text-sm text-gray-500 font-bold whitespace-nowrap" x-text="user.name">N/A</td>
                             <td class="px-6 py-4 text-sm text-gray-800" x-text="user.email">N/A</td>
@@ -46,20 +46,18 @@
 
         <!-- Pagination -->
         <div class="flex justify-between items-center mt-6">
-            <p class="text-sm">Page 1 of 3</p>
+            <p class="text-sm" x-text="`Page ${projectUsers.current_page} of ${projectUsers.last_page}`">Page 1 of 3</p>
+
             <div class="flex justify-end gap-2">
-                <button
-                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded">
-                    Prev </button>
-                <button
-                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded">01</button>
-                <button
-                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded">02</button>
-                <button
-                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded">03</button>
-                <button
-                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded">
-                    Next </button>
+                <template x-for="(link, index) in projectUsers.links">
+                    <button
+                        class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded"
+                        :class="{'bg-gray-600 text-white': link.active}"
+                        x-text="`0${index}`"
+                    >
+                        0
+                    </button>
+                </template>
             </div>
         </div>
 
