@@ -11,15 +11,15 @@
 
         <!-- Users Table -->
         <div class="overflow-x-auto rounded-lg mt-6">
-            <table class="min-w-full table-auto border-collapse border border-gray-200">
+            <table class="min-w-full border-collapse border border-gray-200">
                 <thead class="bg-gray-50">
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
-                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Role</th>
-                    <th class="text-end px-6 py-3 text-sm font-medium text-gray-700">Actions</th>
+                    <th class="w-1/4 px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
+                    <th class="w-1/4 px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
+                    <th class="w-1/4 px-6 py-3 text-left text-sm font-medium text-gray-700">Role</th>
+                    <th class="w-1/4 text-end px-6 py-3 text-sm font-medium text-gray-700">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="bg-gray-50">
                     <template x-for="user in projectUsers.data">
                         <tr class="bg-white border-t">
                             <td class="px-6 py-4 text-sm text-gray-500 font-bold whitespace-nowrap" x-text="user.name">N/A</td>
@@ -49,15 +49,30 @@
             <p class="text-sm" x-text="`Page ${projectUsers.current_page} of ${projectUsers.last_page}`">Page 1 of 3</p>
 
             <div class="flex justify-end gap-2">
-                <template x-for="(link, index) in projectUsers.links">
+                <button
+                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded disabled:bg-gray-300 disabled:text-black"
+                    x-bind:disabled="projectUsers.current_page == 1"
+                    @click="changePage(projectUsers.current_page - 1)"
+                >
+                    Prev
+                </button>
+                <template x-for="i in projectUsers.last_page">
                     <button
-                        class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded"
-                        :class="{'bg-gray-600 text-white': link.active}"
-                        x-text="`0${index}`"
+                        class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded disabled:bg-gray-300 disabled:text-black"
+                        x-bind:disabled="projectUsers.current_page == i"
+                        x-text="String(i).padStart(2,0)"
+                        @click="changePage(i)"
                     >
-                        0
+                        00
                     </button>
                 </template>
+                <button
+                    class="p-1 text-sm text-center border transition-colors border-gray-200 bg-white hover:bg-gray-600 hover:text-white rounded disabled:bg-gray-300 disabled:text-black"
+                    x-bind:disabled="projectUsers.current_page == projectUsers.last_page"
+                    @click="changePage(projectUsers.current_page + 1)"
+                >
+                    Next
+                </button>
             </div>
         </div>
 
@@ -150,6 +165,7 @@
         projectUsers: [],
         users: [1, 2],
         searchTerm: '',
+        currentPage: 1,
 
         init: function (){
             this.fetchProjectUsers()
@@ -161,8 +177,13 @@
             this.showChangeRoleModal = true;
         },
 
+        changePage(page) {
+            this.currentPage = page;
+            this.fetchProjectUsers();
+        },
+
         fetchProjectUsers: function (){
-            fetch(`/api/projects/${this.project.id}/users`, {
+            fetch(`/api/projects/${this.project.id}/users?page=${this.currentPage}`, {
                 method: 'GET',
                 credentials: 'same-origin',
                 headers: {
