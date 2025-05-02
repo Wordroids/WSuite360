@@ -9,7 +9,6 @@ return new class extends Migration {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
-            $table->unsignedBigInteger('assigned_to')->nullable(); // Employee assigned
             $table->string('title');
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
@@ -19,7 +18,6 @@ return new class extends Migration {
 
             // Foreign Keys
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('assigned_to')->references('id')->on('users')->onDelete('set null');
         });
     }
 

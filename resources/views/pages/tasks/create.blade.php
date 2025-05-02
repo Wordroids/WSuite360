@@ -30,20 +30,6 @@
                 @error('project_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <!-- Assign Employee -->
-            <div class="mb-4">
-                <label for="assigned_to" class="block text-sm font-medium text-gray-700">Assign to Employee</label>
-                <select name="assigned_to" id="assigned_to" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
-                    <option value="">Select a Member</option>
-                    @foreach($members as $member)
-                        <option value="{{ $member->id }}" {{ old('assigned_to') == $member->id ? 'selected' : '' }}>
-                            {{ $member->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('assigned_to') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
             <!-- Start Date -->
             <div class="mb-4">
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>

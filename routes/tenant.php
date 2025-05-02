@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\API\ProjectUserController as APIProjectUserController;
+use App\Http\Controllers\API\TaskUserController as APITaskUserController;
 use App\Http\Controllers\API\UserController as APIUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectUserController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskUserController;
 use App\Http\Controllers\TimeEntryApprovalController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
@@ -168,6 +170,9 @@ Route::middleware([
 
             // Project member assingment
             Route::resource('projects.users', ProjectUserController::class)->only(['index', 'store', 'destroy']);
+
+            // Task member assignment
+            Route::resource('tasks.users', TaskUserController::class)->only(['index']);
         });
 
 
@@ -199,6 +204,7 @@ Route::middleware([
         Route::middleware('role:project_manager,admin')->group(function () {
             Route::apiResource('users', APIUserController::class)->names([]);
             Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
+            Route::apiResource('tasks.users', APITaskUserController::class)->names([]);
         });
     });
 });

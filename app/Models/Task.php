@@ -16,10 +16,11 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function assignedEmployee()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->belongsToMany(User::class, 'project_users')->withTimestamps();
     }
+
     // Task has multiple time logs
     public function timeLogs()
     {

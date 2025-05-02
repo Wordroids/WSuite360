@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
-use App\Models\ProjectMembers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -36,7 +35,7 @@ class TaskController extends Controller
             $tasksQuery->where('project_id', $projectId);
         }
 
-        $tasks = $tasksQuery->with(['project', 'assignedEmployee'])->latest()->paginate(10);
+        $tasks = $tasksQuery->with(['project'])->latest()->paginate(10);
 
         return view('pages.tasks.index', compact('tasks', 'projects', 'projectId'));
     }
@@ -45,9 +44,7 @@ class TaskController extends Controller
     {
         $projects = Project::all();
 
-        $members = ProjectMembers::all();
-
-        return view('pages.tasks.create', compact('projects', 'members'));
+        return view('pages.tasks.create', compact('projects'));
     }
 
     public function store(Request $request)
@@ -55,15 +52,12 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'project_id' => 'required|exists:projects,id',
-            //'assigned_to' => 'nullable|exists:users,id',
-            'assigned_to' => 'required|exists:project_members,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
 
         $task = Task::create($request->all());
-
 
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
@@ -77,10 +71,10 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($id);
         $projects = Project::all();
-        $members = ProjectMembers::all();
 
-        return view('pages.tasks.edit', compact('task', 'projects', 'members'));
+        return view('pages.tasks.edit', compact('task', 'projects'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
