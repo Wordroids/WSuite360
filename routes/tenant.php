@@ -31,7 +31,7 @@ use App\Http\Controllers\TimeEntryApprovalController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
 use App\Http\Controllers\TimeSheetController;
-
+use App\Http\Controllers\AdminUserController;
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -169,6 +169,15 @@ Route::middleware([
             // Project member assingment
             Route::resource('projects.users', ProjectUserController::class)->only(['index', 'store', 'destroy']);
         });
+
+
+        //user routes
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::resource('users', AdminUserController::class)->except(['create', 'store']);
+        });
+        Route::get('users/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
+
+        Route::get('/pages/users/index', [AdminUserController::class, 'index'])->name('pages.users.index');
 
 
         //Routes for Invoice
