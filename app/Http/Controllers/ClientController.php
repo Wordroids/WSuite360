@@ -27,8 +27,6 @@ class ClientController extends Controller
         $companies = Company::all(); // Fetch all companies
         return view('pages.clients.create', compact('companies'));
     }
-    
-
     /**
      * Store a newly created resource in storage.
      */
@@ -67,24 +65,46 @@ class ClientController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Client $client)
+    public function edit($id)
     {
-        //
+        $client = Client::findOrFail($id);
+        $companies = Company::all();
+        return view('pages.clients.edit', compact('client', 'companies'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    // Update the client details
+    public function update(Request $request, $id)
     {
-        //
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:clients,email,' . $id, // Allow the same email for this client
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:500',
+            'company_id' => 'required|exists:companies,id',
+        ]);
+
+        $client = Client::findOrFail($id);
+        $client->update($validatedData);
+
+
+        return redirect()->route('clients.index')->with('success', 'Client updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Client $client)
+    public function destroy($id)
     {
-        //
+        $client = Client::findOrFail($id);
+
+
+        $client->delete();
+
+
+        return redirect()->route('clients.index')->with('success', 'Client deleted successfully!');
     }
 }

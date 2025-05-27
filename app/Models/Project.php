@@ -16,7 +16,9 @@ class Project extends Model
         'client_id',
         'start_date',
         'end_date',
-        'status'
+        'status',
+        'budget',
+        'priority',
     ];
 
     /**
@@ -27,8 +29,12 @@ class Project extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'project_users')->withPivot('role')->withTimestamps();
+    }
     public function members()
     {
-        return $this->hasMany(ProjectMembers::class);
+        return $this->belongsToMany(User::class, 'project_users', 'project_id', 'user_id');
     }
 }

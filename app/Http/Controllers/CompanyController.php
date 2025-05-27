@@ -65,27 +65,56 @@ class CompanyController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Company $company)
+    //Update a Company
+    public function edit($id)
     {
-        //
+        $company = Company::findOrFail($id);
+        return view('pages.companies.edit', compact('company'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCompanyRequest $request, Company $company)
+
+
+
+    public function update(Request $request, $id)
     {
-        //
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'logo' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
+        ]);
+
+        $company = Company::findOrFail($id);
+
+        $company->name = $request->input('name');
+        $company->email = $request->input('email');
+        $company->website = $request->input('website');
+
+        // Handle logo upload if provided
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('logos', 'public');
+            $company->logo = $logoPath;
+        }
+        $company->save();
+
+        return redirect()->route('companies.index')->with('success', 'Company updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Company $company)
+
+    //Delete a Company
+    public function destroy($id)
     {
-        //
+
+        $company = Company::findOrFail($id);
+
+
+        $company->delete();
+
+
+        return redirect()->route('companies.index')->with('success', 'Company deleted successfully!');
     }
 }
