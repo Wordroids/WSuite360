@@ -32,6 +32,8 @@ use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\TaskUserController;
+
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -208,6 +210,26 @@ Route::middleware([
         Route::middleware('role:project_manager,admin')->group(function () {
             Route::apiResource('users', APIUserController::class)->names([]);
             Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
+        });
+    });
+});
+
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+    Route::middleware('auth')->group(function () {
+        Route::prefix('tasks/{task}/users')->group(function () {
+            // Web route for the initial view
+            Route::get('/', [TaskUserController::class, 'index'])->name('tasks.users.index');
+
+            // API-style routes for AJAX calls
+            Route::get('/list', [TaskUserController::class, 'getTaskUsers'])->name('tasks.users.list');
+            Route::get('/available', [TaskUserController::class, 'getAvailableUsers'])->name('tasks.users.available');
+            Route::post('/', [TaskUserController::class, 'store'])->name('tasks.users.store');
+            Route::put('/{user}', [TaskUserController::class, 'update'])->name('tasks.users.update');
+            Route::delete('/{user}', [TaskUserController::class, 'destroy'])->name('tasks.users.destroy');
         });
     });
 });

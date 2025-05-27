@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('assigned_to')->nullable(); // Employee assigned
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->enum('status', ['to_do', 'in_progress', 'completed'])->default('to_do');
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();
