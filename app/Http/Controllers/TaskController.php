@@ -45,8 +45,6 @@ class TaskController extends Controller
     {
         $projects = Project::all();
 
-        // $members = ProjectMembers::all();
-
         return view('pages.tasks.create', compact('projects'));
     }
 
@@ -62,7 +60,6 @@ class TaskController extends Controller
 
         $task = Task::create($request->all());
 
-
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
@@ -76,7 +73,6 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($id);
         $projects = Project::all();
-        // $members = ProjectMembers::all();
 
         return view('pages.tasks.edit', compact('task', 'projects'));
     }
@@ -105,7 +101,6 @@ class TaskController extends Controller
     }
 
     // to delete
-
     public function destroy($id)
     {
         $tasks = Task::findOrFail($id);
