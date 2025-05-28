@@ -78,7 +78,7 @@
             <input type="hidden" name="domain" x-bind:value="`${domain}.${root}`">
             <input type="text" x-model="domain" id="display-domain" class="block w-full grow rounded-l-md bg-gray-100 dark:bg-gray-600 px-3 py-1.5 text-base text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm">
             <div class="flex shrink-0 items-center rounded-r-md bg-gray-100 dark:bg-gray-600 px-3 text-base text-gray-500 dark:text-gray-200 sm:text-sm">
-                .{{ explode('//', env('APP_URL'))[1] }}
+                .{{ env('CENTRAL_DOMAIN') }}
             </div>
         </div>
         @error('domain')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
