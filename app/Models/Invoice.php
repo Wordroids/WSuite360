@@ -29,4 +29,19 @@ class Invoice extends Model
         'footer',
         'status'
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
 }

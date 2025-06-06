@@ -181,6 +181,7 @@ Route::middleware([
         Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('pages.invoice.index');
         Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
         Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.viewInvoice');
+        Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
 
 
         //time entry approval
