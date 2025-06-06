@@ -88,60 +88,59 @@
 
                 </div>
 
-                <div class="grid grid-cols-4 bg-white p-5">
+                <div  class="grid grid-cols-4 bg-white p-5">
 
                     <div class="flex  items-center justify-between">
                         <div>
-                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
+                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-solid fa-paper-plane text-lg" style="color: #ff9500;"></i></span>
                         </div>
                         <div>
-                            <div>Create</div>
-                            <span>Created: 2025-06-06</span>
+                            <div>Send</div>
+                            <span>Last Sent: 2025-06-06</span>
                         </div>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-1">
 
                     </div>
 
-                    <div class="flex  items-center justify-between">
+                    <div class="flex col-span-2 items-center justify-between">
                         <div>
-                            <i class="fa-solid fa-money-check-pen"></i>
-                            <span>Edit</span>
+                            <span>Mark as Sent</span>
                         </div>
 
                         <div>
-                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
+                            <button class="bg-orange-400 px-4 py-2">Send Invoice</button>
                         </div>
 
                     </div>
 
 
                 </div>
+
                 <div class="grid grid-cols-4 bg-white p-5">
 
                     <div class="flex  items-center justify-between">
                         <div>
-                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
+                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-solid fa-money-check-dollar text-lg" style="color: #ff9500;"></i></span>
                         </div>
                         <div>
-                            <div>Create</div>
-                            <span>Created: 2025-06-06</span>
+                            <div>Get paid</div>
+                            <span>Amount due: LKR55000</span>
                         </div>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-1">
 
                     </div>
 
-                    <div class="flex  items-center justify-between">
+                    <div class="flex col-span-2 items-center justify-between">
                         <div>
-                            <i class="fa-solid fa-money-check-pen"></i>
-                            <span>Edit</span>
+                            <span>Send a reminder</span>
                         </div>
 
                         <div>
-                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
+                            <button class="bg-orange-400 px-4 py-2">Record payment</button>
                         </div>
 
                     </div>
