@@ -1,72 +1,155 @@
 <x-app-layout>
     <div class="container mx-auto my-10">
-        <!-- Invoice Header -->
-        <div class="text-center mb-8">
-            <h2 class="text-xl font-bold text-gray-800">SECURITY AND INVESTIGATION SERVICES (PVT) LTD.</h2>
-            <p class="text-gray-600">No. 2/25/122, Flower Road, Colombo</p>
-            <p class="text-gray-600">Tel: 077 123 4567 | Hotline: 074 3 11 11 11</p>
+
+        <div class="
+         flex justify-between">
+            <div>
+                <span>Invoice 71</span>
+            </div>
+
+            <div>
+                <button @click="open = !open" class="text-gray-600 hover:text-indigo-600 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 12h.01M12 12h.01M18 12h.01" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Invoice Details -->
-        <div class="mb-4">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">Invoice Details</h4>
-            <p class="text-gray-600"><strong>Invoice No:</strong> ESD/D/2025/03/104</p>
-            <p class="text-gray-600"><strong>Date:</strong> 01/02/2025 - 28/02/2025</p>
-            <p class="text-gray-600"><strong>Nature of Service:</strong> Security</p>
-            <p class="text-gray-600"><strong>Due Date:</strong> 07/03/2025</p>
+        <div>
+            <hr>
         </div>
 
-        <!-- Invoice Table -->
-        <div class="overflow-x-auto rounded-lg shadow-lg">
-            <table class="min-w-full border-collapse border border-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Serial No</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Shifts</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">OIC Shifts Day</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">OIC Shifts Night</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">OIC O/T Hrs</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">SO Shifts Day</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">SO Shifts Night</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">SO O/T Hrs</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">LSO Shifts Day</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">LSO Shifts Night</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Total Amount (Rs)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="bg-white hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-800 text-center">31</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">Shifts Data</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">...</td>
-                        <td class="px-6 py-4 text-sm text-gray-800 text-center">55,050.00</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="bg-gray-50">
-                        <td colspan="10" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
-                            Grand Total (Rs):
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm text-gray-800">55,050.00</td>
-                    </tr>
-                </tfoot>
-            </table>
+        <div class="        ">
+
+            <div class="grid grid-cols-12">
+
+                <div>
+                    <div>status</div>
+                    <span class="bg-gray-300 text-gray-700 rounded-lg py-2 px-4">Draft</span>
+                </div>
+
+                <div class="col-span-2">
+                    <div>Customer</div>
+                    <span class=" text-gray-700">The Idea Hub</span>
+                </div>
+                <div class="col-span-7">
+
+                </div>
+
+                <div class="">
+                    <div>Due Date</div>
+                    <span class="text-gray-700">06 Jun 2025</span>
+                </div>
+                <div class="">
+                    <div>Due Amount</div>
+                    <span class=" text-gray-700">LKR5,000.00
+
+                    </span>
+                </div>
+
+
+            </div>
         </div>
 
-        <!-- Footer Notes -->
-        <div class="text-center mt-8 text-sm text-gray-600">
-            <p>Cheque should be drawn in favor of SECURITY AND INVESTIGATION SERVICES (PVT) LTD and crossed.</p>
-            <p>Please pay the above sum on or before the due date mentioned above.</p>
-            <p>(Account Number: ******** | Sampath Bank - AccountName)</p>
-            <p>Web: www.security.lk | Email: security2004@gmail.com</p>
+        <div>
+            <div class="bg-gray-200 max-w-4xl mx-auto p-5 grid grid-cols-1 gap-4">
+
+                <div class="grid grid-cols-4 bg-white p-5">
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
+                        </div>
+                        <div>
+                            <div>Create</div>
+                            <span>Created: 2025-06-06</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-2">
+
+                    </div>
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <i class="fa-solid fa-money-check-pen"></i>
+                            <span>Edit</span>
+                        </div>
+
+                        <div>
+                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="grid grid-cols-4 bg-white p-5">
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
+                        </div>
+                        <div>
+                            <div>Create</div>
+                            <span>Created: 2025-06-06</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-2">
+
+                    </div>
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <i class="fa-solid fa-money-check-pen"></i>
+                            <span>Edit</span>
+                        </div>
+
+                        <div>
+                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="grid grid-cols-4 bg-white p-5">
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
+                        </div>
+                        <div>
+                            <div>Create</div>
+                            <span>Created: 2025-06-06</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-2">
+
+                    </div>
+
+                    <div class="flex  items-center justify-between">
+                        <div>
+                            <i class="fa-solid fa-money-check-pen"></i>
+                            <span>Edit</span>
+                        </div>
+
+                        <div>
+                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
         </div>
+
     </div>
 </x-app-layout>

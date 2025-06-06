@@ -4,24 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\CompanySettings;
 use App\Models\Invoice;
 use App\Models\Project;
+use Faker\Provider\ar_EG\Company;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
-{
-    $invoices = Invoice::with('client')
-        ->when($request->client, fn($q) => $q->where('client_id', $request->client))
-        ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
-        ->latest()
-        ->paginate(10);
+    {
+        $invoices = Invoice::with('client')
+            ->when($request->client, fn($q) => $q->where('client_id', $request->client))
+            ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
+            ->latest()
+            ->paginate(10);
 
-    $clients = Client::all();
+        $clients = Client::all();
 
-    return view('pages.invoice.index', compact('invoices', 'clients'));
-}
+        return view('pages.invoice.index', compact('invoices', 'clients'));
+    }
 
     //To view an invoice
     public function viewInvoice()
@@ -33,7 +35,8 @@ class InvoiceController extends Controller
     {
         $clients = Client::all();
         $projects = Project::all(['id', 'name']);
-        return view('pages.invoice.create' , compact('clients', 'projects'));
+        $companySettings = CompanySettings::first();
+        return view('pages.invoice.create', compact('clients', 'projects', 'companySettings'));
     }
 
     public function store(Request $request)

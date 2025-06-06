@@ -22,7 +22,7 @@
                         class="w-full mt-2 border border-gray-300 rounded px-3 py-2 focus:ring focus:ring-indigo-500"></textarea>
                 </div>
                 <div class="flex items-center justify-center">
-                    <img src="https://media.licdn.com/dms/image/v2/C560BAQHDR7og8QTPOg/company-logo_200_200/company-logo_200_200/0/1646276784227?e=2147483647&v=beta&t=_QrPcXiAZqq7o20JV2ncC0qvucwsCu6HKoIFzLGP9FQ" alt="Company Logo" class="h-24 object-contain">
+                    <img src="{{ tenant_asset($companySettings->logo) }}" alt="Company Logo" class="h-24 object-contain">
                 </div>
             </div>
 
