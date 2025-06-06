@@ -31,6 +31,8 @@ use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\TimeLogApprovalController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\CompanySettingController;
+
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -184,6 +186,10 @@ Route::middleware([
         Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
         Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
         Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+
+        //Comany Settings
+        Route::get('/company-settings', [CompanySettingController::class, 'companySettings'])->name('company.settings');
+        Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');
 
 
         //time entry approval
