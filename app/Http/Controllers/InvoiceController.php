@@ -10,10 +10,19 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    public function index()
-    {
-        return view('pages.invoice.index');
-    }
+    public function index(Request $request)
+{
+    $invoices = Invoice::with('client')
+        ->when($request->client, fn($q) => $q->where('client_id', $request->client))
+        ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
+        ->latest()
+        ->paginate(10);
+
+    $clients = Client::all();
+
+    return view('pages.invoice.index', compact('invoices', 'clients'));
+}
+
     //To view an invoice
     public function viewInvoice()
     {
@@ -78,6 +87,6 @@ class InvoiceController extends Controller
             }
         }
 
-        return redirect()->route('pages.invoice.index')->with('success', 'Invoice created successfully.');
+        return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
 }

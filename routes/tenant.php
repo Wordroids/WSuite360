@@ -178,10 +178,12 @@ Route::middleware([
 
 
         //Routes for Invoice
-        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('pages.invoice.index');
+        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('invoice.index');
         Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.viewInvoice');
+        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.show');
         Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
+        Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
+        Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
 
 
         //time entry approval
