@@ -20,7 +20,6 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\BreakLogApprovalController;
 use App\Http\Controllers\BreakLogController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
@@ -127,8 +126,6 @@ Route::middleware([
 
         // Admin routes
         Route::middleware('role:admin')->group(function () {
-            // Company Routes
-            Route::resource('companies', CompanyController::class);
 
             // Clients Routes
             Route::resource('clients', ClientController::class);
