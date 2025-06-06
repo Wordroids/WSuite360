@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\CompanySettings;
 use App\Models\Invoice;
 use App\Models\Project;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Faker\Provider\ar_EG\Company;
 use Illuminate\Http\Request;
 
@@ -95,14 +96,13 @@ class InvoiceController extends Controller
 
     public function showPdf($id)
     {
-        $invoice = Invoice::findOrFail($id);
-        // dd($invoice); // For debugging, remove this in production
-        // This assumes you're generating the PDF and saving it in storage
-        $pdfPath = storage_path("app/public/invoices/invoice_{$id}.pdf");
-        if (!file_exists($pdfPath)) {
-            abort(404, 'PDF not found.');
-        }
+        $invoice = Invoice::with(['client', 'items.project'])->findOrFail($id);
+        $company = CompanySettings::first();
 
-        return response()->file($pdfPath);
+       
+
+        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'company'));
+    
+        return $pdf->stream("invoice-{$invoice->id}.pdf");
     }
 }

@@ -23,4 +23,12 @@ class InvoiceItem extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    /**
+     * Define relationship with Project model.
+     */
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 }

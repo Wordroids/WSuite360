@@ -190,6 +190,7 @@ Route::middleware([
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
 
 
+
         //Comany Settings
         Route::get('/company-settings', [CompanySettingController::class, 'companySettings'])->name('company.settings');
         Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');
