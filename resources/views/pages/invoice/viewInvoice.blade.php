@@ -88,7 +88,7 @@
 
                 </div>
 
-                <div  class="grid grid-cols-4 bg-white p-5">
+                <div class="grid grid-cols-4 bg-white p-5">
 
                     <div class="flex  items-center justify-between">
                         <div>
@@ -147,6 +147,25 @@
 
 
                 </div>
+
+
+                <div class="grid grid-cols-4 bg-white p-5">
+
+                    <div class="col-span-4 bg-white p-5">
+                        <h3 class="text-md font-semibold text-gray-800 mb-3">Invoice Preview</h3>
+                        <div class="border rounded overflow-hidden shadow">
+                            <iframe
+                                src="{{ route('invoices.showPdf', ['invoice' => 3]) }}"
+                                width="100%"
+                                height="600px"
+                                class="w-full border-none">
+                            </iframe>
+                        </div>
+                    </div>
+
+                </div>
+
+
             </div>
         </div>
 

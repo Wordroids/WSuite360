@@ -187,6 +187,9 @@ Route::middleware([
         Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
         Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
 
+        Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
+
+
         //Comany Settings
         Route::get('/company-settings', [CompanySettingController::class, 'companySettings'])->name('company.settings');
         Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');

@@ -92,4 +92,17 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
+
+    public function showPdf($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        // dd($invoice); // For debugging, remove this in production
+        // This assumes you're generating the PDF and saving it in storage
+        $pdfPath = storage_path("app/public/invoices/invoice_{$id}.pdf");
+        if (!file_exists($pdfPath)) {
+            abort(404, 'PDF not found.');
+        }
+
+        return response()->file($pdfPath);
+    }
 }
