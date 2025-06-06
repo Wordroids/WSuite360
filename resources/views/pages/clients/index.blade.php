@@ -40,7 +40,7 @@
                                 <td class="px-4 py-3 text-sm text-gray-800">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-3">
                                     @if($client->logo)
-                                        <img src="{{ Storage::url($client->logo)  }}" alt="Logo" class="h-8 w-8 rounded-full object-cover">
+                                    <img src="{{ tenant_asset($client->logo)  }}" alt="Logo" class="h-8 w-8 rounded-full object-cover">
                                     @else
                                         <span class="text-gray-400 text-xs">No Logo</span>
                                     @endif

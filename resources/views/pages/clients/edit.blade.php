@@ -74,7 +74,7 @@
                 <label class="block text-sm font-medium text-gray-700">Client Logo</label>
                 @if($client->logo)
                     <div class="mb-2">
-                        <img src="{{ asset('storage/' . $client->logo) }}" alt="Client Logo"
+                        <img src="{{ tenant_asset($client->logo) }}" alt="Client Logo"
                              class="h-12 w-12 rounded-full object-cover">
                     </div>
                 @endif
