@@ -25,4 +25,10 @@ class Task extends Model
     {
         return $this->hasMany(TimeLog::class);
     }
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'task_users')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 }

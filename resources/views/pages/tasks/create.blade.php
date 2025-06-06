@@ -11,15 +11,19 @@
             <!-- Task Title -->
             <div class="mb-4">
                 <label for="title" class="block text-sm font-medium text-gray-700">Task Title</label>
-                <input type="text" name="title" id="title" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300"
-                    required value="{{ old('title') }}">
-                @error('title') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                <input type="text" name="title" id="title"
+                    class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required
+                    value="{{ old('title') }}">
+                @error('title')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Project Selection -->
             <div class="mb-4">
                 <label for="project_id" class="block text-sm font-medium text-gray-700">Project</label>
-                <select name="project_id" id="project_id" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                <select name="project_id" id="project_id"
+                    class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
                     <option value="">Select a Project</option>
                     @foreach ($projects as $project)
                         <option value="{{ $project->id }}" {{ old('project_id') == $project->id ? 'selected' : '' }}>
@@ -27,39 +31,45 @@
                         </option>
                     @endforeach
                 </select>
-                @error('project_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                @error('project_id')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <!-- Assign Employee -->
-            <div class="mb-4">
-                <label for="assigned_to" class="block text-sm font-medium text-gray-700">Assign to Employee</label>
-                <select name="assigned_to" id="assigned_to" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
-                    <option value="">Select a Member</option>
-                    @foreach($members as $member)
-                        <option value="{{ $member->id }}" {{ old('assigned_to') == $member->id ? 'selected' : '' }}>
-                            {{ $member->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('assigned_to') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
+
 
             <!-- Start Date -->
             <div class="mb-4">
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                <input type="date" name="start_date" id="start_date" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300"
-                    required value="{{ old('start_date') }}">
-                @error('start_date') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                <input type="date" name="start_date" id="start_date"
+                    class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required
+                    value="{{ old('start_date') }}">
+                @error('start_date')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- End Date -->
             <div class="mb-4">
                 <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
-                <input type="date" name="end_date" id="end_date" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300"
-                    required value="{{ old('end_date') }}">
-                @error('end_date') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                <input type="date" name="end_date" id="end_date"
+                    class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required
+                    value="{{ old('end_date') }}">
+                @error('end_date')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
+            <!-- Status -->
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select name="status" id="status"
+                    class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300">
+                    <option value="pending">Do to</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
             <!-- Submit Button -->
             <div class="flex justify-end">
                 <button type="submit"
