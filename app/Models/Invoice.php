@@ -27,9 +27,16 @@ class Invoice extends Model
         'notes',
         'instructions',
         'footer',
-        'status'
+        'status',
+        'conversion_rate',
+        'currency',
+        
     ];
 
+    protected $casts = [
+        'invoice_date' => 'date',
+        'due_date' => 'date',
+    ];
     public function client()
     {
         return $this->belongsTo(Client::class);

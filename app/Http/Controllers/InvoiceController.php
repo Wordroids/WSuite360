@@ -29,7 +29,9 @@ class InvoiceController extends Controller
     //To view an invoice
     public function viewInvoice()
     {
-        return view('pages.invoice.viewInvoice');
+        $invoice = Invoice::with(['client', 'items.project'])->findOrFail(3);
+        $company = CompanySettings::first();
+        return view('pages.invoice.viewInvoice', compact('invoice', 'company'));
     }
     //To create an invoice
     public function create()
@@ -99,10 +101,9 @@ class InvoiceController extends Controller
         $invoice = Invoice::with(['client', 'items.project'])->findOrFail($id);
         $company = CompanySettings::first();
 
-       
+        $pdf = Pdf::loadView('pdf.pdf', compact('invoice', 'company'))
+                   ->setPaper('a4', 'portrait'); // Set A4 size
 
-        $pdf = Pdf::loadView('pdf.invoice', compact('invoice', 'company'));
-    
         return $pdf->stream("invoice-{$invoice->id}.pdf");
     }
 }

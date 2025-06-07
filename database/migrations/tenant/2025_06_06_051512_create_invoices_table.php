@@ -34,6 +34,9 @@ return new class extends Migration
             $table->text('instructions')->nullable();
             $table->text('footer')->nullable();
 
+            $table->decimal('conversion_rate', 10, 4)->default(1.0000);
+            $table->string('currency', 3)->default('USD'); // ISO 4217 currency code
+
 
             $table->enum('status', ['draft', 'sent', 'paid', 'overdue'])->default('draft');
 
