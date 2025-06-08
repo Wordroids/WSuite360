@@ -26,14 +26,21 @@
                 <div class="text-sm text-gray-500">Client</div>
                 <div class="text-gray-800 font-medium mt-1">{{ $invoice->client->name }}</div>
             </div>
-            <div class="md:col-span-3">
+            <div class="md:col-span-2">
                 <div class="text-sm text-gray-500">Due Date</div>
                 <div class="text-gray-800 font-medium mt-1">{{ $invoice->due_date->format('d M Y') }}</div>
             </div>
-            <div class="md:col-span-4">
+            <div class="md:col-span-2">
                 <div class="text-sm text-gray-500">Amount Due</div>
                 <div class="text-gray-800 font-bold mt-1">{{ $invoice->currency }} {{ number_format($invoice->due, 2) }}</div>
             </div>
+            <div class="col-span-3 items-center flex">
+                <a href="{{ route('invoice.download', $invoice->id) }}"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    Download PDF
+                </a>
+            </div>
+
         </div>
 
         <!-- Actions Overview -->
@@ -92,7 +99,7 @@
                 </div>
                 <div class="md:col-span-1"></div>
                 <div class="md:col-span-2 flex justify-end items-center gap-3">
-                    
+
                     <form method="POST" action="{{ route('invoice.markAsSent', $invoice->id) }}">
                         @csrf
                         <button type="submit" class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">

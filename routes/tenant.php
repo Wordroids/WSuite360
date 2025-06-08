@@ -188,6 +188,8 @@ Route::middleware([
         Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
 
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
+        Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoice.download');
+
 
         Route::post('/invoice/{invoice}/approve', [InvoiceController::class, 'approve'])->name('invoice.approve');
         Route::post('/invoice/{invoice}/mark-as-sent', [InvoiceController::class, 'markAsSent'])->name('invoice.markAsSent');

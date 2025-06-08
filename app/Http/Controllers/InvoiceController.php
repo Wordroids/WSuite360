@@ -103,16 +103,6 @@ class InvoiceController extends Controller
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
 
-    public function showPdf($id)
-    {
-        $invoice = Invoice::with(['client', 'items.project'])->findOrFail($id);
-        $company = CompanySettings::first();
-
-        $pdf = Pdf::loadView('pdf.pdf', compact('invoice', 'company'))
-            ->setPaper('a4', 'portrait'); // Set A4 size
-
-        return $pdf->stream("invoice-{$invoice->id}.pdf");
-    }
 
     public function approve(Invoice $invoice)
     {
@@ -175,4 +165,13 @@ class InvoiceController extends Controller
 
         return redirect()->back()->with('success', 'Payment recorded successfully.');
     }
+
+    public function downloadPdf(Invoice $invoice)
+{
+    $company = tenant()->company; // Adjust based on your logic
+    $payments = $invoice->payments;
+
+    $pdf = Pdf::loadView('pdf.pdf', compact('invoice', 'company', 'payments'));
+    return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+}
 }
