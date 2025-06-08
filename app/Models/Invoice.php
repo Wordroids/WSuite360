@@ -30,7 +30,9 @@ class Invoice extends Model
         'status',
         'conversion_rate',
         'currency',
-        
+        'sent_at',
+        'paid_at',
+
     ];
 
     protected $casts = [
@@ -50,5 +52,10 @@ class Invoice extends Model
     public function items()
     {
         return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(InvoicePayment::class);
     }
 }

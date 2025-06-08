@@ -1,281 +1,252 @@
 <x-app-layout>
-    <div class="container mx-auto my-10">
+    <div class="container mx-auto my-10 px-4" x-data="{ paymentOpen: false }">
 
-        <div class="
-         flex justify-between">
-            <div>
-                <span>Invoice 71</span>
+        <!-- Toast -->
+        @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
+            class="mb-4 bg-green-100 text-green-800 px-4 py-3 rounded shadow">
+            {{ session('success') }}
+        </div>
+        @endif
+
+        <!-- Invoice Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-gray-800">Invoice #{{ $invoice->invoice_number }}</h1>
+        </div>
+
+        <!-- Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+            <div class="md:col-span-2">
+                <div class="text-sm text-gray-500">Status</div>
+                <span class="inline-block bg-gray-200 text-gray-800 text-xs font-semibold mt-1 px-3 py-1 rounded-full">
+                    {{ ucfirst($invoice->status) }}
+                </span>
             </div>
-
-            <div>
-                <button @click="open = !open" class="text-gray-600 hover:text-indigo-600 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 12h.01M12 12h.01M18 12h.01" />
-                    </svg>
-                </button>
+            <div class="md:col-span-3">
+                <div class="text-sm text-gray-500">Client</div>
+                <div class="text-gray-800 font-medium mt-1">{{ $invoice->client->name }}</div>
+            </div>
+            <div class="md:col-span-3">
+                <div class="text-sm text-gray-500">Due Date</div>
+                <div class="text-gray-800 font-medium mt-1">{{ $invoice->due_date->format('d M Y') }}</div>
+            </div>
+            <div class="md:col-span-4">
+                <div class="text-sm text-gray-500">Amount Due</div>
+                <div class="text-gray-800 font-bold mt-1">{{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</div>
             </div>
         </div>
 
-        <div>
-            <hr>
-        </div>
-
-        <div class="        ">
-
-            <div class="grid grid-cols-12">
-
-                <div>
-                    <div>status</div>
-                    <span class="bg-gray-300 text-gray-700 rounded-lg py-2 px-4">Draft</span>
-                </div>
-
-                <div class="col-span-2">
-                    <div>Customer</div>
-                    <span class=" text-gray-700">The Idea Hub</span>
-                </div>
-                <div class="col-span-7">
-
-                </div>
-
-                <div class="">
-                    <div>Due Date</div>
-                    <span class="text-gray-700">06 Jun 2025</span>
-                </div>
-                <div class="">
-                    <div>Due Amount</div>
-                    <span class=" text-gray-700">LKR5,000.00
-
+        <!-- Actions Overview -->
+        <div class="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
+            {{-- CREATE --}}
+            @if ($invoice->status === 'draft')
+            <div class="grid grid-cols-1 md:grid-cols-4 items-center bg-white rounded-lg shadow p-5">
+                <div class="flex items-center gap-3">
+                    <span class="border border-orange-400 p-3 rounded-full">
+                        <i class="fa-regular fa-file-lines text-lg text-orange-500"></i>
                     </span>
+                    <div>
+                        <div class="text-gray-800 font-semibold">Create</div>
+                        <div class="text-gray-500 text-sm">Draft Status</div>
+                    </div>
+                </div>
+                <div class="md:col-span-2"></div>
+                <div class="flex justify-end">
+                    <form method="POST" action="{{ route('invoice.approve', $invoice->id) }}">
+                        @csrf
+                        <button type="submit" class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
+                            Approve Draft
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @else
+            <div class="grid grid-cols-1 md:grid-cols-4 items-center bg-white rounded-lg shadow p-5">
+                <div class="flex items-center gap-3">
+                    <span class="border border-orange-400 p-3 rounded-full">
+                        <i class="fa-regular fa-file-lines text-lg text-orange-500"></i>
+                    </span>
+                    <div>
+                        <div class="text-gray-800 font-semibold">Created</div>
+                        <div class="text-gray-500 text-sm">{{ $invoice->created_at->format('Y-m-d') }}</div>
+                    </div>
+                </div>
+                <div class="md:col-span-2"></div>
+                <div class="flex justify-end">
+                    <span class="text-green-600 text-sm font-semibold">Approved</span>
+                </div>
+            </div>
+            @endif
+
+            {{-- SEND --}}
+            @if (in_array($invoice->status, ['overdue', 'sent', 'paid' , 'partialy-paid']))
+            <div class="grid grid-cols-1 md:grid-cols-4 items-center bg-white rounded-lg shadow p-5">
+                <div class="flex items-center gap-3">
+                    <span class="border border-orange-400 p-3 rounded-full">
+                        <i class="fa-solid fa-paper-plane text-lg text-orange-500"></i>
+                    </span>
+                    <div>
+                        <div class="text-gray-800 font-semibold">Send</div>
+                        <div class="text-gray-500 text-sm">Last Sent: {{ optional($invoice->sent_at)->format('Y-m-d') ?? 'Not sent' }}</div>
+                    </div>
+                </div>
+                <div class="md:col-span-1"></div>
+                <div class="md:col-span-2 flex justify-end items-center gap-3">
+                    @if ($invoice->status === 'overdue')
+                    <form method="POST" action="{{ route('invoice.markAsSent', $invoice->id) }}">
+                        @csrf
+                        <button type="submit" class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
+                            Send Invoice
+                        </button>
+                    </form>
+                    @else
+                    <span class="text-green-600 text-sm font-semibold">Sent</span>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            {{-- GET PAID --}}
+            @if (in_array($invoice->status, ['sent', 'paid' , 'partialy-paid', ]))
+            <div class="bg-white rounded-lg shadow p-5">
+                <div class="grid grid-cols-1 md:grid-cols-4 items-center mb-4 ">
+                    <div class="flex items-center gap-3">
+                        <span class="border border-orange-400 p-3 rounded-full">
+                            <i class="fa-solid fa-money-check-dollar text-lg text-orange-500"></i>
+                        </span>
+                        <div>
+                            <div class="text-gray-800 font-semibold">Get Paid</div>
+                            <div class="text-gray-500 text-sm">Amount Due: {{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-1"></div>
+                    <div class="md:col-span-2 flex justify-end items-center gap-3">
+                        @if ($invoice->status === 'sent' || $invoice->status === 'partialy-paid' || $invoice->status === 'overdue')
+                        <button @click="paymentOpen = true"
+                            class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
+                            Record Payment
+                        </button>
+                        @else
+                        <span class="text-green-600 text-sm font-semibold">Paid</span>
+                        @endif
+                    </div>
+
                 </div>
 
 
+                <hr>
+
+                <!-- Payments List -->
+                <div class="mt-4">
+                    <h4 class="text-gray-400 font-medium text-sm mb-2">Payments received :</h4>
+
+
+
+                    @forelse($invoice->payments->sortByDesc('payment_date') as $index => $payment)
+                    <p class="text-sm text-blue-950 mb-2 text-justify whitespace-normal leading-relaxed">
+
+                        {{ $index + 1 }}.
+                        {{ \Carbon\Carbon::parse($payment->payment_date)->format('F d, Y') }} –
+                        A payment of {{ $invoice->currency }}{{ number_format($payment->amount, 2) }}
+                        was made using {{ strtolower($payment->payment_method) }}.
+                        <a href="{{ route('invoice.receipt', [$invoice->id, $payment->id]) }}" class="text-orange-500 hover:underline ml-1">
+                            send receipt
+                        </a>
+                        <span class="text-gray-500">.</span>
+                        <a href="{{ route('invoice.editPayment', [$invoice->id, $payment->id]) }}" class="text-orange-500 hover:underline ml-1">
+                            edit payment
+                        </a>
+                    </p>
+
+                    @empty
+                    <p class="text-sm text-gray-500">No payments recorded yet.</p>
+                    @endforelse
+
+
+                </div>
+            </div>
+
+            @endif
+
+            <!-- PDF-like Preview -->
+            <div class="mt-10">
+                @include('pages.invoice.partials.preview', ['invoice' => $invoice, 'company' => $company , 'payments' => $payments])
             </div>
         </div>
 
-        <div>
-            <div class="bg-gray-200 max-w-4xl mx-auto p-5 grid grid-cols-1 gap-4">
 
-                <div class="grid grid-cols-4 bg-white p-5">
 
-                    <div class="flex  items-center justify-between">
-                        <div>
-                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-regular fa-file-lines text-lg" style="color: #ff9500;"></i></span>
-                        </div>
-                        <div>
-                            <div>Create</div>
-                            <span>Created: 2025-06-06</span>
-                        </div>
+        <!-- Payment Modal -->
+        <div x-show="paymentOpen" style="display: none;"
+            class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded shadow-lg w-full max-w-md relative">
+                <h2 class="text-lg font-bold mb-4">Record Payment</h2>
+                <form method="POST" action="{{ route('invoice.recordxPayment', $invoice->id) }}">
+                    @csrf
+
+                    <!-- Amount -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Amount Paid</label>
+                        <input type="number" name="amount" step="0.01" min="0"
+                            class="w-full border-gray-300 rounded px-3 py-2 mt-1" required>
                     </div>
 
-                    <div class="col-span-2">
-
+                    <!-- Date -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Payment Date</label>
+                        <input type="date" name="payment_date"
+                            class="w-full border-gray-300 rounded px-3 py-2 mt-1" required>
                     </div>
 
-                    <div class="flex  items-center justify-between">
-                        <div>
-                            <i class="fa-solid fa-money-check-pen"></i>
-                            <span>Edit</span>
-                        </div>
-
-                        <div>
-                            <button class="bg-orange-400 px-4 py-2">Approve draft</button>
-                        </div>
-
+                    <!-- Method Dropdown -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Payment Method</label>
+                        <select name="payment_method"
+                            class="w-full border-gray-300 rounded px-3 py-2 mt-1 focus:ring focus:ring-indigo-500" required>
+                            <option value="">Select method</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
-
-                </div>
-
-                <div class="grid grid-cols-4 bg-white p-5">
-
-                    <div class="flex  items-center justify-between">
-                        <div>
-                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-solid fa-paper-plane text-lg" style="color: #ff9500;"></i></span>
-                        </div>
-                        <div>
-                            <div>Send</div>
-                            <span>Last Sent: 2025-06-06</span>
-                        </div>
+                    <!-- Account Dropdown -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Payment Account</label>
+                        <select name="payment_account"
+                            class="w-full border-gray-300 rounded px-3 py-2 mt-1 focus:ring focus:ring-indigo-500">
+                            <option value="">Select account</option>
+                            <option value="Sampath Bank">Sampath Bank</option>
+                            <option value="Commercial Bank">Commercial Bank</option>
+                            <option value="People's Bank">People's Bank</option>
+                            <option value="HNB">HNB</option>
+                            <option value="BOC">BOC</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
-                    <div class="col-span-1">
-
+                    <!-- Notes -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Notes</label>
+                        <textarea name="notes" rows="3"
+                            class="w-full border-gray-300 rounded px-3 py-2 mt-1"
+                            placeholder="Optional remarks..."></textarea>
                     </div>
 
-                    <div class="flex col-span-2 items-center justify-between">
-                        <div>
-                            <span>Mark as Sent</span>
-                        </div>
-
-                        <div>
-                            <button class="bg-orange-400 px-4 py-2">Send Invoice</button>
-                        </div>
-
+                    <!-- Buttons -->
+                    <div class="flex justify-end gap-2">
+                        <button type="button" @click="paymentOpen = false"
+                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                            Record Payment
+                        </button>
                     </div>
-
-
-                </div>
-
-                <div class="grid grid-cols-4 bg-white p-5">
-
-                    <div class="flex  items-center justify-between">
-                        <div>
-                            <span class="border-[1px] border-orange-400 p-3 rounded-full"><i class="fa-solid fa-money-check-dollar text-lg" style="color: #ff9500;"></i></span>
-                        </div>
-                        <div>
-                            <div>Get paid</div>
-                            <span>Amount due: LKR55000</span>
-                        </div>
-                    </div>
-
-                    <div class="col-span-1">
-
-                    </div>
-
-                    <div class="flex col-span-2 items-center justify-between">
-                        <div>
-                            <span>Send a reminder</span>
-                        </div>
-
-                        <div>
-                            <button class="bg-orange-400 px-4 py-2">Record payment</button>
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-                @php
-
-                @endphp
-
-                <div class="grid grid-cols-4 bg-white p-5">
-
-                    <div class="col-span-4 bg-white">
-                        <h3 class="text-md font-semibold text-gray-800 mb-3">Invoice Preview</h3>
-
-                        <div class="max-w-4xl mx-auto py-10 px-6">
-
-                            <!-- Header -->
-                            <div class="grid grid-cols-4 items-start mb-6">
-                                <div>
-                                    @if ($company->logo)
-                                    <img src="{{ tenant_asset($company->logo) }}" class="w-40" alt="Company Logo">
-                                    @endif
-                                </div>
-                                <div class="col-span-2 mt-8">
-                                    <h2 class="text-3xl text-blue-950 font-black">{{ $company->name }}</h2>
-                                    <p class="text-gray-400 font-bold">{{ $company->address }}</p>
-                                </div>
-                                <div class="text-right mt-8">
-                                    <h1 class="text-lg font-bold">Contact Information</h1>
-                                    <p class="text-gray-400">{{ $company->email }}</p>
-                                    <p class="text-gray-400">{{ $company->phone }}</p>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <!-- Client & Total -->
-                            <div class="grid grid-cols-2 my-6">
-                                <div>
-                                    <h1 class="text-2xl text-blue-950 font-black">
-                                        {{ $invoice->title ?? 'Invoice' }}
-                                    </h1>
-                                    <p class="text-gray-400">{{ $invoice->description }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-gray-400">Amount Due ({{ $invoice->currency }})</p>
-                                    <p class="text-2xl text-blue-950 font-black">
-                                        {{ $invoice->currency }}{{ number_format($invoice->total, 2) }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Billing & Invoice Details -->
-                            <div class="grid md:grid-cols-2 gap-20 mt-6">
-                                <div class="grid grid-cols-3 text-sm gap-y-1">
-                                    <div class="text-gray-400">Bill to</div>
-                                    <div class="col-span-2 font-bold">: {{ $invoice->client->name }}</div>
-
-                                    <div class="text-gray-400">Email</div>
-                                    <div class="col-span-2 font-bold">: {{ $invoice->client->email }}</div>
-
-                                    <div class="text-gray-400">Phone</div>
-                                    <div class="col-span-2 font-bold">: {{ $invoice->client->phone }}</div>
-
-                                    <div class="text-gray-400">Address</div>
-                                    <div class="col-span-2 font-bold">: {{ $invoice->client->address }}</div>
-                                </div>
-
-                                <div class="grid grid-cols-3 text-sm gap-y-1">
-                                    <div class="text-gray-400 col-span-2">Invoice No:</div>
-                                    <div class="font-bold text-right">{{ $invoice->invoice_number }}</div>
-
-                                    <div class="text-gray-400 col-span-2">PO/SO Number:</div>
-                                    <div class="font-bold text-right">{{ $invoice->po_so_number ?? '-' }}</div>
-
-                                    <div class="text-gray-400 col-span-2">Invoice Date:</div>
-                                    <div class="font-bold text-right">{{ $invoice->invoice_date->format('Y-m-d') }}</div>
-
-                                    <div class="text-gray-400 col-span-2">Due Date:</div>
-                                    <div class="font-bold text-right">{{ $invoice->due_date->format('Y-m-d') }}</div>
-                                </div>
-                            </div>
-
-                            <!-- Items Table -->
-                            <div class="mt-10">
-                                <table class="w-full border-separate border-spacing-2 text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Item</th>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Quantity</th>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Price ({{ $invoice->currency }})</th>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Amount ({{ $invoice->currency }})</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($invoice->items as $item)
-                                        <tr>
-                                            <td class="px-4 py-2 border-b">{{ $item->project->name ?? '-' }}</td>
-                                            <td class="px-4 py-2 border-b">{{ $item->quantity }}</td>
-                                            <td class="px-4 py-2 border-b">{{ number_format($item->unit_price, 2) }}</td>
-                                            <td class="px-4 py-2 border-b">{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Totals -->
-                            <div class="mt-6 text-right space-y-1 text-sm">
-                                <p class="font-semibold">Sub Total: {{ $invoice->currency }} {{ number_format($invoice->subtotal, 2) }}</p>
-                                <p class="font-semibold">Tax: {{ $invoice->currency }} {{ number_format($invoice->tax_amount, 2) }}</p>
-                                <p class="font-semibold">Discount: -{{ $invoice->currency }} {{ number_format($invoice->discount_amount, 2) }}</p>
-                                <p class="font-bold">Total: {{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</p>
-                                <p class="mt-2 font-bold text-lg">Grand Total ({{ $invoice->currency }}): LKR {{ $invoice->total }}</p>
-                            </div>
-
-                            <!-- Notes , instructions and Footer Notes  -->
-                            <div class="mt-10">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Notes</h3>
-                                <p class="text-gray-600">{{ $invoice->notes ?? 'No additional notes.' }}</p>
-                                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Payment Instructions</h3>
-                                <p class="text-gray-600">{{ $invoice->instructions ?? 'No payment instructions provided.' }}</p>
-                                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Footer Notes</h3>
-                                <p class="text-gray-600">{{ $invoice->footer ?? 'No footer notes provided.' }}</p>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                </div>
-
-
+                </form>
             </div>
         </div>
 

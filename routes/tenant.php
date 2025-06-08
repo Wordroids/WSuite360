@@ -189,6 +189,16 @@ Route::middleware([
 
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
 
+        Route::post('/invoice/{invoice}/approve', [InvoiceController::class, 'approve'])->name('invoice.approve');
+        Route::post('/invoice/{invoice}/mark-as-sent', [InvoiceController::class, 'markAsSent'])->name('invoice.markAsSent');
+        Route::post('/invoices/{invoice}/record-payment', [InvoiceController::class, 'recordPayment'])->name('invoice.recordxPayment');
+
+        Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
+        Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
+
+
+
+
 
 
         //Comany Settings

@@ -38,7 +38,10 @@ return new class extends Migration
             $table->string('currency', 3)->default('USD'); // ISO 4217 currency code
 
 
-            $table->enum('status', ['draft', 'sent', 'paid', 'overdue'])->default('draft');
+            $table->enum('status', ['draft', 'sent', 'paid', 'overdue' , 'partialy-paid'])->default('draft');
+            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+
 
 
             $table->timestamps();
