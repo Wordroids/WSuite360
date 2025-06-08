@@ -27,9 +27,10 @@ class InvoiceController extends Controller
     }
 
     //To view an invoice
-    public function viewInvoice()
+    public function viewInvoice(Request $request)
     {
-        $invoice = Invoice::with(['client', 'items.project'])->findOrFail(3);
+       
+        $invoice = Invoice::with(['client', 'items.project'])->findOrFail($request->id);
         $company = CompanySettings::first();
         return view('pages.invoice.viewInvoice', compact('invoice', 'company'));
     }

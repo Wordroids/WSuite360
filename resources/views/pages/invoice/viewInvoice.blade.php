@@ -182,14 +182,14 @@
                             <!-- Client & Total -->
                             <div class="grid grid-cols-2 my-6">
                                 <div>
-                                    <h1 class="text-3xl text-blue-950 font-black">
+                                    <h1 class="text-2xl text-blue-950 font-black">
                                         {{ $invoice->title ?? 'Invoice' }}
                                     </h1>
-                                    <p class="text-gray-400">{{ $invoice->client->name }}</p>
+                                    <p class="text-gray-400">{{ $invoice->description }}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-gray-400">Amount Due ({{ $invoice->currency }})</p>
-                                    <p class="text-3xl text-blue-950 font-black">
+                                    <p class="text-2xl text-blue-950 font-black">
                                         {{ $invoice->currency }}{{ number_format($invoice->total, 2) }}
                                     </p>
                                 </div>
@@ -233,8 +233,8 @@
                                         <tr>
                                             <th class="bg-blue-100 text-left px-4 py-2 rounded">Item</th>
                                             <th class="bg-blue-100 text-left px-4 py-2 rounded">Quantity</th>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Price</th>
-                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Amount</th>
+                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Price ({{ $invoice->currency }})</th>
+                                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Amount ({{ $invoice->currency }})</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -242,8 +242,8 @@
                                         <tr>
                                             <td class="px-4 py-2 border-b">{{ $item->project->name ?? '-' }}</td>
                                             <td class="px-4 py-2 border-b">{{ $item->quantity }}</td>
-                                            <td class="px-4 py-2 border-b">{{ $invoice->currency }}{{ number_format($item->price, 2) }}</td>
-                                            <td class="px-4 py-2 border-b">{{ $invoice->currency }}{{ number_format($item->quantity * $item->price, 2) }}</td>
+                                            <td class="px-4 py-2 border-b">{{ number_format($item->unit_price, 2) }}</td>
+                                            <td class="px-4 py-2 border-b">{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -252,11 +252,21 @@
 
                             <!-- Totals -->
                             <div class="mt-6 text-right space-y-1 text-sm">
-                                <p class="font-semibold">Sub Total: {{ $invoice->currency }}{{ number_format($invoice->subtotal, 2) }}</p>
-                                <p class="font-semibold">Tax: {{ $invoice->currency }}{{ number_format($invoice->tax_amount, 2) }}</p>
-                                <p class="font-semibold">Discount: -{{ $invoice->currency }}{{ number_format($invoice->discount_amount, 2) }}</p>
-                                <p class="font-bold">Total: {{ $invoice->currency }}{{ number_format($invoice->total, 2) }}</p>
-                                <p class="mt-2 font-bold text-lg">Grand Total (LKR): LKR {{ number_format($invoice->total * $invoice->conversion_rate, 2) }}</p>
+                                <p class="font-semibold">Sub Total: {{ $invoice->currency }} {{ number_format($invoice->subtotal, 2) }}</p>
+                                <p class="font-semibold">Tax: {{ $invoice->currency }} {{ number_format($invoice->tax_amount, 2) }}</p>
+                                <p class="font-semibold">Discount: -{{ $invoice->currency }} {{ number_format($invoice->discount_amount, 2) }}</p>
+                                <p class="font-bold">Total: {{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</p>
+                                <p class="mt-2 font-bold text-lg">Grand Total ({{ $invoice->currency }}): LKR {{ $invoice->total }}</p>
+                            </div>
+
+                            <!-- Notes , instructions and Footer Notes  -->
+                            <div class="mt-10">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Notes</h3>
+                                <p class="text-gray-600">{{ $invoice->notes ?? 'No additional notes.' }}</p>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Payment Instructions</h3>
+                                <p class="text-gray-600">{{ $invoice->instructions ?? 'No payment instructions provided.' }}</p>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Footer Notes</h3>
+                                <p class="text-gray-600">{{ $invoice->footer ?? 'No footer notes provided.' }}</p>
                             </div>
 
                         </div>
