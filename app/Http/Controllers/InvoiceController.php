@@ -9,8 +9,8 @@ use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Project;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Faker\Provider\ar_EG\Company;
 use Illuminate\Http\Request;
+use Spatie\Browsershot\Browsershot;
 
 class InvoiceController extends Controller
 {
@@ -104,6 +104,7 @@ class InvoiceController extends Controller
     }
 
 
+
     public function approve(Invoice $invoice)
     {
         if ($invoice->status !== 'draft') {
@@ -131,7 +132,7 @@ class InvoiceController extends Controller
 
     public function recordPayment(Request $request, Invoice $invoice)
     {
-        
+
 
         $request->validate([
             'payment_date' => 'required',
@@ -156,8 +157,7 @@ class InvoiceController extends Controller
         $totalPaid = $invoice->payments()->sum('amount');
         if ($totalPaid == $invoice->total) {
             $invoice->status = 'paid';
-        }
-        else {
+        } else {
             $invoice->status = 'partialy-paid';
         }
         $invoice->paid_at = $request->payment_date;
@@ -166,12 +166,36 @@ class InvoiceController extends Controller
         return redirect()->back()->with('success', 'Payment recorded successfully.');
     }
 
-    public function downloadPdf(Invoice $invoice)
-{
-    $company = tenant()->company; // Adjust based on your logic
-    $payments = $invoice->payments;
 
-    $pdf = Pdf::loadView('pdf.pdf', compact('invoice', 'company', 'payments'));
-    return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
-}
+    public function downloadPdf(Request $request, Invoice $invoice)
+    {
+        $invoice->load(['client', 'items.project']);
+        $payments = $invoice->payments()->latest()->get();
+        $due = $invoice->total - $payments->sum('amount');
+        $invoice->due = $due;
+
+        $company = CompanySettings::first();
+        
+
+        $template = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
+
+
+        Browsershot::html($template)
+            ->save(storage_path('app/reports/invoices/' . $invoice->invoice_number . '.pdf'));
+
+        // To download
+        return $template;
+    }
+
+    public function showPDF(Request $request, Invoice $invoice)
+    {
+        $invoice->load(['client', 'items.project']);
+        $payments = $invoice->payments()->latest()->get();
+        $due = $invoice->total - $payments->sum('amount');
+        $invoice->due = $due;
+
+        $company = CompanySettings::first();
+
+        return view('pdf.pdf', compact('invoice', 'company', 'payments'));
+    }
 }

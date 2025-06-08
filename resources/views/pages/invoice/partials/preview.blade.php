@@ -9,7 +9,7 @@
             <div class="grid grid-cols-4 items-start mb-6">
                 <div>
                     @if ($company->logo)
-                    <img src="{{ tenant_asset($company->logo) }}" class="w-40" alt="Company Logo">
+                    <img src="{{ asset('/uploads/company_logos/' . basename($company->logo)) }}" class="w-40" alt="Company Logo">
                     @endif
                 </div>
                 <div class="col-span-2 mt-8">
