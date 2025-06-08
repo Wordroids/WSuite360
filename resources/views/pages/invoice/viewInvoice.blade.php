@@ -32,7 +32,7 @@
             </div>
             <div class="md:col-span-4">
                 <div class="text-sm text-gray-500">Amount Due</div>
-                <div class="text-gray-800 font-bold mt-1">{{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</div>
+                <div class="text-gray-800 font-bold mt-1">{{ $invoice->currency }} {{ number_format($invoice->due, 2) }}</div>
             </div>
         </div>
 
@@ -116,7 +116,7 @@
                         </span>
                         <div>
                             <div class="text-gray-800 font-semibold">Get Paid</div>
-                            <div class="text-gray-500 text-sm">Amount Due: {{ $invoice->currency }} {{ number_format($invoice->total, 2) }}</div>
+                            <div class="text-gray-500 text-sm">Amount Due: {{ $invoice->currency }} {{ number_format($invoice->due, 2) }}</div>
                         </div>
                     </div>
                     <div class="md:col-span-1"></div>
