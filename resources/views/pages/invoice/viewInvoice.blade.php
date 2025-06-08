@@ -92,14 +92,14 @@
                 </div>
                 <div class="md:col-span-1"></div>
                 <div class="md:col-span-2 flex justify-end items-center gap-3">
-                    @if ($invoice->status === 'overdue')
+                    
                     <form method="POST" action="{{ route('invoice.markAsSent', $invoice->id) }}">
                         @csrf
                         <button type="submit" class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
                             Send Invoice
                         </button>
                     </form>
-                    @else
+                    @if ($invoice->sent_at != null)
                     <span class="text-green-600 text-sm font-semibold">Sent</span>
                     @endif
                 </div>

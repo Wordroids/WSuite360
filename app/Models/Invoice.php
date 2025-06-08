@@ -38,6 +38,8 @@ class Invoice extends Model
     protected $casts = [
         'invoice_date' => 'date',
         'due_date' => 'date',
+        'sent_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
     public function client()
     {
