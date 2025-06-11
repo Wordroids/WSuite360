@@ -42,6 +42,9 @@ jobs:
     - name: Delete cache
       run: rm -rf /bootstrap/cache/*
 
+    - name: Run Queue
+      run: php artisan queue:work
+
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
@@ -51,4 +54,4 @@ jobs:
         server-dir: ./${{ vars.live_ftp_sever_dir }}/
 
     - name: Check website status
-      run: curl -I http://${{ vars.live_url }}/
+      run: curl -I http://${{ vars.live_app_url }}/
