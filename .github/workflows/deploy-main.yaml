@@ -42,9 +42,6 @@ jobs:
     - name: Delete cache
       run: rm -rf /bootstrap/cache/*
 
-    - name: Run Queue
-      run: php artisan queue:listen
-
     - name: Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
