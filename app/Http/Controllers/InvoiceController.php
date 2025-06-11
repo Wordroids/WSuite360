@@ -177,7 +177,7 @@ class InvoiceController extends Controller
         $company = CompanySettings::first();
 
         $template = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
-
+        
         $html = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
 
         $pdfPath = storage_path('app/public/invoice-' . $invoice->id . '.pdf');
@@ -188,7 +188,8 @@ class InvoiceController extends Controller
             ->format('A4')
             ->waitUntilNetworkIdle()
             ->setDelay(2000) // wait 2 seconds before capture
-            ->timeout(120)   // give it more time
+            ->timeout(220)   // give it more time
+            ->dumpBrowserConsoleLog()
             ->save($pdfPath);
 
 
