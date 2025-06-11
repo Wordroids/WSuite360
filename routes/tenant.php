@@ -56,6 +56,12 @@ Route::middleware([
     });
     Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
 
+    //storage link
+    Route::get('/storage-link', function () {
+        \Artisan::call('storage:link');
+        return 'Storage link created successfully.';
+    })->name('storage.link');
+
     
 
     // Dashboard Route (Only Authenticated Users)
