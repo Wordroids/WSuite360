@@ -175,13 +175,23 @@ class InvoiceController extends Controller
         $invoice->due = $due;
 
         $company = CompanySettings::first();
-        
 
         $template = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
 
+        $html = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
 
-        Browsershot::html($template)
-            ->save(storage_path('app/reports/invoices/' . $invoice->invoice_number . '.pdf'));
+        $pdfPath = storage_path('app/public/invoice-' . $invoice->id . '.pdf');
+
+        Browsershot::html($html)
+            ->setNodeBinary('/opt/homebrew/bin/node')
+            ->setNpmBinary('/opt/homebrew/bin/npm')
+            ->format('A4')
+            ->waitUntilNetworkIdle()
+            ->setDelay(2000) // wait 2 seconds before capture
+            ->timeout(120)   // give it more time
+            ->save($pdfPath);
+
+
 
         // To download
         return $template;

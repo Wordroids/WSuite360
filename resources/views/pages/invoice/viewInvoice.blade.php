@@ -41,6 +41,13 @@
                 </a>
             </div>
 
+            <div>
+                <a href="{{ route('invoice.preview', $invoice->id) }}"
+                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
+                    <i class="fa-solid fa-pencil-alt"></i>  Invoice
+                </a>
+            </div>
+
         </div>
 
         <!-- Actions Overview -->

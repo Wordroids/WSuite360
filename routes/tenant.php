@@ -54,6 +54,9 @@ Route::middleware([
     Route::get('/', function () {
         return view('welcome');
     });
+    Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
+
+    
 
     // Dashboard Route (Only Authenticated Users)
     Route::get('/dashboard', function () {
@@ -62,6 +65,8 @@ Route::middleware([
 
     // Authentication routes
     Route::middleware('guest')->group(function () {
+
+        
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
 
@@ -189,7 +194,6 @@ Route::middleware([
 
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
         Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoice.download');
-        Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
 
 
 
@@ -199,7 +203,6 @@ Route::middleware([
 
         Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
         Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
-
 
 
 
