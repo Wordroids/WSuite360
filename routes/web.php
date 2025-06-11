@@ -10,6 +10,13 @@ foreach (config('tenancy.central_domains') as $domain) {
             return view('central.welcome');
         });
 
+
+        //storage link
+        Route::get('/storage-link', function () {
+            \Artisan::call('storage:link');
+            return 'Storage link created successfully.';
+        })->name('storage.link');
+
         // Authenticated routes
         Route::middleware('auth')->group(function () {
             Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
