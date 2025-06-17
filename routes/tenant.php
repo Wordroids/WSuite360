@@ -63,7 +63,7 @@ Route::middleware([
         return 'Storage link created successfully.';
     })->name('storage.link');
 
-    
+
 
     // Dashboard Route (Only Authenticated Users)
     Route::get('/dashboard', function () {
@@ -73,7 +73,7 @@ Route::middleware([
     // Authentication routes
     Route::middleware('guest')->group(function () {
 
-        
+
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
 
@@ -225,8 +225,7 @@ Route::middleware([
 
         // Routes For admin and ProjectManger Role
         Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
-            Route::get('tasks/create/{project_id}', [TaskController::class, 'create'])->name('tasks.create');
-            Route::resource('tasks', TaskController::class)->except(['create']);
+            Route::resource('tasks', TaskController::class);
             Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
             Route::resource('projects', ProjectController::class);
         });
