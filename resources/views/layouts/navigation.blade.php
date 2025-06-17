@@ -20,18 +20,7 @@
                                 Dashboard
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('companies.index') }}"
-                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
-                                <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
-                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
-                                    data-slot="icon">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                                </svg>
-                                Companies
-                            </a>
-                        </li>
+
                         <li>
                             <a href="{{ route('projects.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
@@ -101,7 +90,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('pages.invoice.index') }}"
+                            <a href="{{ route('invoice.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
@@ -133,6 +122,22 @@
                                 <span class="truncate">Users</span>
                             </a>
                         </li>
+
+                        <li>
+                            <div class="text-xs/6 font-semibold text-indigo-200">Settings</div>
+                            <ul role="list" class="-mx-2 mt-2 space-y-1">
+                                <li>
+                                    <a href="{{ route('company.settings') }}"
+                                        class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                        <span
+                                            class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">C</span>
+                                        <span class="truncate">Company Settings</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+
                     </ul>
                 </li>
                 <li class="mt-auto">

@@ -11,13 +11,11 @@ class Client extends Model
 {
     /** @use HasFactory<\Database\Factories\ClientFactory> */
     use HasFactory, SoftDeletes;
-    protected $fillable = ['name', 'email', 'phone', 'address', 'company_id'];
+
+    protected $fillable = ['name', 'email', 'phone', 'address', 'website', 'billing_currency', 'logo'];
 
     /**
      * Define relationship with Company model.
      */
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+    
 }

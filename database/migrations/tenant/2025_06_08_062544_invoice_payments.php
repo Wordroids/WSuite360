@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('invoice_payments', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('logo')->nullable();
-            $table->string('website')->nullable();
-            $table->softDeletes();
+            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->date('payment_date');
+            $table->decimal('amount', 10, 2);
+            $table->string('payment_method')->nullable();
+            $table->string('payment_account')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        //
     }
 };

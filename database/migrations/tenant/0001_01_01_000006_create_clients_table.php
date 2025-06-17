@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('address');
-            $table->unsignedBigInteger('company_id');
-            $table->foreign('company_id')->references('id')->on('companies');
+            $table->string('website')->nullable();
+            $table->string('billing_currency')->nullable();
+            $table->string('logo')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

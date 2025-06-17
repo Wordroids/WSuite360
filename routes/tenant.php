@@ -20,7 +20,6 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\BreakLogApprovalController;
 use App\Http\Controllers\BreakLogController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
@@ -33,6 +32,7 @@ use App\Http\Controllers\TimeLogApprovalController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskUserController;
+use App\Http\Controllers\CompanySettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +55,15 @@ Route::middleware([
     Route::get('/', function () {
         return view('welcome');
     });
+    Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
+
+    //storage link
+    Route::get('/storage-link', function () {
+        \Artisan::call('storage:link');
+        return 'Storage link created successfully.';
+    })->name('storage.link');
+
+    
 
     // Dashboard Route (Only Authenticated Users)
     Route::get('/dashboard', function () {
@@ -63,6 +72,8 @@ Route::middleware([
 
     // Authentication routes
     Route::middleware('guest')->group(function () {
+
+        
         Route::get('register', [RegisteredUserController::class, 'create'])
             ->name('register');
 
@@ -129,8 +140,6 @@ Route::middleware([
 
         // Admin routes
         Route::middleware('role:admin')->group(function () {
-            // Company Routes
-            Route::resource('companies', CompanyController::class);
 
             // Clients Routes
             Route::resource('clients', ClientController::class);
@@ -183,9 +192,32 @@ Route::middleware([
 
 
         //Routes for Invoice
-        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('pages.invoice.index');
+        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('invoice.index');
         Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.viewInvoice');
+        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.show');
+        Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
+        Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
+        Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+
+        Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
+        Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoice.download');
+
+
+
+        Route::post('/invoice/{invoice}/approve', [InvoiceController::class, 'approve'])->name('invoice.approve');
+        Route::post('/invoice/{invoice}/mark-as-sent', [InvoiceController::class, 'markAsSent'])->name('invoice.markAsSent');
+        Route::post('/invoices/{invoice}/record-payment', [InvoiceController::class, 'recordPayment'])->name('invoice.recordxPayment');
+
+        Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
+        Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
+
+
+
+
+
+        //Comany Settings
+        Route::get('/company-settings', [CompanySettingController::class, 'companySettings'])->name('company.settings');
+        Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');
 
 
         //time entry approval
