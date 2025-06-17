@@ -45,9 +45,7 @@ class TaskController extends Controller
     {
         $projects = Project::all();
 
-        $members = ProjectMembers::all();
-
-        return view('pages.tasks.create', compact('projects', 'members'));
+        return view('pages.tasks.create', compact('projects'));
     }
 
     public function store(Request $request)
@@ -55,8 +53,6 @@ class TaskController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'project_id' => 'required|exists:projects,id',
-            //'assigned_to' => 'nullable|exists:users,id',
-            'assigned_to' => 'required|exists:project_members,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -64,12 +60,12 @@ class TaskController extends Controller
 
         $task = Task::create($request->all());
 
-
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
     public function show(Task $task)
     {
+        $task->load('members');
         return view('pages.tasks.show', compact('task'));
     }
 
@@ -77,16 +73,16 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($id);
         $projects = Project::all();
-        $members = ProjectMembers::all();
 
-        return view('pages.tasks.edit', compact('task', 'projects', 'members'));
+        return view('pages.tasks.edit', compact('task', 'projects'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',
             'project_id' => 'required|exists:projects,id',
-            'assigned_to' => 'required|exists:project_members,id',
+            'status' => 'required|in:to_do,in_progress,completed',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -96,7 +92,7 @@ class TaskController extends Controller
         $task->update([
             'title' => $request->input('title'),
             'project_id' => $request->input('project_id'),
-            'assigned_to' => $request->input('assigned_to'),
+            'status' => $request->input('status'),
             'start_date' => $request->input('start_date'),
             'end_date' => $request->input('end_date'),
         ]);
@@ -104,8 +100,7 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
-    // to delete 
-
+    // to delete
     public function destroy($id)
     {
         $tasks = Task::findOrFail($id);

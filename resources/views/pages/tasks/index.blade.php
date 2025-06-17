@@ -29,7 +29,7 @@
                         </button>
                     </form>
 
-                    <a href="{{ route('tasks.create', ['project_id' => $project->id]) }}"
+                    <a href="{{ route('tasks.create') }}"
                         class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 transition">
                         + Create Task
                     </a>
@@ -43,7 +43,8 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Task Title</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Project</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Assigned User</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Assigned User
+                            </th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Start Date</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">End Date</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Status</th>
@@ -78,6 +79,10 @@
                                         onclick="confirmTaskDeletion({{ $task->id }})">
                                         Delete
                                     </button>
+                                    <a href="{{ route('tasks.users.index', $task->id) }}"
+                                        class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
+                                        Users
+                                    </a>
                                 </td>
                             </tr>
                         @empty
