@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
 
             $table->string('invoice_number')->unique();
-            $table->string('po/so_number')->nullable();
+            $table->string('po_so_number')->nullable();
 
             $table->date('invoice_date');
             $table->date('due_date');

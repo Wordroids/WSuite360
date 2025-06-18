@@ -167,7 +167,7 @@ class InvoiceController extends Controller
     }
 
 
-    public function downloadPdf(Request $request, Invoice $invoice)
+    /*public function downloadPdf(Request $request, Invoice $invoice)
     {
         $invoice->load(['client', 'items.project']);
         $payments = $invoice->payments()->latest()->get();
@@ -196,7 +196,42 @@ class InvoiceController extends Controller
 
         // To download
         return $template;
+    }*/
+
+    public function downloadPdf(Request $request, Invoice $invoice) 
+{
+    $invoice->load(['client', 'items.project']);
+    $payments = $invoice->payments()->latest()->get();
+    $due = $invoice->total - $payments->sum('amount');
+    $invoice->due = $due;
+
+    $company = CompanySettings::first();
+    
+    // Convert logo to base64 if it exists
+    if ($company && $company->logo) {
+        $imagePath = storage_path('app/public/' . $company->logo);
+        if (file_exists($imagePath)) {
+            $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
+            $imageData = file_get_contents($imagePath);
+            $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+            $company->base64_logo = $base64Image;
+        }
     }
+    
+    $pdf = PDF::loadView('pdf.pdf', compact('invoice', 'company', 'payments'));
+    
+    $pdf->setPaper('a4', 'portrait');
+    $pdf->setOptions([
+        'dpi' => 150,
+        'defaultFont' => 'sans-serif',
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
+        'debugKeepTemp' => false,
+        'isFontSubsettingEnabled' => true
+    ]);
+    
+    return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+}
 
     public function showPDF(Request $request, Invoice $invoice)
     {

@@ -9,7 +9,7 @@
             <div class="grid grid-cols-4 items-start mb-6">
                 <div>
                     @if ($company->logo)
-                    <img src="{{ tenant_asset($company->logo) }}" class="w-40" alt="Company Logo">
+                        <img src="{{ tenant_asset($company->logo) }}" class="w-40" alt="Company Logo">
                     @endif
                 </div>
                 <div class="col-span-2 mt-8">
@@ -85,12 +85,13 @@
                     </thead>
                     <tbody>
                         @foreach ($invoice->items as $item)
-                        <tr>
-                            <td class="px-4 py-2 border-b">{{ $item->project->name ?? '-' }}</td>
-                            <td class="px-4 py-2 border-b">{{ $item->quantity }}</td>
-                            <td class="px-4 py-2 border-b">{{ number_format($item->unit_price, 2) }}</td>
-                            <td class="px-4 py-2 border-b">{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
-                        </tr>
+                            <tr>
+                                <td class="px-4 py-2 border-b">{{ $item->project->name ?? '-' }}</td>
+                                <td class="px-4 py-2 border-b">{{ $item->quantity }}</td>
+                                <td class="px-4 py-2 border-b">{{ number_format($item->unit_price, 2) }}</td>
+                                <td class="px-4 py-2 border-b">
+                                    {{ number_format($item->quantity * $item->unit_price, 2) }}</td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -119,10 +120,11 @@
                 </div>
 
                 @foreach ($invoice->payments as $payment)
-                <div class="flex justify-end gap-4 text-base font-semibold">
-                    <p>Payment on {{ \Carbon\Carbon::parse($payment->payment_date)->format('F d, Y') }} using {{ $payment->payment_method }} payment :</p>
-                    <p>LKR{{ number_format($payment->amount, 2) }}</p>
-                </div>
+                    <div class="flex justify-end gap-4 text-base font-semibold">
+                        <p>Payment on {{ \Carbon\Carbon::parse($payment->payment_date)->format('F d, Y') }} using
+                            {{ $payment->payment_method }} payment :</p>
+                        <p>LKR{{ number_format($payment->amount, 2) }}</p>
+                    </div>
                 @endforeach
             </div>
 
