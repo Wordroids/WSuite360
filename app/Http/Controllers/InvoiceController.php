@@ -8,9 +8,11 @@ use App\Models\CompanySettings;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Project;
-use Barryvdh\DomPDF\Facade\Pdf;
+//use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\Enums\Format;
 
 class InvoiceController extends Controller
 {
@@ -167,7 +169,7 @@ class InvoiceController extends Controller
     }
 
 
-    public function downloadPdf(Request $request, Invoice $invoice)
+    /*public function downloadPdf(Request $request, Invoice $invoice)
     {
         $invoice->load(['client', 'items.project']);
         $payments = $invoice->payments()->latest()->get();
@@ -196,7 +198,38 @@ class InvoiceController extends Controller
 
         // To download
         return $template;
+    }*/
+
+    public function downloadPdf(Request $request, Invoice $invoice)
+{
+    $invoice->load(['client', 'items.project', 'payments']);
+    $payments = $invoice->payments;
+    $due = $invoice->total - $payments->sum('amount');
+    $invoice->due = $due;
+
+    $company = CompanySettings::first();
+    
+    // Convert logo to base64 if it exists
+    if ($company && $company->logo) {
+        $imagePath = storage_path('app/public/' . $company->logo);
+        if (file_exists($imagePath)) {
+            $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
+            $imageData = file_get_contents($imagePath);
+            $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+            $company->base64_logo = $base64Image;
+        }
     }
+    
+    // Use the correct namespace for Spatie's Laravel-PDF
+    return Pdf::view('pdf.pdf', [
+        'invoice' => $invoice,
+        'company' => $company,
+        'payments' => $payments,
+    ])
+    ->format(Format::A4)
+    ->name('invoice-' . $invoice->invoice_number . '.pdf')
+    ->download();
+}
 
     public function showPDF(Request $request, Invoice $invoice)
     {
