@@ -18,11 +18,7 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::with('client')
-            ->when($request->client, fn($q) => $q->where('client_id', $request->client))
-            ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
-            ->latest()
-            ->paginate(10);
+        $invoices = Invoice::with('client')->when($request->client, fn($q) => $q->where('client_id', $request->client))->when($request->date, fn($q) => $q->whereDate('date', $request->date))->latest()->paginate(10);
 
         $clients = Client::all();
 
@@ -32,12 +28,10 @@ class InvoiceController extends Controller
     //To view an invoice
     public function viewInvoice(Request $request)
     {
-
         $invoice = Invoice::with(['client', 'items.project'])->findOrFail($request->id);
         $payments = $invoice->payments()->latest()->get();
         $due = $invoice->total - $payments->sum('amount');
         $invoice->due = $due;
-
 
         $company = CompanySettings::first();
         return view('pages.invoice.viewInvoice', compact('invoice', 'company', 'payments'));
@@ -53,7 +47,6 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-
         // Validate the request data
         $request->validate([
             'title' => 'required',
@@ -105,8 +98,6 @@ class InvoiceController extends Controller
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
 
-
-
     public function approve(Invoice $invoice)
     {
         if ($invoice->status !== 'draft') {
@@ -134,8 +125,6 @@ class InvoiceController extends Controller
 
     public function recordPayment(Request $request, Invoice $invoice)
     {
-
-
         $request->validate([
             'payment_date' => 'required',
             'amount' => 'required',
@@ -146,12 +135,12 @@ class InvoiceController extends Controller
 
         // Save payment
         InvoicePayment::create([
-            'invoice_id'      => $invoice->id,
-            'payment_date'    => $request->payment_date,
-            'amount'          => $request->amount,
-            'payment_method'  => $request->payment_method,
+            'invoice_id' => $invoice->id,
+            'payment_date' => $request->payment_date,
+            'amount' => $request->amount,
+            'payment_method' => $request->payment_method,
             'payment_account' => $request->payment_account,
-            'notes'           => $request->notes,
+            'notes' => $request->notes,
         ]);
 
         // Update invoice
@@ -167,7 +156,6 @@ class InvoiceController extends Controller
 
         return redirect()->back()->with('success', 'Payment recorded successfully.');
     }
-
 
     /*public function downloadPdf(Request $request, Invoice $invoice)
     {
@@ -201,35 +189,35 @@ class InvoiceController extends Controller
     }*/
 
     public function downloadPdf(Request $request, Invoice $invoice)
-{
-    $invoice->load(['client', 'items.project', 'payments']);
-    $payments = $invoice->payments;
-    $due = $invoice->total - $payments->sum('amount');
-    $invoice->due = $due;
+    {
+        $invoice->load(['client', 'items.project', 'payments']);
+        $payments = $invoice->payments;
+        $due = $invoice->total - $payments->sum('amount');
+        $invoice->due = $due;
 
-    $company = CompanySettings::first();
-    
-    // Convert logo to base64 if it exists
-    if ($company && $company->logo) {
-        $imagePath = storage_path('app/public/' . $company->logo);
-        if (file_exists($imagePath)) {
-            $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $imageData = file_get_contents($imagePath);
-            $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-            $company->base64_logo = $base64Image;
+        $company = CompanySettings::first();
+
+        // Convert logo to base64 if it exists
+        if ($company && $company->logo) {
+            $imagePath = storage_path('app/public/' . $company->logo);
+            if (file_exists($imagePath)) {
+                $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
+                $imageData = file_get_contents($imagePath);
+                $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+                $company->base64_logo = $base64Image;
+            }
         }
+
+        // Use the correct namespace for Spatie's Laravel-PDF
+        return Pdf::view('pdf.pdf', [
+            'invoice' => $invoice,
+            'company' => $company,
+            'payments' => $payments,
+        ])
+            ->format(Format::A4)
+            ->name('invoice-' . $invoice->invoice_number . '.pdf')
+            ->download();
     }
-    
-    // Use the correct namespace for Spatie's Laravel-PDF
-    return Pdf::view('pdf.pdf', [
-        'invoice' => $invoice,
-        'company' => $company,
-        'payments' => $payments,
-    ])
-    ->format(Format::A4)
-    ->name('invoice-' . $invoice->invoice_number . '.pdf')
-    ->download();
-}
 
     public function showPDF(Request $request, Invoice $invoice)
     {
