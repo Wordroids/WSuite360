@@ -75,6 +75,20 @@
                                 Timesheet
                             </a>
                         </li>
+                               <li>
+                            <a href="{{ route('project-payment.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                                    data-slot="icon">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+                                </svg>
+                                Payments
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li>
