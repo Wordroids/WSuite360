@@ -33,6 +33,7 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskUserController;
 use App\Http\Controllers\CompanySettingController;
+use App\Http\Controllers\ProjectPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -137,6 +138,14 @@ Route::middleware([
         Route::get('/chartsView', [TimeSheetController::class, 'chartsView'])->name('timesheet.chartsView');
         Route::get('/detailedReport', [TimeSheetController::class, 'detailedReport'])->name('timesheet.detailedReport');
         Route::get('/weeklyReport', [TimeSheetController::class, 'weeklyReport'])->name('timesheet.weeklyReport');
+
+        //Payment Routes
+        Route::prefix('project-payment')->group(function () {
+            Route::get('/', [ProjectPaymentController::class, 'index'])->name('project-payment.index');
+            Route::get('/projects/{clientId}', [ProjectPaymentController::class, 'getProjects'])->name('project-payment.projects');
+            Route::post('/setup-becs', [ProjectPaymentController::class, 'setupBecs'])->name('project-payment.setupBecs');
+            Route::post('/process', [ProjectPaymentController::class, 'processPayment'])->name('project-payment.process');
+        });
 
         // Admin routes
         Route::middleware('role:admin')->group(function () {
