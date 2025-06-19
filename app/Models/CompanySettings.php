@@ -10,4 +10,13 @@ class CompanySettings extends Model
         'name', 'email', 'phone', 'address',
         'logo', 'vat_number', 'currency', 'footer_note',
     ];
+
+    public function getLogoPathAttribute()
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        
+        return public_path('storage/' . $this->logo);
+    }
 }
