@@ -8,9 +8,11 @@ use App\Models\CompanySettings;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Project;
-use Barryvdh\DomPDF\Facade\Pdf;
+//use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\Enums\Format;
 
 class InvoiceController extends Controller
 {
@@ -198,10 +200,10 @@ class InvoiceController extends Controller
         return $template;
     }*/
 
-    public function downloadPdf(Request $request, Invoice $invoice) 
+    public function downloadPdf(Request $request, Invoice $invoice)
 {
-    $invoice->load(['client', 'items.project']);
-    $payments = $invoice->payments()->latest()->get();
+    $invoice->load(['client', 'items.project', 'payments']);
+    $payments = $invoice->payments;
     $due = $invoice->total - $payments->sum('amount');
     $invoice->due = $due;
 
@@ -218,19 +220,15 @@ class InvoiceController extends Controller
         }
     }
     
-    $pdf = PDF::loadView('pdf.pdf', compact('invoice', 'company', 'payments'));
-    
-    $pdf->setPaper('a4', 'portrait');
-    $pdf->setOptions([
-        'dpi' => 150,
-        'defaultFont' => 'sans-serif',
-        'isHtml5ParserEnabled' => true,
-        'isRemoteEnabled' => true,
-        'debugKeepTemp' => false,
-        'isFontSubsettingEnabled' => true
-    ]);
-    
-    return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+    // Use the correct namespace for Spatie's Laravel-PDF
+    return Pdf::view('pdf.pdf', [
+        'invoice' => $invoice,
+        'company' => $company,
+        'payments' => $payments,
+    ])
+    ->format(Format::A4)
+    ->name('invoice-' . $invoice->invoice_number . '.pdf')
+    ->download();
 }
 
     public function showPDF(Request $request, Invoice $invoice)
