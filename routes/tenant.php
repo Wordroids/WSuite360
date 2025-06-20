@@ -159,9 +159,10 @@ Route::middleware([
             Route::get('/projects/{clientId}', [ProjectPaymentController::class, 'getProjects'])->name('payments.projects');
             Route::get('/bank-process', [ProjectPaymentController::class, 'process'])->name('payments.bank-process');
             Route::post('/bank-confirm', [ProjectPaymentController::class, 'confirm'])->name('payments.bank-confirm');
-
-
+            Route::get('/select-bank/{clientId}', [ProjectPaymentController::class, 'selectBank'])->name('payments.selectBank');
+            Route::post('/cancel-subscription', [PaymentController::class, 'cancelSubscription'])->name('payments.cancelSubscription');
             // Card payment routes
+            Route::get('/select-card/{clientId}', [ProjectCardPaymentController::class, 'selectCard'])->name('payments.selectCard');
             Route::get('/card-charge', [ProjectCardPaymentController::class, 'selectCard'])->name('payments.card-charge');
             Route::get('/projects/{clientId}', [ProjectCardPaymentController::class, 'getProjects'])->name('payments.projects');
             Route::post('/card-confirm', [ProjectCardPaymentController::class, 'confirm'])->name('payments.card-confirm');
@@ -174,6 +175,7 @@ Route::middleware([
             // Clients Routes
             Route::resource('clients', ClientController::class);
         });
+        Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
 
         //Activity log
         Route::get('/logs', [ActivityLogController::class, 'logs'])->name('pages.activity_log.logs');

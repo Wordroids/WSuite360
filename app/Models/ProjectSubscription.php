@@ -16,6 +16,7 @@ class ProjectSubscription extends Model
         'amount',
         'currency',
         'billing_cycle',
+        'payment_type',
         'notes'
     ];
 
