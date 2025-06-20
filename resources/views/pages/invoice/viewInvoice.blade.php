@@ -42,12 +42,7 @@
                 </a>
             </div>
 
-            <div>
-                <a href="{{ route('invoice.preview', $invoice->id) }}"
-                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
-                    <i class="fa-solid fa-pencil-alt"></i> Invoice
-                </a>
-            </div>
+           
 
         </div>
 
@@ -110,13 +105,15 @@
                     <div class="md:col-span-1"></div>
                     <div class="md:col-span-2 flex justify-end items-center gap-3">
 
-                        <form method="POST" action="{{ route('invoice.markAsSent', $invoice->id) }}">
-                            @csrf
-                            <button type="submit"
-                                class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
-                                Send Invoice
-                            </button>
-                        </form>
+                        <div class="mt-4">
+    <h3 class="text-lg font-medium mb-2">Send Simple Email Confirmation</h3>
+    <form action="/mail-test" method="GET" class="flex gap-2">
+        
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            Send Simple Email
+        </button>
+    </form>
+</div>
                         @if ($invoice->sent_at != null)
                             <span class="text-green-600 text-sm font-semibold">Sent</span>
                         @endif
@@ -275,4 +272,9 @@
         </div>
 
     </div>
+
+    
 </x-app-layout>
+
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

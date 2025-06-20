@@ -32,6 +32,10 @@
                     class="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">
                     Apply Filters
                 </button>
+                <button type="reset" onclick="window.location.href='{{ route('invoice.index') }}'"
+                    class="bg-gray-700 text-white px-6 py-2 ml-4 rounded-lg hover:bg-gray-800 transition">
+                    Reset Filters
+                </button>
             </div>
         </form>
 

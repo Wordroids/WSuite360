@@ -13,12 +13,15 @@ use Illuminate\Http\Request;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\Enums\Format;
+use App\Mail\InvoiceMail;
+use Illuminate\Support\Facades\Mail;
+
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::with('client')->when($request->client, fn($q) => $q->where('client_id', $request->client))->when($request->date, fn($q) => $q->whereDate('date', $request->date))->latest()->paginate(10);
+        $invoices = Invoice::with('client')->when($request->client, fn($q) => $q->where('client_id', $request->client))->when($request->date, fn($q) => $q->whereDate('invoice_date', $request->date))->latest()->paginate(10);
 
         $clients = Client::all();
 
@@ -230,4 +233,128 @@ class InvoiceController extends Controller
 
         return view('pdf.pdf', compact('invoice', 'company', 'payments'));
     }
+
+    public function edit(Invoice $invoice)
+    {
+        // Load relationships with project details
+        $invoice->load(['client', 'items.project']);
+
+        // Get required data for dropdowns
+        $clients = Client::all();
+        $projects = Project::all(['id', 'name']);
+        $companySettings = CompanySettings::first();
+
+        // Make sure all items have their associated project name for the edit form
+        foreach ($invoice->items as $item) {
+            $item->project_name = $item->project ? $item->project->name : '';
+        }
+
+        return view('pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings'));
+    }
+
+    /**
+     * Update the specified invoice in storage.
+     */
+    public function update(Request $request, Invoice $invoice)
+    {
+        //dd($request->all());
+        // Validate the request data
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'client_id' => 'required|exists:clients,id',
+            'currency' => 'required|string|max:10',
+            'invoice_number' => 'required|string|max:255',
+            'po_so_number' => 'nullable|string|max:255',
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'subtotal' => 'required|numeric|min:0',
+            'total' => 'required|numeric|min:0',
+            'notes' => 'nullable|string',
+            'instructions' => 'nullable|string',
+            'footer' => 'nullable|string',
+        ]);
+
+        // Update invoice details
+        $invoice->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'client_id' => $request->client_id,
+            'currency' => $request->currency,
+            'invoice_number' => $request->invoice_number,
+            'po_so_number' => $request->po_so_number,
+            'invoice_date' => $request->invoice_date,
+            'due_date' => $request->due_date,
+            'subtotal' => $request->subtotal,
+            'total' => $request->total,
+            'notes' => $request->notes,
+            'instructions' => $request->instructions,
+            'footer' => $request->footer,
+        ]);
+
+        // Delete existing invoice items
+        $invoice->items()->delete();
+
+        // Create new invoice items
+        if ($request->has('products')) {
+            foreach ($request->products as $product) {
+                if (!empty($product['project_id']) && !empty($product['quantity']) && !empty($product['price'])) {
+                    $invoice->items()->create([
+                        'project_id' => $product['project_id'],
+                        'description' => $product['description'] ?? null,
+                        'quantity' => $product['quantity'],
+                        'unit_price' => $product['price'],
+                        'total' => $product['price'] * $product['quantity'],
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('invoice.index')->with('success', 'Invoice updated successfully.');
+    }
+
+    /**
+     * Delete the specified invoice from storage.
+     */
+    public function destroy(Invoice $invoice)
+    {
+        // First delete associated items
+        $invoice->items()->delete();
+
+        // Delete associated payments
+        $invoice->payments()->delete();
+
+        // Delete the invoice
+        $invoice->delete();
+
+        return redirect()->route('invoice.index')->with('success', 'Invoice deleted successfully.');
+    }
+
+
+    public function sendEmail(Request $request, Invoice $invoice)
+{
+    $request->validate([
+        'email' => 'required|email',
+    ]);
+    
+    try {
+        // Load the client relationship
+        $invoice->load(['client']);
+        
+        // Log the attempt
+        \Log::info("Sending simple confirmation email for invoice #{$invoice->invoice_number} to {$request->email}");
+        
+        // Send the email
+        Mail::to($request->email)
+            ->send(new InvoiceMail($invoice));
+            
+        // Log success
+        \Log::info("Successfully sent simple confirmation email for invoice #{$invoice->invoice_number}");
+        
+        return redirect()->back()->with('success', "Simple confirmation email sent successfully to {$request->email}");
+    } catch (\Exception $e) {
+        \Log::error("Error sending simple email: " . $e->getMessage());
+        return redirect()->back()->with('error', 'Error sending email: ' . $e->getMessage());
+    }
+}
 }

@@ -54,7 +54,7 @@ Route::middleware([
     Route::get('/', function () {
         return view('welcome');
     });
-    Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
+    
 
     //storage link
     Route::get('/storage-link', function () {
@@ -197,11 +197,13 @@ Route::middleware([
         Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
         Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
         Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
+        Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+        Route::get('/invoices/view/{invoice}', [InvoiceController::class, 'viewInvoice'])->name('invoice.view');
 
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
         Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoice.download');
 
-
+        Route::post('/invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.send-email');
 
         Route::post('/invoice/{invoice}/approve', [InvoiceController::class, 'approve'])->name('invoice.approve');
         Route::post('/invoice/{invoice}/mark-as-sent', [InvoiceController::class, 'markAsSent'])->name('invoice.markAsSent');
@@ -211,6 +213,23 @@ Route::middleware([
         Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
 
 
+        Route::post('/invoices/{invoice}/send-simple-email', [InvoiceController::class, 'sendEmail'])
+    ->name('invoices.send-simple-email');
+
+    Route::get('/mail-test', function () {
+    try {
+        $data = ['message' => 'This is a test email from Laravel'];
+        
+        Mail::send('emails.invoice', $data, function($message) {
+            $message->to('33476a5cf3-1da824+user1@inbox.mailtrap.io', 'Test User')
+                    ->subject('Test Email');
+        });
+        
+        return 'Email has been sent! Check your Mailtrap inbox.';
+    } catch (\Exception $e) {
+        return 'Error sending mail: ' . $e->getMessage();
+    }
+});
 
 
 
