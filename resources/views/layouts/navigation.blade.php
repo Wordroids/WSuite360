@@ -76,7 +76,7 @@
                             </a>
                         </li>
                                <li>
-                            <a href="{{ route('project-payment.index') }}"
+                            <a href="{{ route('payments.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
