@@ -33,6 +33,8 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskUserController;
 use App\Http\Controllers\CompanySettingController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProjectCardPaymentController;
 use App\Http\Controllers\ProjectPaymentController;
 
 /*
@@ -145,6 +147,25 @@ Route::middleware([
             Route::get('/projects/{clientId}', [ProjectPaymentController::class, 'getProjects'])->name('project-payment.projects');
             Route::post('/setup-becs', [ProjectPaymentController::class, 'setupBecs'])->name('project-payment.setupBecs');
             Route::post('/process', [ProjectPaymentController::class, 'processPayment'])->name('project-payment.process');
+        });
+
+        // Main payment routes
+        Route::prefix('payments')->group(function () {
+            // Index page
+            Route::get('/', [PaymentController::class, 'index'])->name('payments.index');
+
+            // Bank payment routes
+            Route::get('/bank-charge', [ProjectPaymentController::class, 'selectBank'])->name('payments.bank-charge');
+            Route::get('/projects/{clientId}', [ProjectPaymentController::class, 'getProjects'])->name('payments.projects');
+            Route::get('/bank-process', [ProjectPaymentController::class, 'process'])->name('payments.bank-process');
+            Route::post('/bank-confirm', [ProjectPaymentController::class, 'confirm'])->name('payments.bank-confirm');
+
+
+            // Card payment routes
+            Route::get('/card-charge', [ProjectCardPaymentController::class, 'selectCard'])->name('payments.card-charge');
+            Route::get('/projects/{clientId}', [ProjectCardPaymentController::class, 'getProjects'])->name('payments.projects');
+            Route::post('/card-confirm', [ProjectCardPaymentController::class, 'confirm'])->name('payments.card-confirm');
+            Route::post('/card-process', [ProjectCardPaymentController::class, 'process'])->name('payments.card-process');
         });
 
         // Admin routes
