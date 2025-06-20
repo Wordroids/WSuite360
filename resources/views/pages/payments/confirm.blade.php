@@ -30,7 +30,6 @@
                 <p class="font-medium">Account Number:</p>
                 <p>****{{ substr($account_number, -4) }}</p>
             </div>
-
             <div>
                 <p class="font-medium">Amount:</p>
                 <p>${{ number_format($amount, 2) }} AUD</p>
@@ -42,12 +41,17 @@
             </div>
         </div>
 
-        <button type="button" id="confirmButton" class="mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <div class="mt-6 flex space-x-4">
+     <button type="submit" id="confirmButton" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Confirm Payment
         </button>
+                <a href="{{ route('payments.bank-charge') }}"
+                    class="flex-1 px-4 py-2 text-center bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                    Go Back
+                </a>
+            </div>
     </form>
 </div>
-
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     document.getElementById("confirmButton").addEventListener("click", async function() {
