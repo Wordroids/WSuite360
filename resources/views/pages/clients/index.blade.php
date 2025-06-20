@@ -57,6 +57,11 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-800">{{ $client->billing_currency ?? 'N/A' }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-800 flex space-x-2">
+                                   <a href="{{ route('clients.show', $client->id) }}"
+                                        class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition">
+                                        View
+                                    </a>
+
                                     <a href="{{ route('clients.edit', $client->id) }}"
                                         class="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">
                                         Edit
