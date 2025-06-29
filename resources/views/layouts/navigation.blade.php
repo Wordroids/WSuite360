@@ -75,7 +75,7 @@
                                 Timesheet
                             </a>
                         </li>
-                               <li>
+                        <li>
                             <a href="{{ route('payments.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
@@ -96,11 +96,17 @@
                     <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li>
 
-                            <a href="#"
+                            <a href="{{ route('employees.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
-                                <span class="truncate">Project Members</span>
+                                <span class="truncate">Employees</span>
+                            </a>
+                            <a href="{{ route('departments.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Departments</span>
                             </a>
                         </li>
                         <li>
