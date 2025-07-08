@@ -70,7 +70,15 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        //
+
+        $client->load(['subscriptions' => function ($query) {
+            $query->with('project')
+                ->orderBy('created_at', 'desc');
+        }]);
+
+        return view('pages.clients.show', [
+            'client' => $client
+        ]);
     }
 
     /**
@@ -90,7 +98,6 @@ class ClientController extends Controller
     {
         // Find client
         $client = Client::findOrFail($id);
-    
         // Validate input
         $validatedData = $request->validate([
             'name'             => 'required|string|max:255',
@@ -101,24 +108,19 @@ class ClientController extends Controller
             'billing_currency' => 'nullable|string|max:10',
             'logo'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
-    
         // Handle logo upload
         if ($request->hasFile('logo')) {
             // Delete old logo if it exists
             if ($client->logo && Storage::disk('public')->exists($client->logo)) {
                 Storage::disk('public')->delete($client->logo);
             }
-    
             // Upload new logo to tenant-aware public disk
             $validatedData['logo'] = $request->file('logo')->store('client-logos', 'public');
         }
-    
         // Update client
         $client->update($validatedData);
-    
         return redirect()->route('clients.index')->with('success', 'Client updated successfully!');
     }
-    
 
 
     /**

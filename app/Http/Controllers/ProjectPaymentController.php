@@ -127,7 +127,8 @@ class ProjectPaymentController extends Controller
             'status' => $subscription->status,
             'amount' => $request->amount,
             'currency' => $subscription->currency,
-            'billing_cycle' => $subscription->plan->interval
+            'billing_cycle' => $subscription->plan->interval,
+            'payment_type' => 'bank'
         ]);
 
         return redirect()->route('projects.index')->with('success', 'Subscription created successfully!');
