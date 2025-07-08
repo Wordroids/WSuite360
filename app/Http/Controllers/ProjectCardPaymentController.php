@@ -2,56 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Project;
 use App\Models\ProjectSubscription;
-
+use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Customer;
-use Stripe\SetupIntent;
-use Stripe\Price;
-use Stripe\Product;
-use Stripe\Subscription;
 use Stripe\PaymentMethod;
+use Stripe\Product;
+use Stripe\Price;
+use Stripe\Subscription;
 use Carbon\Carbon;
 
-class ProjectPaymentController extends Controller
+class ProjectCardPaymentController extends Controller
 {
-    public function selectBank(){
+
+    //to select the card
+    public function selectCard()
+    {
         $clients = Client::all();
-        $projects = Project::all();
-         return view('pages.payments.bankCharge', compact('clients', 'projects'));
+        $projects = collect();
+        return view('pages.payments.cardCharge', compact('clients', 'projects'));
     }
+
+    //to get the project
     public function getProjects($clientId)
     {
         $projects = Project::where('client_id', $clientId)->get();
         return response()->json($projects);
     }
 
-    public function setupBecs(Request $request)
+    //confirm payment
+    public function confirm(Request $request)
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
             'project_id' => 'required|exists:projects,id',
-            'bsb' => 'required',
-            'account_number' => 'required',
+            'amount' => 'required|numeric|min:1',
             'payment_cycle' => 'required|in:weekly,monthly,yearly',
-            'amount' => 'required|numeric',
+            'payment_method_id' => 'required|string',
         ]);
+
         $project = Project::findOrFail($request->project_id);
+        $client = Client::findOrFail($request->client_id);
+
 
         // Check if project has been started
         if ($project->start_date && Carbon::parse($project->start_date)->isFuture()) {
             return redirect()->back()->with('error', "Can't process the payment. The selected project has not been started yet.");
         }
 
+
+        return view('pages.payments.cardConfirm', [
+            'client' => $client,
+            'project' => $project,
+            'amount' => $request->amount,
+            'payment_cycle' => $request->payment_cycle,
+            'payment_method_id' => $request->payment_method_id,
+        ]);
+    }
+
+    public function process(Request $request)
+    {
+        $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'project_id' => 'required|exists:projects,id',
+            'amount' => 'required|numeric|min:1',
+            'payment_cycle' => 'required|in:weekly,monthly,yearly',
+            'payment_method_id' => 'required|string',
+        ]);
+
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
+        $project = Project::findOrFail($request->project_id);
         $client = Client::findOrFail($request->client_id);
 
-
+        // Create or retrieve customer
         if (!$client->stripe_customer_id) {
             $customer = Customer::create([
                 'email' => $client->email,
@@ -60,65 +86,40 @@ class ProjectPaymentController extends Controller
             $client->update(['stripe_customer_id' => $customer->id]);
         }
 
-        $intent = SetupIntent::create([
-            'customer' => $client->stripe_customer_id,
-            'payment_method_types' => ['au_becs_debit'],
-        ]);
 
-        return view('pages.payments.confirm', [
-            'client_secret' => $intent->client_secret,
-            'client' => $client,
-            'project' => $project,
-            'bsb' => $request->bsb,
-            'account_number' => $request->account_number,
-            'payment_cycle' => $request->payment_cycle,
-            'amount' => $request->amount,
-        ]);
-    }
-
-    public function processPayment(Request $request)
-    {
-        $request->validate([
-            'payment_method' => 'required|string',
-            'payment_cycle' => 'required|in:weekly,monthly,yearly',
-            'amount' => 'required|numeric',
-            'client_id' => 'required|exists:clients,id',
-            'project_id' => 'required|exists:projects,id',
-        ]);
-
-        Stripe::setApiKey(env('STRIPE_SECRET'));
-
-        $client = Client::findOrFail($request->client_id);
-        $project = Project::findOrFail($request->project_id);
-
-        $paymentMethod = $request->payment_method;
-
-        PaymentMethod::retrieve($paymentMethod)->attach(['customer' => $client->stripe_customer_id]);
+        PaymentMethod::retrieve($request->payment_method_id)
+            ->attach(['customer' => $client->stripe_customer_id]);
 
         Customer::update($client->stripe_customer_id, [
-            'invoice_settings' => ['default_payment_method' => $paymentMethod],
+            'invoice_settings' => ['default_payment_method' => $request->payment_method_id],
         ]);
+
 
         $interval = $this->getSubscriptionInterval($request->payment_cycle);
 
+
         $product = Product::create([
-            'name' => "Subscription for Project: {$project->name}",
+            'name' => "Subscription for {$project->name}",
             'type' => 'service'
         ]);
 
-        $plan = Price::create([
+        $price = Price::create([
             'product' => $product->id,
             'currency' => 'aud',
-            'recurring' => ['interval' => $interval['interval'], 'interval_count' => 1],
             'unit_amount' => $request->amount * 100,
+            'recurring' => [
+                'interval' => $interval['interval'],
+                'interval_count' => 1
+            ],
         ]);
+
 
         $subscription = Subscription::create([
             'customer' => $client->stripe_customer_id,
-            'items' => [['price' => $plan->id]],
-            'default_payment_method' => $paymentMethod,
-            'expand' => ['latest_invoice.payment_intent'],
+            'items' => [['price' => $price->id]],
+            'default_payment_method' => $request->payment_method_id,
         ]);
+
 
         ProjectSubscription::create([
             'client_id' => $client->id,
@@ -127,10 +128,12 @@ class ProjectPaymentController extends Controller
             'status' => $subscription->status,
             'amount' => $request->amount,
             'currency' => $subscription->currency,
-            'billing_cycle' => $subscription->plan->interval
+            'billing_cycle' => $subscription->plan->interval ?? $interval['interval'],
+            'payment_type' => 'card',
         ]);
 
-        return redirect()->route('projects.index')->with('success', 'Subscription created successfully!');
+        return redirect()->route('projects.index')
+            ->with('success', 'Card payment subscription created successfully!');
     }
 
     private function getSubscriptionInterval($cycle)
