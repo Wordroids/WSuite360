@@ -33,6 +33,9 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskUserController;
 use App\Http\Controllers\CompanySettingController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeDocumentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProjectCardPaymentController;
 use App\Http\Controllers\ProjectPaymentController;
@@ -121,6 +124,32 @@ Route::middleware([
 
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
+
+
+
+        // HR Management Routes
+        Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
+        // Employee Routes
+            Route::resource('employees', EmployeeController::class);
+            Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
+                ->name('employees.deactivate.form');
+            Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])
+                ->name('employees.deactivate');
+            Route::post('employees/{employee}/reactivate', [EmployeeController::class, 'reactivate'])
+                ->name('employees.reactivate');
+
+            // Employee Document Routes
+            Route::prefix('employees/{employee}/documents')->group(function () {
+                Route::get('/', [EmployeeDocumentController::class, 'index'])->name('employees.documents.index');
+                Route::get('/create', [EmployeeDocumentController::class, 'create'])->name('employees.documents.create');
+                Route::post('/', [EmployeeDocumentController::class, 'store'])->name('employees.documents.store');
+                Route::get('/{document}', [EmployeeDocumentController::class, 'show'])->name('employees.documents.show');
+                Route::delete('/{document}', [EmployeeDocumentController::class, 'destroy'])->name('employees.documents.destroy');
+            });
+
+            // Department Routes
+            Route::resource('departments', DepartmentController::class);
+        });
     });
 
     // Authenticated Routes Group
