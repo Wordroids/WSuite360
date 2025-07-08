@@ -1,7 +1,14 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-        <h2 class="text-2xl font-semibold mb-6">Card Payment Setup</h2>
-
+    <div class="max-w-4xl mx-auto px-4 py-8">
+   <div class="bg-white rounded-lg shadow-md overflow-hidden">
+     <div class="bg-blue-700 px-6 py-4">
+                <h2 class="text-xl font-semibold text-white flex items-center ">
+                       <svg class="w-8 h-8 mr-3 text-white dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M2 7c0-1.10457.89543-2 2-2h16c1.1046 0 2 .89543 2 2v4c0 .5523-.4477 1-1 1s-1-.4477-1-1v-1H4v7h10c.5523 0 1 .4477 1 1s-.4477 1-1 1H4c-1.10457 0-2-.8954-2-2V7Z"/>
+  <path fill="currentColor" d="M5 14c0-.5523.44772-1 1-1h2c.55228 0 1 .4477 1 1s-.44772 1-1 1H6c-.55228 0-1-.4477-1-1Zm5 0c0-.5523.4477-1 1-1h4c.5523 0 1 .4477 1 1s-.4477 1-1 1h-4c-.5523 0-1-.4477-1-1Zm9-1c.5523 0 1 .4477 1 1v1h1c.5523 0 1 .4477 1 1s-.4477 1-1 1h-1v1c0 .5523-.4477 1-1 1s-1-.4477-1-1v-1h-1c-.5523 0-1-.4477-1-1s.4477-1 1-1h1v-1c0-.5523.4477-1 1-1Z"/>
+</svg>Card Payment</h2>
+            </div>
+<div class="p-6">
         @if (session('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 {{ session('error') }}
@@ -14,7 +21,14 @@
             <!-- Client and Project Selection -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Client</label>
+                    <label class=" text-sm font-medium text-gray-700 mb-1 flex items-center">
+                       <svg class="w-5 h-5 mr-2 text-gray-500" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd"
+                                            d="M8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H6Zm7.25-2.095c.478-.86.75-1.85.75-2.905a5.973 5.973 0 0 0-.75-2.906 4 4 0 1 1 0 5.811ZM15.466 20c.34-.588.535-1.271.535-2v-1a5.978 5.978 0 0 0-1.528-4H18a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-4.535Z"
+                                            clip-rule="evenodd" />
+                                    </svg>Select Client</label>
                     <select name="client_id" id="client_id" class="w-full p-2 border rounded" required>
                         <option value="">Select Client</option>
                         @foreach ($clients as $client)
@@ -24,7 +38,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Project</label>
+                    <label class=" text-sm font-medium text-gray-700 mb-1 flex items-center">
+                     <svg class="w-5 h-5 mr-2 text-gray-500" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd"
+                                            d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7ZM8 16a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm1-5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                        Select Project</label>
                     <select name="project_id" id="project_id" class="w-full p-2 border rounded" required disabled>
                         <option value="">Select Client First</option>
                     </select>
@@ -56,10 +78,12 @@
             <input type="hidden" name="payment_method_id" id="payment_method_id">
 
             <button type="submit" id="submit-button"
-                class="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                class=" px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                 Process Payment
             </button>
         </form>
+   </div>
+    </div>
     </div>
 
     <script src="https://js.stripe.com/v3/"></script>
