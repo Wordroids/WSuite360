@@ -17,7 +17,7 @@ class Employee extends Model
         'email',
         'phone',
         'department_id',
-        'designation',
+        'designation_id',
         'date_of_joining',
         'status',
         'inactive_reason',
@@ -62,5 +62,9 @@ class Employee extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+       public function designation()
+    {
+        return $this->belongsTo(Designation::class);
     }
 }

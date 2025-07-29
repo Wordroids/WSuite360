@@ -34,6 +34,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\TaskUserController;
 use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeDocumentController;
 use App\Http\Controllers\PaymentController;
@@ -129,7 +130,7 @@ Route::middleware([
 
         // HR Management Routes
         Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
-        // Employee Routes
+            // Employee Routes
             Route::resource('employees', EmployeeController::class);
             Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
                 ->name('employees.deactivate.form');
@@ -149,9 +150,21 @@ Route::middleware([
 
             // Department Routes
             Route::resource('departments', DepartmentController::class);
+            Route::prefix('departments/{department}')->group(function () {
+                Route::resource('designations', DesignationController::class)
+                    ->except(['show'])
+                    ->names([
+                        'index' => 'departments.designations.index',
+                        'create' => 'departments.designations.create',
+                        'store' => 'departments.designations.store',
+                        'edit' => 'departments.designations.edit',
+                        'update' => 'departments.designations.update',
+                        'destroy' => 'departments.designations.destroy',
+                    ]);
+            });
         });
     });
-
+    Route::get('/employees/get-designations/{departmentId}', [EmployeeController::class, 'getDesignations'])->name('employees.get-designations');
     // Authenticated Routes Group
     Route::middleware('auth')->group(function () {
 

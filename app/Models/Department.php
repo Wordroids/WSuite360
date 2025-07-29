@@ -9,12 +9,17 @@ class Department extends Model
 {
 
 
-     use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['name', 'description'];
 
     public function employees()
     {
         return $this->hasMany(Employee::class);
+    }
+    
+    public function designations()
+    {
+        return $this->hasMany(Designation::class);
     }
 }
