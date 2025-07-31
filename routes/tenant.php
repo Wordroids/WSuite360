@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\LeaveTypeController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -37,6 +38,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeDocumentController;
+use App\Http\Controllers\LeaveApplicationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProjectCardPaymentController;
 use App\Http\Controllers\ProjectPaymentController;
@@ -234,6 +236,21 @@ Route::middleware([
             Route::resource('break_logs', BreakLogController::class)->except(['destroy']);
             Route::get('employee/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
         });
+
+
+        //Leave Management routes
+        Route::middleware(['role:admin,hr_manager'])->group(function () {
+            Route::resource('leave-types', LeaveTypeController::class);
+            Route::resource('leave-applications', LeaveApplicationController::class);
+            Route::post('leave-applications/{leave_application}/approve', [LeaveApplicationController::class, 'approve'])
+                ->name('leave-applications.approve');
+            Route::post('leave-applications/{leave_application}/reject', [LeaveApplicationController::class, 'reject'])
+                ->name('leave-applications.reject');
+            Route::post('leave-applications/{leave_application}/update-status', [LeaveApplicationController::class, 'updateStatus'])
+                ->name('leave-applications.update-status');
+        });
+
+
 
         // Project Manager Routes (Approvals & Manager Dashboard)
         Route::middleware('role:project_manager,admin')->group(function () {
