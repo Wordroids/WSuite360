@@ -128,11 +128,13 @@ Route::middleware([
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
 
-
+         });
 
         // HR Management Routes
         Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
             // Employee Routes
+           Route::get('employees/export', [EmployeeController::class, 'exportPdf'])
+                ->name('employees.export');
             Route::resource('employees', EmployeeController::class);
             Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
                 ->name('employees.deactivate.form');
@@ -163,7 +165,6 @@ Route::middleware([
                         'update' => 'departments.designations.update',
                         'destroy' => 'departments.designations.destroy',
                     ]);
-            });
         });
     });
     Route::get('/employees/get-designations/{departmentId}', [EmployeeController::class, 'getDesignations'])->name('employees.get-designations');
@@ -240,6 +241,8 @@ Route::middleware([
 
         //Leave Management routes
         Route::middleware(['role:admin,hr_manager'])->group(function () {
+             Route::get('leave-applications/report', [LeaveApplicationController::class, 'report'])
+                ->name('leave-applications.report');
             Route::resource('leave-types', LeaveTypeController::class);
             Route::resource('leave-applications', LeaveApplicationController::class);
             Route::post('leave-applications/{leave_application}/approve', [LeaveApplicationController::class, 'approve'])
@@ -249,7 +252,6 @@ Route::middleware([
             Route::post('leave-applications/{leave_application}/update-status', [LeaveApplicationController::class, 'updateStatus'])
                 ->name('leave-applications.update-status');
         });
-
 
 
         // Project Manager Routes (Approvals & Manager Dashboard)
