@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\LeaveApplication;
 use App\Models\LeaveType;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LeaveApplicationController extends Controller
 {
@@ -153,5 +155,50 @@ class LeaveApplicationController extends Controller
         $leaveApplication->update($updateData);
 
         return back()->with('success', 'Leave application status updated.');
+    }
+
+    public function report(Request $request)
+    {
+        $query = LeaveApplication::with(['employee', 'leaveType', 'employee.department'])
+            ->when($request->has('department_id') && $request->department_id != '', function ($q) use ($request) {
+                $q->whereHas('employee', function ($employeeQuery) use ($request) {
+                    $employeeQuery->where('department_id', $request->department_id);
+                });
+            })
+            ->when($request->has('leave_type_id') && $request->leave_type_id != '', function ($q) use ($request) {
+                $q->where('leave_type_id', $request->leave_type_id);
+            })
+            ->when($request->has('status') && $request->status != '', function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->when($request->has('start_date') && $request->start_date != '', function ($q) use ($request) {
+                $q->whereDate('start_date', '>=', $request->start_date);
+            })
+            ->when($request->has('end_date') && $request->end_date != '', function ($q) use ($request) {
+                $q->whereDate('end_date', '<=', $request->end_date);
+            });
+
+        $leaveApplications = $query->latest()->get();
+
+        $departments = Department::all();
+        $leaveTypes = LeaveType::all();
+
+        // PDF Export
+        if ($request->has('export') && $request->export == 'pdf') {
+            $pdf = PDF::loadView('pages.leave-applications.report-pdf', [
+                'leaveApplications' => $leaveApplications,
+                'filters' => $request->all(),
+                'departmentName' => $request->department_id ? Department::find($request->department_id)->name : 'All',
+                'leaveTypeName' => $request->leave_type_id ? LeaveType::find($request->leave_type_id)->name : 'All'
+            ]);
+            return $pdf->download('leave-history-report-' . now()->format('Y-m-d') . '.pdf');
+        }
+
+        return view('pages.leave-applications.report', [
+            'leaveApplications' => $leaveApplications,
+            'departments' => $departments,
+            'leaveTypes' => $leaveTypes,
+            'filters' => $request->all()
+        ]);
     }
 }
