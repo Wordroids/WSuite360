@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\Designation;
 use App\Models\EmployeeStatusHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::with('department')->active()->paginate(10);
+        $employees = Employee::with(['department', 'designation'])->active()->paginate(10);
         return view('pages.employees.index', compact('employees'));
     }
 
@@ -22,6 +23,13 @@ class EmployeeController extends Controller
     {
         $departments = Department::all();
         return view('pages.employees.create', compact('departments'));
+    }
+
+    // To fetch designations
+    public function getDesignations($departmentId)
+    {
+        $designations = Designation::where('department_id', $departmentId)->get();
+        return response()->json($designations);
     }
 
     public function store(Request $request)
@@ -33,9 +41,14 @@ class EmployeeController extends Controller
             'email' => 'required|email|unique:employees',
             'phone' => 'nullable|string|max:20',
             'department_id' => 'required|exists:departments,id',
-            'designation' => 'required|string|max:100',
+            'designation_id' => 'required|exists:designations,id',
             'date_of_joining' => 'required|date',
         ]);
+
+        $designation = Designation::find($validated['designation_id']);
+        if ($designation->department_id != $validated['department_id']) {
+            return back()->withErrors(['designation_id' => 'Selected designation does not belong to the selected department.']);
+        }
 
         $validated['status'] = 'active';
         $validated['created_by'] = Auth::id();
@@ -69,9 +82,14 @@ class EmployeeController extends Controller
             ],
             'phone' => 'nullable|string|max:20',
             'department_id' => 'required|exists:departments,id',
-            'designation' => 'required|string|max:100',
+            'designation_id' => 'required|exists:designations,id',
             'date_of_joining' => 'required|date',
         ]);
+
+        $designation = Designation::find($validated['designation_id']);
+        if ($designation->department_id != $validated['department_id']) {
+            return back()->withErrors(['designation_id' => 'Selected designation does not belong to the selected department.']);
+        }
 
         $validated['updated_by'] = Auth::id();
 

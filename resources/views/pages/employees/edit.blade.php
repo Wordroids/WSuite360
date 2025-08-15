@@ -54,8 +54,16 @@
 
                 <!-- Designation -->
                 <div class="mb-4">
-                    <label for="designation" class="block text-sm font-medium text-gray-700">Designation*</label>
-                    <input type="text" name="designation" id="designation" value="{{ $employee->designation }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <label for="designation_id" class="block text-sm font-medium text-gray-700">Designation*</label>
+                    <select name="designation_id" id="designation_id" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                        <option value="">Select Designation</option>
+                        @foreach ($designations as $designation)
+                            <option value="{{ $designation->id }}"
+                                {{ $employee->designation_id == $designation->id ? 'selected' : '' }}>
+                                {{ $designation->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Date of Joining -->
@@ -76,4 +84,31 @@
             </div>
         </form>
     </div>
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#department_id').change(function() {
+            var departmentId = $(this).val();
+            if (departmentId) {
+                $.ajax({
+                    url: "{{ route('employees.getDesignations') }}",
+                    type: "GET",
+                    data: {'department_id': departmentId},
+                    success: function(data) {
+                        $('#designation_id').empty();
+                        $('#designation_id').append('<option value="">Select Designation</option>');
+                        $.each(data, function(key, value) {
+                            $('#designation_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#designation_id').empty();
+                $('#designation_id').append('<option value="">Select Department First</option>');
+            }
+        });
+    });
+</script>
+@endpush
 </x-app-layout>

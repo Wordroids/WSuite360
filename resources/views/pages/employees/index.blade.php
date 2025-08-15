@@ -45,7 +45,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->employee_code }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->full_name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->department->name }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A'}}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">
                                     {{ $employee->date_of_joining->format('d M Y') }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">

@@ -51,8 +51,10 @@
 
                 <!-- Designation -->
                 <div class="mb-4">
-                    <label for="designation" class="block text-sm font-medium text-gray-700">Designation*</label>
-                    <input type="text" name="designation" id="designation" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <label for="designation_id" class="block text-sm font-medium text-gray-700">Designation*</label>
+                    <select name="designation_id" id="designation_id" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                        <option value="">Select Department First</option>
+                    </select>
                 </div>
 
                 <!-- Date of Joining -->
@@ -73,4 +75,38 @@
             </div>
         </form>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#department_id').change(function() {
+        var departmentId = $(this).val();
+
+        if (departmentId) {
+
+            var url = "{{ route('employees.get-designations', ':id') }}".replace(':id', departmentId);
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $('#designation_id').empty();
+                    $('#designation_id').append('<option value="">Select Designation</option>');
+                    $.each(data, function(key, value) {
+                        $('#designation_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                    console.log(xxhr.responseText);
+                }
+            });
+        } else {
+            $('#designation_id').empty();
+            $('#designation_id').append('<option value="">Select Department First</option>');
+        }
+    });
+});
+</script>
+
 </x-app-layout>

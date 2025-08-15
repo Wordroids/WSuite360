@@ -31,7 +31,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-gray-700">Designation</p>
-                    <p class="text-sm text-gray-800">{{ $employee->designation }}</p>
+                    <p class="text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A' }}</p>
                 </div>
                 <div>
                     <p class="text-sm font-medium text-gray-700">Date of Joining</p>
