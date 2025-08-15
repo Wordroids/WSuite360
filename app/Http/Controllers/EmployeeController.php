@@ -9,13 +9,33 @@ use App\Models\EmployeeStatusHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::with(['department', 'designation'])->active()->paginate(10);
-        return view('pages.employees.index', compact('employees'));
+        $query = Employee::with(['department', 'designation']);
+
+        //  filters
+        if ($request->has('department_id') && $request->department_id) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->has('designation_id') && $request->designation_id) {
+            $query->where('designation_id', $request->designation_id);
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $employees = $query->paginate(10);
+        $departments = Department::all();
+        $designations = Designation::all();
+
+        return view('pages.employees.index', compact('employees', 'departments', 'designations'));
     }
 
     //To Create
@@ -156,5 +176,35 @@ class EmployeeController extends Controller
 
         return redirect()->route('employees.index')
             ->with('success', 'Employee reactivated successfully.');
+    }
+    
+    public function exportPdf(Request $request)
+    {
+        $query = Employee::with(['department', 'designation']);
+
+        // filters
+        if ($request->has('department_id') && $request->department_id) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->has('designation_id') && $request->designation_id) {
+            $query->where('designation_id', $request->designation_id);
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $employees = $query->get();
+
+        // Load the view
+        $pdf = PDF::loadView('pages.employees.report', [
+            'employees' => $employees
+        ]);
+
+        // Set paper size and orientation
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->download('employee_report_' . now()->format('YmdHis') . '.pdf');
     }
 }
