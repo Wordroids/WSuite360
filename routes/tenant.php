@@ -243,6 +243,8 @@ Route::middleware([
         Route::middleware(['role:admin,hr_manager'])->group(function () {
              Route::get('leave-applications/report', [LeaveApplicationController::class, 'report'])
                 ->name('leave-applications.report');
+            Route::get('leave-applications/leave-balance', [LeaveApplicationController::class, 'leaveBalanceReport'])
+                ->name('leave-applications.leave-balance');
             Route::resource('leave-types', LeaveTypeController::class);
             Route::resource('leave-applications', LeaveApplicationController::class);
             Route::post('leave-applications/{leave_application}/approve', [LeaveApplicationController::class, 'approve'])

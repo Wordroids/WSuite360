@@ -67,4 +67,13 @@ class Employee extends Model
     {
         return $this->belongsTo(Designation::class);
     }
+    public function leaveApplications()
+    {
+        return $this->hasMany(LeaveApplication::class);
+    }
+
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
 }

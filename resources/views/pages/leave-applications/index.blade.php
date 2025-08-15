@@ -24,6 +24,10 @@
                         class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center0">
                         + Generate Report
                     </a>
+                    <a href="{{ route('leave-applications.leave-balance') }}"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Leave Balance Report
+                    </a>
                 </div>
             </div>
 

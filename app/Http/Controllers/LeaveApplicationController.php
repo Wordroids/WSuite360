@@ -201,4 +201,109 @@ class LeaveApplicationController extends Controller
             'filters' => $request->all()
         ]);
     }
+
+    //to generate leave balance report
+    public function leaveBalanceReport(Request $request)
+    {
+        // Get all active employees with their leave balances
+        $query = Employee::with(['department', 'leaveBalances.leaveType'])
+            ->active()
+            ->withCount(['leaveApplications as total_used_leave' => function ($q) use ($request) {
+                $q->where('status', 'approved');
+
+                if ($request->has('leave_type_id') && $request->leave_type_id != '') {
+                    $q->where('leave_type_id', $request->leave_type_id);
+                }
+
+                if ($request->has('start_date') && $request->start_date != '') {
+                    $q->whereDate('start_date', '>=', $request->start_date);
+                }
+
+                if ($request->has('end_date') && $request->end_date != '') {
+                    $q->whereDate('end_date', '<=', $request->end_date);
+                }
+            }]);
+
+        // Apply department filter 
+        if ($request->has('department_id') && $request->department_id != '') {
+            $query->where('department_id', $request->department_id);
+        }
+
+        $employees = $query->get()->map(function ($employee) use ($request) {
+            // If no leave balances exist, create a default breakdown using leave types
+            if ($employee->leaveBalances->isEmpty()) {
+                $leaveTypes = LeaveType::all();
+                $employee->leave_breakdown = $leaveTypes->map(function ($type) use ($employee, $request) {
+                    $usedQuery = $employee->leaveApplications()
+                        ->where('leave_type_id', $type->id)
+                        ->where('status', 'approved');
+
+                    if ($request->has('start_date') && $request->start_date != '') {
+                        $usedQuery->whereDate('start_date', '>=', $request->start_date);
+                    }
+
+                    if ($request->has('end_date') && $request->end_date != '') {
+                        $usedQuery->whereDate('end_date', '<=', $request->end_date);
+                    }
+
+                    $used = $usedQuery->sum('days_requested');
+
+                    return [
+                        'leave_type' => $type->name,
+                        'allocated' => $type->default_entitlement ?? 0,
+                        'used' => $used,
+                        'remaining' => ($type->default_entitlement ?? 0) - $used
+                    ];
+                });
+            } else {
+                // Calculate leave balances for each leave type
+                $employee->leave_breakdown = $employee->leaveBalances->map(function ($balance) use ($employee, $request) {
+                    $usedQuery = $employee->leaveApplications()
+                        ->where('leave_type_id', $balance->leave_type_id)
+                        ->where('status', 'approved');
+
+                    if ($request->has('start_date') && $request->start_date != '') {
+                        $usedQuery->whereDate('start_date', '>=', $request->start_date);
+                    }
+
+                    if ($request->has('end_date') && $request->end_date != '') {
+                        $usedQuery->whereDate('end_date', '<=', $request->end_date);
+                    }
+
+                    $used = $usedQuery->sum('days_requested');
+
+                    return [
+                        'leave_type' => $balance->leaveType->name,
+                        'allocated' => $balance->days,
+                        'used' => $used,
+                        'remaining' => $balance->days - $used
+                    ];
+                });
+            }
+
+            return $employee;
+        });
+
+        $departments = Department::all();
+        $leaveTypes = LeaveType::all();
+
+        // PDF Export
+        if ($request->has('export') && $request->export == 'pdf') {
+            $filters = $request->all();
+            $pdf = PDF::loadView('pages.leave-applications.leave-balance-pdf', [
+                'employees' => $employees,
+                'filters' => $filters,
+                'departmentName' => isset($filters['department_id']) && $filters['department_id'] ? Department::find($filters['department_id'])->name : 'All',
+                'leaveTypeName' => isset($filters['leave_type_id']) && $filters['leave_type_id'] ? LeaveType::find($filters['leave_type_id'])->name : 'All'
+            ]);
+            return $pdf->download('leave-balance-report-' . now()->format('Y-m-d') . '.pdf');
+        }
+
+        return view('pages.leave-applications.leave-balance', [
+            'employees' => $employees,
+            'departments' => $departments,
+            'leaveTypes' => $leaveTypes,
+            'filters' => $request->all()
+        ]);
+    }
 }
