@@ -13,12 +13,18 @@
                 </div>
             @endif
 
-            <div class="flex justify-between mb-4">
+            <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold">Leave Applications</h3>
+                <div class="flex space-x-2">
                 <a href="{{ route('leave-applications.create') }}"
                     class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     + New Application
                 </a>
+                    <a href="{{ route('leave-applications.report') }}"
+                        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center0">
+                        + Generate Report
+                    </a>
+                </div>
             </div>
 
             <!-- Filters -->
