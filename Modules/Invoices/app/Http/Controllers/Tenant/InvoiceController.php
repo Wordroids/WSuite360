@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Invoices\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client;
-use App\Models\CompanySettings;
-use App\Models\Invoice;
-use App\Models\InvoicePayment;
-use App\Models\Project;
-//use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\Enums\Format;
+
+// External models
+use App\Models\Client;
+use App\Models\CompanySettings;
+use App\Models\Project;
+
+// Module models
+use Modules\Invoices\Models\Invoice;
+use Modules\Invoices\Models\InvoicePayment;
 
 class InvoiceController extends Controller
 {
@@ -26,7 +28,7 @@ class InvoiceController extends Controller
 
         $clients = Client::all();
 
-        return view('pages.invoice.index', compact('invoices', 'clients'));
+        return view('invoices::pages.invoice.index', compact('invoices', 'clients'));
     }
 
     //To view an invoice
@@ -40,7 +42,7 @@ class InvoiceController extends Controller
 
 
         $company = CompanySettings::first();
-        return view('pages.invoice.viewInvoice', compact('invoice', 'company', 'payments'));
+        return view('invoices::pages.invoice.viewInvoice', compact('invoice', 'company', 'payments'));
     }
     //To create an invoice
     public function create()
@@ -48,7 +50,7 @@ class InvoiceController extends Controller
         $clients = Client::all();
         $projects = Project::all(['id', 'name']);
         $companySettings = CompanySettings::first();
-        return view('pages.invoice.create', compact('clients', 'projects', 'companySettings'));
+        return view('invoices::pages.invoice.create', compact('clients', 'projects', 'companySettings'));
     }
 
     public function store(Request $request)
@@ -178,9 +180,9 @@ class InvoiceController extends Controller
 
         $company = CompanySettings::first();
 
-        $template = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
+        $template = view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'))->render();
         
-        $html = view('pdf.pdf', compact('invoice', 'company', 'payments'))->render();
+        $html = view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'))->render();
 
         $pdfPath = storage_path('app/public/invoice-' . $invoice->id . '.pdf');
 
@@ -221,7 +223,7 @@ class InvoiceController extends Controller
     }
     
     // Use the correct namespace for Spatie's Laravel-PDF
-    return Pdf::view('pdf.pdf', [
+    return Pdf::view('invoices::pdf.pdf', [
         'invoice' => $invoice,
         'company' => $company,
         'payments' => $payments,
@@ -240,6 +242,6 @@ class InvoiceController extends Controller
 
         $company = CompanySettings::first();
 
-        return view('pdf.pdf', compact('invoice', 'company', 'payments'));
+        return view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'));
     }
 }
