@@ -22,7 +22,6 @@ use App\Http\Controllers\BreakLogApprovalController;
 use App\Http\Controllers\BreakLogController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\EmployeeDashboardController;
-use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectUserController;
@@ -64,14 +63,12 @@ Route::middleware([
     Route::get('/', function () {
         return view('welcome');
     });
-    Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
 
     //storage link
     Route::get('/storage-link', function () {
         \Artisan::call('storage:link');
         return 'Storage link created successfully.';
     })->name('storage.link');
-
 
 
     // Dashboard Route (Only Authenticated Users)
@@ -284,30 +281,6 @@ Route::middleware([
         Route::get('users/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
 
         Route::get('/pages/users/index', [AdminUserController::class, 'index'])->name('pages.users.index');
-
-
-        //Routes for Invoice
-        Route::get('/pages/invoice/index', [InvoiceController::class, 'index'])->name('invoice.index');
-        Route::get('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-        Route::get('/viewInvoice', [InvoiceController::class, 'viewInvoice'])->name('invoice.show');
-        Route::post('/invoice/store', [InvoiceController::class, 'store'])->name('invoices.store');
-        Route::delete('/invoice/{invoice}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
-        Route::get('/invoice/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoice.edit');
-
-        Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'showPdf'])->name('invoices.showPdf');
-        Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoice.download');
-
-
-
-        Route::post('/invoice/{invoice}/approve', [InvoiceController::class, 'approve'])->name('invoice.approve');
-        Route::post('/invoice/{invoice}/mark-as-sent', [InvoiceController::class, 'markAsSent'])->name('invoice.markAsSent');
-        Route::post('/invoices/{invoice}/record-payment', [InvoiceController::class, 'recordPayment'])->name('invoice.recordxPayment');
-
-        Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
-        Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
-
-
-
 
 
         //Comany Settings
