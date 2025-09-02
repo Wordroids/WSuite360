@@ -95,13 +95,14 @@
                     <div class="text-xs/6 font-semibold text-indigo-200">Your teams</div>
                     <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li>
-
+                             @if(Auth::user()->hasRole('admin'))
                             <a href="{{ route('employees.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
                                 <span class="truncate">Employees</span>
                             </a>
+                            @endif
                             <a href="{{ route('departments.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span

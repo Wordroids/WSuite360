@@ -107,6 +107,7 @@
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Employee Code
                             </th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">User Email</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Department</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Designation</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Date of Joining
@@ -120,6 +121,7 @@
                             <tr class="bg-white hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->employee_code }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->full_name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->user->email ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->department->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A'}}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">

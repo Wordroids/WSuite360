@@ -9,37 +9,38 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Employee Code (readonly) -->
+                <!-- User Account Fields -->
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name (User Account)*</label>
+                    <input type="text" name="name" id="name" value="{{ old('name', $employee->user->name) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">User Email*</label>
+                    <input type="email" name="email" id="email" value="{{ old('email', $employee->user->email) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                </div>
+
+                <!-- Employee Profile Fields -->
                 <div class="mb-4">
                     <label for="employee_code" class="block text-sm font-medium text-gray-700">Employee Code</label>
                     <input type="text" id="employee_code" value="{{ $employee->employee_code }}" class="mt-1 p-2 w-full border rounded-lg bg-gray-100" readonly>
                 </div>
 
-                <!-- First Name -->
                 <div class="mb-4">
                     <label for="first_name" class="block text-sm font-medium text-gray-700">First Name*</label>
-                    <input type="text" name="first_name" id="first_name" value="{{ $employee->first_name }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <input type="text" name="first_name" id="first_name" value="{{ old('first_name', $employee->first_name) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
                 </div>
 
-                <!-- Last Name -->
                 <div class="mb-4">
                     <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name*</label>
-                    <input type="text" name="last_name" id="last_name" value="{{ $employee->last_name }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <input type="text" name="last_name" id="last_name" value="{{ old('last_name', $employee->last_name) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
                 </div>
 
-                <!-- Email -->
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email*</label>
-                    <input type="email" name="email" id="email" value="{{ $employee->email }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
-                </div>
-
-                <!-- Phone -->
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
-                    <input type="text" name="phone" id="phone" value="{{ $employee->phone }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300">
+                    <input type="text" name="phone" id="phone" value="{{ old('phone', $employee->phone) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300">
                 </div>
 
-                <!-- Department -->
                 <div class="mb-4">
                     <label for="department_id" class="block text-sm font-medium text-gray-700">Department*</label>
                     <select name="department_id" id="department_id" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
@@ -52,7 +53,6 @@
                     </select>
                 </div>
 
-                <!-- Designation -->
                 <div class="mb-4">
                     <label for="designation_id" class="block text-sm font-medium text-gray-700">Designation*</label>
                     <select name="designation_id" id="designation_id" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
@@ -66,7 +66,6 @@
                     </select>
                 </div>
 
-                <!-- Date of Joining -->
                 <div class="mb-4">
                     <label for="date_of_joining" class="block text-sm font-medium text-gray-700">Date of Joining*</label>
                     <input type="date" name="date_of_joining" id="date_of_joining" value="{{ $employee->date_of_joining->format('Y-m-d') }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
