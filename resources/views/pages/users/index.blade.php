@@ -31,21 +31,25 @@
                                         class="bg-indigo-700 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600">
                                         View
                                     </a>
+                                     @if(Auth::user()->hasRole('admin'))
                                     <a href="{{ route('admin.users.edit', $user) }}"
                                         class="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600">
                                         Edit
                                     </a>
+                                    @endif
                                     <form id="delete-form-{{ $user->id }}"
                                         action="{{ route('admin.users.destroy', $user) }}" method="POST"
                                         class="inline">
                                         @csrf
                                         @method('DELETE')
                                     </form>
+                                     @if(Auth::user()->hasRole('admin'))
                                     <button type="button"
                                         class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
                                         onclick="confirmDeletion({{ $user->id }})">
                                         Delete
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
