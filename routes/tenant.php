@@ -167,7 +167,7 @@ Route::middleware([
                     ]);
         });
     });
-    Route::get('/employees/get-designations/{departmentId}', [EmployeeController::class, 'getDesignations'])->name('employees.get-designations');
+    Route::get('/employees/get-designations', [EmployeeController::class, 'getDesignations'])->name('employees.get-designations');
     // Authenticated Routes Group
     Route::middleware('auth')->group(function () {
 

@@ -65,8 +65,9 @@ class EmployeeController extends Controller
     }
 
     // To fetch designations
-    public function getDesignations($departmentId)
+    public function getDesignations(Request $request)
     {
+         $departmentId = $request->input('department_id');
         $designations = Designation::where('department_id', $departmentId)->get();
         return response()->json($designations);
     }
@@ -154,7 +155,9 @@ class EmployeeController extends Controller
     public function edit(EmployeeProfile $employee)
     {
         $departments = Department::all();
-        return view('pages.employees.edit', compact('employee', 'departments'));
+        $designations = Designation::all();
+        $employee->load('user');
+        return view('pages.employees.edit', compact('employee', 'departments','designations'));
     }
 
     public function update(Request $request, EmployeeProfile $employee)
