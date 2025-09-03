@@ -43,7 +43,7 @@ class EmployeeProfile extends Model
 
     public function documents()
     {
-        return $this->hasMany(EmployeeDocument::class);
+        return $this->hasMany(EmployeeDocument::class,'employee_id');
     }
 
     public function statusHistory()
