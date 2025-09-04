@@ -145,8 +145,7 @@ $(document).ready(function() {
 
                     if (designationSelect.length) {
         if (departmentId) {
-            var url = "{{ route('employees.get-designations', ':id') }}".replace(':id',
- departmentId);
+            var url = "{{ route('employees.get-designations') }}?department_id=" + departmentId;
 
             $.ajax({
                 url: url,

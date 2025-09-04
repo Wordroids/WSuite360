@@ -8,7 +8,8 @@
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Employee -->
+                <!-- Employee - Only show for admin/HR -->
+                @if(in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                 <div class="mb-4">
                     <label for="employee_id" class="block text-sm font-medium text-gray-700">Employee</label>
                     <select name="employee_id" id="employee_id"
@@ -22,6 +23,10 @@
                         @endforeach
                     </select>
                 </div>
+                @else
+                    <!-- Hidden input for employee ID for non-admin users -->
+                    <input type="hidden" name="employee_id" value="{{ auth()->user()->employeeProfile->id }}">
+                @endif
 
                 <!-- Leave Type -->
                 <div class="mb-4">
@@ -64,7 +69,11 @@
             <div class="flex justify-end mt-4">
                 <button type="submit"
                     class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200">
+                    @if(in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                     Submit Application
+                    @else
+                        Request Leave
+                    @endif
                 </button>
                 <a href="{{ route('leave-applications.index') }}"
                     class="ml-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">

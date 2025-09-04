@@ -16,6 +16,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold">Leave Applications</h3>
                 <div class="flex space-x-2">
+                    @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                 <a href="{{ route('leave-applications.create') }}"
                     class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     + New Application
@@ -28,10 +29,17 @@
                         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                         Leave Balance Report
                     </a>
+                    @elseif (auth()->user()->role->name !== 'guest')
+                        <a href="{{ route('leave-applications.create') }}"
+                            class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                            + Request Leave
+                        </a>
+                    @endif
                 </div>
             </div>
 
-            <!-- Filters -->
+            <!-- Filters - Only show for admin/HR -->
+            @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
             <div class="mb-4 p-4 bg-gray-50 rounded-lg">
                 <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -82,13 +90,16 @@
                     </div>
                 </form>
             </div>
+            @endif
 
             <!-- Leave Applications Table -->
             <div class="overflow-x-auto rounded-lg shadow-lg">
                 <table class="min-w-full table-auto border-collapse border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Employee</th>
+                            @endif
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Leave Type</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Dates</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Days</th>
@@ -99,9 +110,11 @@
                     <tbody>
                         @forelse ($leaveApplications as $leaveApplication)
                             <tr class="bg-white hover:bg-gray-50">
+                                @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                                 <td class="px-6 py-4 text-sm text-gray-800">
                                     {{ $leaveApplication->employee->full_name }}
                                 </td>
+                                @endif
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $leaveApplication->leaveType->name }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-800">
@@ -160,7 +173,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="{{ in_array(auth()->user()->role->name, ['admin', 'hr_manager']) ? '6' : '5' }}" class="px-6 py-4 text-center text-gray-500">
                                     No leave applications found.
                                 </td>
                             </tr>
@@ -176,7 +189,8 @@
         </div>
     </div>
 
-    <!-- Reject Modal -->
+    <!-- Reject Modal - Only for admin/HR -->
+    @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
     <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
@@ -202,6 +216,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <script>
         function openRejectModal(applicationId) {
