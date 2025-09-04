@@ -13,6 +13,7 @@
                 </div>
             @endif
 
+         <!-- In your index.blade.php file, update the button section: -->
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold">Leave Applications</h3>
                 <div class="flex space-x-2">
@@ -25,19 +26,21 @@
                         class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center0">
                         + Generate Report
                     </a>
-                    <a href="{{ route('leave-applications.leave-balance') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                        Leave Balance Report
-                    </a>
                     @elseif (auth()->user()->role->name !== 'guest')
                         <a href="{{ route('leave-applications.create') }}"
                             class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                             + Request Leave
                         </a>
                     @endif
+                    <!-- Show Leave Balance Report for all users except guests -->
+                    @if (auth()->user()->role->name !== 'guest')
+                        <a href="{{ route('leave-applications.leave-balance') }}"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Leave Balance Report
+                        </a>
+                    @endif
                 </div>
             </div>
-
             <!-- Filters - Only show for admin/HR -->
             @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
             <div class="mb-4 p-4 bg-gray-50 rounded-lg">

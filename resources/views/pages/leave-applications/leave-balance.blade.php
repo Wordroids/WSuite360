@@ -2,7 +2,13 @@
     <div class="flex h-screen overflow-hidden">
         <div class="flex-1 flex flex-col mt-5">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Leave Balance Report</h3>
+                <h3 class="text-lg font-semibold">
+                    @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
+                        Leave Balance Report
+                    @else
+                        My Leave Balance
+                    @endif
+                </h3>
                 <div class="flex space-x-2">
                     <a href="{{ route('leave-applications.index') }}"
                         class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
@@ -15,7 +21,8 @@
                 </div>
             </div>
 
-            <!-- Filters -->
+            <!-- Filters - Only show for admin/HR -->
+            @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
             <div class="mb-4 p-4 bg-gray-50 rounded-lg">
                 <form method="GET" action="{{ route('leave-applications.leave-balance') }}"
                     class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -65,14 +72,17 @@
                     </div>
                 </form>
             </div>
+            @endif
 
             <!-- Leave Balance Table -->
             <div class="overflow-x-auto rounded-lg shadow-lg">
                 <table class="min-w-full table-auto border-collapse border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Employee</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Department</th>
+                            @endif
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Leave Type</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Allocated</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Used</th>
@@ -84,12 +94,14 @@
                             @if ($employee->leave_breakdown->count() > 0)
                                 @foreach ($employee->leave_breakdown as $balance)
                                     <tr class="bg-white hover:bg-gray-50">
+                                        @if (in_array(auth()->user()->role->name, ['admin', 'hr_manager']))
                                         <td class="px-6 py-4 text-sm text-gray-800">
                                             {{ $employee->full_name }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-800">
                                             {{ $employee->department->name ?? 'N/A' }}
                                         </td>
+                                        @endif
                                         <td class="px-6 py-4 text-sm text-gray-800">
                                             {{ $balance['leave_type'] }}
                                         </td>
@@ -109,14 +121,14 @@
                                 @endforeach
                             @else
                                 <tr class="bg-white hover:bg-gray-50">
-                                    <td class="px-6 py-4 text-sm text-gray-800" colspan="6">
+                                    <td colspan="{{ in_array(auth()->user()->role->name, ['admin', 'hr_manager']) ? '6' : '4' }}"class="px-6 py-4 text-center text-gray-500">
                                         No leave balance information available for {{ $employee->full_name }}
                                     </td>
                                 </tr>
                             @endif
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="{{ in_array(auth()->user()->role->name, ['admin', 'hr_manager']) ? '6' : '4' }}" class="px-6 py-4 text-center text-gray-500">
                                     No employees found matching your criteria.
                                 </td>
                             </tr>
