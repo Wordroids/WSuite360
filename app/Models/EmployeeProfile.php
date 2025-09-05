@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
 
-class Employee extends Model
+class EmployeeProfile extends Model
 {
-     use HasFactory, SoftDeletes;
-
+    use HasFactory, SoftDeletes;
+    protected $table = 'employees';
     protected $fillable = [
+        'user_id',
         'employee_code',
         'first_name',
         'last_name',
@@ -29,6 +31,11 @@ class Employee extends Model
         'date_of_joining' => 'date',
     ];
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function department()
     {
         return $this->belongsTo(Department::class);
@@ -63,7 +70,7 @@ class Employee extends Model
     {
         return $query->where('status', 'active');
     }
-       public function designation()
+    public function designation()
     {
         return $this->belongsTo(Designation::class);
     }

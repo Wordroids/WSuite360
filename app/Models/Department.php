@@ -15,9 +15,8 @@ class Department extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(EmployeeProfile::class);
     }
-    
     public function designations()
     {
         return $this->hasMany(Designation::class);
