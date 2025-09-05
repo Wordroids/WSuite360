@@ -15,8 +15,15 @@
             @endif
 
             <div class="flex justify-between mb-4">
-                <h3 class="text-lg font-semibold">Employee </h3>
+                <h3 class="text-lg font-semibold">
+                    @if (auth()->user()->role->name === 'admin')
+                        Employees
+                    @else
+                        My Profile
+                    @endif
+                </h3>
                 <div class="flex space-x-2">
+                    @if (auth()->user()->role->name === 'admin')
                     <form action="{{ route('employees.export') }}" method="GET" class="flex items-center">
                         @foreach (request()->all() as $key => $value)
                             @if ($key !== '_token' && $value)
@@ -38,10 +45,12 @@
                     class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                     + Add New Employee
                 </a>
+                    @endif
                 </div>
             </div>
 
-            <!-- Filter Form -->
+            <!-- Filter Form - Only show for admin -->
+            @if (auth()->user()->role->name === 'admin')
             <div class=" p-4 mb-8">
                 <form action="{{ route('employees.index') }}" method="GET"
                     class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -99,8 +108,10 @@
                     </div>
                 </form>
             </div>
+            @endif
             <!-- Employees Table -->
             <div class="overflow-x-auto rounded-lg shadow-lg">
+                <div class="overflow-x-auto"> <
                 <table class="min-w-full table-auto border-collapse border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -108,8 +119,10 @@
                             </th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Name</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">User Email</th>
+                            @if (auth()->user()->role->name === 'admin')
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Department</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Designation</th>
+                            @endif
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Date of Joining
                             </th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Status</th>
@@ -122,8 +135,10 @@
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->employee_code }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->full_name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->user->email ?? 'N/A' }}</td>
+                                @if (auth()->user()->role->name === 'admin')
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->department->name }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A'}}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A' }}</td>
+                                @endif
                                 <td class="px-6 py-4 text-sm text-gray-800">
                                     {{ $employee->date_of_joining->format('d M Y') }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">
@@ -137,6 +152,7 @@
                                         class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
                                         View
                                     </a>
+                                    @if (auth()->user()->role->name === 'admin')
                                     <a href="{{ route('employees.edit', $employee) }}"
                                         class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
                                         Edit
@@ -159,11 +175,12 @@
                                         class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition">
                                         Documents
                                     </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="{{ auth()->user()->role->name === 'admin' ? '8' : '5' }}" class="px-6 py-4 text-center text-gray-500">
                                     No employees available.
                                 </td>
                             </tr>
@@ -172,9 +189,12 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
+            <!-- Pagination - Only show for admin -->
+            @if (auth()->user()->role->name === 'admin')
             <div class="mt-4">
                 {{ $employees->links() }}
+                </div>
+            @endif
             </div>
         </div>
     </div>

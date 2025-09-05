@@ -20,25 +20,26 @@ class EmployeeController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
-            $query = EmployeeProfile::with(['department', 'designation', 'user']);
-        } elseif ($user->hasRole('project_manager')) {
-            $projectIds = $user->managedProjects()->pluck('id');
-            $employeeIds = DB::table('project_user')
-                ->whereIn('project_id', $projectIds)
-                ->pluck('user_id')
-                ->toArray();
+        // Guests cannot access employee pages
+        if ($user->role->name === 'guest') {
+            abort(403, 'Unauthorized action.');
+        }
 
-            $query = EmployeeProfile::with(['department', 'designation', 'user'])
-                ->whereIn('user_id', $employeeIds);
+        if ($user->hasRole('admin')) {
+            // Admins can see all employees
+            $query = EmployeeProfile::with(['department', 'designation', 'user']);
         } else {
-            // t get the employee profile for the logged-in user
-            $employeeProfile = $user->employeeProfile;
-            if (!$employeeProfile) {
+            // Non-admin users can only see their own profile
+            if (!$user->employeeProfile) {
                 abort(403, 'You need to have an employee profile to access this page.');
             }
-            return redirect()->route('employees.show', $employeeProfile);
+
+            $query = EmployeeProfile::with(['department', 'designation', 'user'])
+                ->where('id', $user->employeeProfile->id);
         }
+
+        // Apply filters only for admin users
+        if ($user->hasRole('admin')) {
         if ($request->has('department_id') && $request->department_id) {
             $query->where('department_id', $request->department_id);
         }
@@ -47,6 +48,7 @@ class EmployeeController extends Controller
         }
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
+            }
         }
 
         $employees = $query->paginate(10);
@@ -55,7 +57,6 @@ class EmployeeController extends Controller
 
         return view('pages.employees.index', compact('employees', 'departments', 'designations'));
     }
-
     //To Create
     public function create()
     {
@@ -130,25 +131,24 @@ class EmployeeController extends Controller
     {
         $user = Auth::user();
 
+        // Guests cannot access employee pages
+        if ($user->role->name === 'guest') {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($user->hasRole('admin')) {
             return view('pages.employees.show', compact('employee'));
-        } elseif ($user->hasRole('project_manager')) {
-            $projectIds = $user->managedProjects()->pluck('id');
-            $isEmployeeInProjects = DB::table('project_user')
-                ->whereIn('project_id', $projectIds)
-                ->where('user_id', $employee->user_id) // Check the user_id from the profile
-                ->exists();
-
-            if ($isEmployeeInProjects) {
-                return view('pages.employees.show', compact('employee'));
-            }
-            abort(403, 'Access denied. You can only view employees in your projects.');
         } else {
-            $userEmployeeProfile = $user->employeeProfile; // Get profile via trait
-            if ($userEmployeeProfile && $userEmployeeProfile->id === $employee->id) {
-                return view('pages.employees.show', compact('employee'));
+            // Non-admin users can only view their own profile
+            if (!$user->employeeProfile) {
+            abort(403, 'You need to have an employee profile to access this page.');
             }
+
+            if ($user->employeeProfile->id !== $employee->id) {
             abort(403, 'Access denied. You can only view your own profile.');
+            }
+
+            return view('pages.employees.show', compact('employee'));
         }
     }
     //To edit

@@ -130,13 +130,20 @@ Route::middleware([
          });
 
         // HR Management Routes
+
         Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
+        Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
         Route::get('/employees/get-designations', [EmployeeController::class, 'getDesignations'])
             ->name('employees.get-designations');
+
+        Route::post('employees', [EmployeeController::class, 'store'])->name('employees.store');
+        Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+        Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+        Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+
             // Employee Routes
            Route::get('employees/export', [EmployeeController::class, 'exportPdf'])
                 ->name('employees.export');
-            Route::resource('employees', EmployeeController::class);
             Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
                 ->name('employees.deactivate.form');
             Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])
@@ -152,7 +159,6 @@ Route::middleware([
                 Route::get('/{document}', [EmployeeDocumentController::class, 'show'])->name('employees.documents.show');
                 Route::delete('/{document}', [EmployeeDocumentController::class, 'destroy'])->name('employees.documents.destroy');
             });
-
             // Department Routes
             Route::resource('departments', DepartmentController::class);
             Route::prefix('departments/{department}')->group(function () {
@@ -168,6 +174,7 @@ Route::middleware([
                     ]);
         });
     });
+    Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
 
     // Authenticated Routes Group
     Route::middleware('auth')->group(function () {
