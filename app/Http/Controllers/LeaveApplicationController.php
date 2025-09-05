@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\LeaveApplication;
 use App\Models\LeaveType;
-use App\Models\Employee;
 use App\Models\EmployeeProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -261,15 +260,25 @@ class LeaveApplicationController extends Controller
     //to generate leave balance report
     public function leaveBalanceReport(Request $request)
     {
-        // Only admins and HR managers can generate reports
-        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+        // Guests cannot access leave balance reports
+        if (auth()->user()->role->name === 'guest') {
             abort(403, 'Unauthorized action.');
         }
 
-        // Get all active employees with their leave balances
+        if (in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            // Admins/HR can see all employees
+            $query = EmployeeProfile::with(['department', 'leaveBalances.leaveType'])
+                ->active();
+        } else {
+            // Non-admin users can only see their own profile
+            if (!auth()->user()->employeeProfile) {
+                abort(403, 'You need an employee profile to view leave balance.');
+            }
         $query = EmployeeProfile::with(['department', 'leaveBalances.leaveType'])
-            ->active()
-            ->withCount(['leaveApplications as total_used_leave' => function ($q) use ($request) {
+                ->where('id', auth()->user()->employeeProfile->id)
+            ->active();
+            }
+        $query->withCount(['leaveApplications as total_used_leave' => function ($q) use ($request) {
                 $q->where('status', 'approved');
 
                 if ($request->has('leave_type_id') && $request->leave_type_id != '') {
@@ -285,8 +294,8 @@ class LeaveApplicationController extends Controller
                 }
             }]);
 
-        // Apply department filter 
-        if ($request->has('department_id') && $request->department_id != '') {
+        // Apply department filter only for admins/HR
+      if ($request->has('department_id') && $request->department_id != '' && in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
             $query->where('department_id', $request->department_id);
         }
 
@@ -351,13 +360,19 @@ class LeaveApplicationController extends Controller
         // PDF Export
         if ($request->has('export') && $request->export == 'pdf') {
             $filters = $request->all();
+            // For non-admin users, set the filename to include their name
+            $filename = 'leave-balance-report-' . now()->format('Y-m-d') . '.pdf';
+            if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager']) && auth()->user()->employeeProfile) {
+                $filename = 'my-leave-balance-' . now()->format('Y-m-d') . '.pdf';
+            }
+
             $pdf = PDF::loadView('pages.leave-applications.leave-balance-pdf', [
                 'employees' => $employees,
                 'filters' => $filters,
                 'departmentName' => isset($filters['department_id']) && $filters['department_id'] ? Department::find($filters['department_id'])->name : 'All',
                 'leaveTypeName' => isset($filters['leave_type_id']) && $filters['leave_type_id'] ? LeaveType::find($filters['leave_type_id'])->name : 'All'
             ]);
-            return $pdf->download('leave-balance-report-' . now()->format('Y-m-d') . '.pdf');
+            return $pdf->download($filename);
         }
 
         return view('pages.leave-applications.leave-balance', [

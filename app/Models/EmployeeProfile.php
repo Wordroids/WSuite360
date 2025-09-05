@@ -76,11 +76,11 @@ class EmployeeProfile extends Model
     }
     public function leaveApplications()
     {
-        return $this->hasMany(LeaveApplication::class);
+        return $this->hasMany(LeaveApplication::class,'employee_id');
     }
 
     public function leaveBalances()
     {
-        return $this->hasMany(LeaveBalance::class);
+        return $this->hasMany(LeaveBalance::class,'employee_id');
     }
 }
