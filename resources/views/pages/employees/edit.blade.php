@@ -12,12 +12,12 @@
                 <!-- User Account Fields -->
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-700">Full Name (User Account)*</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $employee->user->name) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <input type="text" name="name" id="name" value="{{ old('name', $employee->user->name ?? '') }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">User Email*</label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $employee->user->email) }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
+                    <input type="email" name="email" id="email" value="{{ old('email', $employee->user->email ?? '') }}" class="mt-1 p-2 w-full border rounded-lg focus:ring focus:ring-blue-300" required>
                 </div>
 
                 <!-- Employee Profile Fields -->
@@ -91,7 +91,7 @@
             var departmentId = $(this).val();
             if (departmentId) {
                 $.ajax({
-                    url: "{{ route('employees.getDesignations') }}",
+                    url: "{{ route('employees.get-designations') }}",
                     type: "GET",
                     data: {'department_id': departmentId},
                     success: function(data) {
