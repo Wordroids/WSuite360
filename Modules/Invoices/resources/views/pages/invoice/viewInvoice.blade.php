@@ -191,7 +191,7 @@
 
             <!-- PDF-like Preview -->
             <div class="mt-10">
-                @include('pages.invoice.partials.preview', [
+                @include('invoices::pages.invoice.partials.preview', [
                     'invoice' => $invoice,
                     'company' => $company,
                     'payments' => $payments,

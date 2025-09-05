@@ -37,4 +37,9 @@ class Project extends Model
     {
         return $this->belongsToMany(User::class, 'project_users', 'project_id', 'user_id');
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(ProjectSubscription::class);
+    }
 }

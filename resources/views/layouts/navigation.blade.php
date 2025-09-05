@@ -75,27 +75,62 @@
                                 Timesheet
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('payments.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <svg class="size-6 shrink-0 text-indigo-200 group-hover:text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                                    data-slot="icon">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+                                </svg>
+                                Payments
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li>
                     <div class="text-xs/6 font-semibold text-indigo-200">Your teams</div>
                     <ul role="list" class="-mx-2 mt-2 space-y-1">
                         <li>
-
-                            <a href="#"
+                            <a href="{{ route('employees.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
-                                <span class="truncate">Project Members</span>
+                                <span class="truncate">Employees</span>
                             </a>
+                            <a href="{{ route('departments.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Departments</span>
+                            </a>
+                            <a href="{{ route('leave-applications.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Leave Applications</span>
+                            </a>
+                             @if(Auth::user()->hasRole('admin'))
+                            <a href="{{ route('leave-types.index') }}"
+                                class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
+                                <span
+                                    class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
+                                <span class="truncate">Leave Types</span>
+                            </a>
+                            @endif
                         </li>
                         <li>
+                              @if(Auth::user()->hasRole('admin'))
                             <a href="{{ route('invoice.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
                                 <span class="truncate">Invoice</span>
                             </a>
+                            @endif
                         </li>
 
                         <li>
