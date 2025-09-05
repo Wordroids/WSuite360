@@ -72,4 +72,9 @@ class User extends Authenticatable
             ->withPivot('role')
             ->withTimestamps();
     }
+
+    public function employeeProfile()
+    {
+        return $this->hasOne(EmployeeProfile::class, 'user_id');
+    }
 }

@@ -113,14 +113,16 @@
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
-                                <span class="truncate">Leave</span>
+                                <span class="truncate">Leave Applications</span>
                             </a>
+                             @if(Auth::user()->hasRole('admin'))
                             <a href="{{ route('leave-types.index') }}"
                                 class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-indigo-200 hover:bg-indigo-700 hover:text-white">
                                 <span
                                     class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">H</span>
                                 <span class="truncate">Leave Types</span>
                             </a>
+                            @endif
                         </li>
                         <li>
                             <a href="{{ route('invoice.index') }}"

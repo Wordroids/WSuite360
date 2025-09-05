@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\LeaveApplication;
 use App\Models\LeaveType;
 use App\Models\Employee;
+use App\Models\EmployeeProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,8 +17,19 @@ class LeaveApplicationController extends Controller
     {
         $query = LeaveApplication::with(['employee', 'leaveType']);
 
+        // For non-admin roles, only show their own applications
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            // Check if user has an employee profile
+            if (auth()->user()->employeeProfile) {
+                $query->where('employee_id', auth()->user()->employeeProfile->id);
+            } else {
+                // If no employee profile, return empty results
+                $query->where('employee_id', 0);
+            }
+        }
+
         // Apply filters only if they are present in the request
-        if ($request->has('employee_id') && $request->employee_id != '') {
+        if ($request->has('employee_id') && $request->employee_id != '' && in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
             $query->where('employee_id', $request->employee_id);
         }
 
@@ -31,7 +43,11 @@ class LeaveApplicationController extends Controller
 
         $leaveApplications = $query->latest()->paginate(10);
 
-        $employees = Employee::active()->get();
+        // Only admins and HR managers can see all employees
+        $employees = [];
+        if (in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+        $employees = EmployeeProfile::active()->get();
+        }
         $leaveTypes = LeaveType::all();
 
         return view('pages.leave-applications.index', [
@@ -41,17 +57,36 @@ class LeaveApplicationController extends Controller
         ]);
     }
 
-    //to create
+    // Only employees and above can create leave applications
     public function create()
     {
+        // Guests cannot request leaves
+        if (auth()->user()->role->name === 'guest') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if non-admin user has an employee profile
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager']) && !auth()->user()->employeeProfile) {
+            abort(403, 'You need an employee profile to request leave.');
+        }
+
         $leaveTypes = LeaveType::where('is_active', true)->get();
-        $employees = Employee::active()->get();
+        // For non-admin roles, only show their own employee profile
+        $employees = [];
+        if (in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+        $employees = EmployeeProfile::active()->get();
+        }
 
         return view('pages.leave-applications.create', compact('leaveTypes', 'employees'));
     }
 
     public function store(Request $request)
     {
+        // Guests cannot request leaves
+        if (auth()->user()->role->name === 'guest') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'leave_type_id' => 'required|exists:leave_types,id',
@@ -59,6 +94,14 @@ class LeaveApplicationController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string|max:500',
         ]);
+
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            // Check if user has an employee profile
+            if (!auth()->user()->employeeProfile) {
+                abort(403, 'You need an employee profile to request leave.');
+            }
+            $validated['employee_id'] = auth()->user()->employeeProfile->id;
+        }
 
         // Calculate days requested
         $start = new \DateTime($validated['start_date']);
@@ -76,6 +119,17 @@ class LeaveApplicationController extends Controller
 
     public function show(LeaveApplication $leaveApplication)
     {
+        // Non-admin roles can only view their own applications
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            // Check if user has an employee profile
+            if (!auth()->user()->employeeProfile) {
+                abort(403, 'You need an employee profile to view leave applications.');
+            }
+
+            if ($leaveApplication->employee_id != auth()->user()->employeeProfile->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
         return view('pages.leave-applications.show', compact('leaveApplication'));
     }
 
@@ -116,8 +170,6 @@ class LeaveApplicationController extends Controller
         return back()->with('success', 'Leave application rejected.');
     }
 
-
-
     public function updateStatus(Request $request, LeaveApplication $leaveApplication)
     {
         if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
@@ -144,7 +196,6 @@ class LeaveApplicationController extends Controller
             $updateData['approved_by'] = null;
             $updateData['approved_at'] = null;
         } else {
-
             $updateData['approved_by'] = null;
             $updateData['approved_at'] = null;
             $updateData['rejection_reason'] = null;
@@ -159,6 +210,11 @@ class LeaveApplicationController extends Controller
 
     public function report(Request $request)
     {
+        // Only admins and HR managers can generate reports
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $query = LeaveApplication::with(['employee', 'leaveType', 'employee.department'])
             ->when($request->has('department_id') && $request->department_id != '', function ($q) use ($request) {
                 $q->whereHas('employee', function ($employeeQuery) use ($request) {
@@ -205,8 +261,13 @@ class LeaveApplicationController extends Controller
     //to generate leave balance report
     public function leaveBalanceReport(Request $request)
     {
+        // Only admins and HR managers can generate reports
+        if (!in_array(auth()->user()->role->name, ['admin', 'hr_manager'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
         // Get all active employees with their leave balances
-        $query = Employee::with(['department', 'leaveBalances.leaveType'])
+        $query = EmployeeProfile::with(['department', 'leaveBalances.leaveType'])
             ->active()
             ->withCount(['leaveApplications as total_used_leave' => function ($q) use ($request) {
                 $q->where('status', 'approved');

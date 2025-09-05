@@ -124,11 +124,12 @@ Route::middleware([
 
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
-
          });
 
         // HR Management Routes
         Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
+        Route::get('/employees/get-designations', [EmployeeController::class, 'getDesignations'])
+            ->name('employees.get-designations');
             // Employee Routes
            Route::get('employees/export', [EmployeeController::class, 'exportPdf'])
                 ->name('employees.export');
@@ -164,7 +165,7 @@ Route::middleware([
                     ]);
         });
     });
-    Route::get('/employees/get-designations', [EmployeeController::class, 'getDesignations'])->name('employees.get-designations');
+
     // Authenticated Routes Group
     Route::middleware('auth')->group(function () {
 
@@ -237,13 +238,14 @@ Route::middleware([
 
 
         //Leave Management routes
+        Route::resource('leave-applications', LeaveApplicationController::class)->only(['index', 'show', 'create', 'store']);
+      // Only admin and HR managers can manage leave types and generate reports
         Route::middleware(['role:admin,hr_manager'])->group(function () {
-             Route::get('leave-applications/report', [LeaveApplicationController::class, 'report'])
+            Route::get('leave-applications/report', [LeaveApplicationController::class, 'report'])
                 ->name('leave-applications.report');
             Route::get('leave-applications/leave-balance', [LeaveApplicationController::class, 'leaveBalanceReport'])
                 ->name('leave-applications.leave-balance');
             Route::resource('leave-types', LeaveTypeController::class);
-            Route::resource('leave-applications', LeaveApplicationController::class);
             Route::post('leave-applications/{leave_application}/approve', [LeaveApplicationController::class, 'approve'])
                 ->name('leave-applications.approve');
             Route::post('leave-applications/{leave_application}/reject', [LeaveApplicationController::class, 'reject'])
@@ -251,7 +253,6 @@ Route::middleware([
             Route::post('leave-applications/{leave_application}/update-status', [LeaveApplicationController::class, 'updateStatus'])
                 ->name('leave-applications.update-status');
         });
-
 
         // Project Manager Routes (Approvals & Manager Dashboard)
         Route::middleware('role:project_manager,admin')->group(function () {
