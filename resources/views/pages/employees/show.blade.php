@@ -54,10 +54,12 @@
         </div>
 
         <div class="flex justify-end space-x-2">
+              @if(Auth::user()->hasRole('admin'))
             <a href="{{ route('employees.edit', $employee) }}"
                 class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
                 Edit
             </a>
+            @endif
             <a href="{{ route('employees.index') }}"
                 class="bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200">
                 Back to List
