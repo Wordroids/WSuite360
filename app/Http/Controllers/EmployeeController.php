@@ -28,8 +28,16 @@ class EmployeeController extends Controller
         if ($user->hasRole('admin')) {
             // Admins can see all employees
             $query = EmployeeProfile::with(['department', 'designation', 'user']);
+        } elseif ($user->hasRole('project_manager')) {
+            // Project Managers can only see employees in their department
+            if (!$user->employeeProfile) {
+                abort(403, 'You need to have an employee profile to access this page.');
+            }
+
+            $query = EmployeeProfile::with(['department', 'designation', 'user'])
+                ->where('department_id', $user->employeeProfile->department_id);
         } else {
-            // Non-admin users can only see their own profile
+            // Non-admin and non-project-manager users can only see their own profile
             if (!$user->employeeProfile) {
                 abort(403, 'You need to have an employee profile to access this page.');
             }
@@ -38,8 +46,8 @@ class EmployeeController extends Controller
                 ->where('id', $user->employeeProfile->id);
         }
 
-        // Apply filters only for admin users
-        if ($user->hasRole('admin')) {
+        // Apply filters only for admin and project manager users
+        if ($user->hasRole('admin') || $user->hasRole('project_manager')) {
         if ($request->has('department_id') && $request->department_id) {
             $query->where('department_id', $request->department_id);
         }
