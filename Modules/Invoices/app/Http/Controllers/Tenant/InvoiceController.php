@@ -181,7 +181,7 @@ class InvoiceController extends Controller
         $company = CompanySettings::first();
 
         $template = view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'))->render();
-        
+
         $html = view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'))->render();
 
         $pdfPath = storage_path('app/public/invoice-' . $invoice->id . '.pdf');
@@ -210,7 +210,7 @@ class InvoiceController extends Controller
     $invoice->due = $due;
 
     $company = CompanySettings::first();
-    
+
     // Convert logo to base64 if it exists
     if ($company && $company->logo) {
         $imagePath = storage_path('app/public/' . $company->logo);
@@ -221,7 +221,7 @@ class InvoiceController extends Controller
             $company->base64_logo = $base64Image;
         }
     }
-    
+
     // Use the correct namespace for Spatie's Laravel-PDF
     return Pdf::view('invoices::pdf.pdf', [
         'invoice' => $invoice,
@@ -243,5 +243,24 @@ class InvoiceController extends Controller
         $company = CompanySettings::first();
 
         return view('invoices::pdf.pdf', compact('invoice', 'company', 'payments'));
+    }
+
+    //to delete invoice
+    public function destroy(Invoice $invoice)
+    {
+        try {
+            // Delete related items first
+            $invoice->items()->delete();
+            $invoice->payments()->delete();
+
+            
+            $invoice->delete();
+
+            return redirect()->route('invoice.index')
+                ->with('success', 'Invoice deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('invoice.index')
+                ->with('error', 'Error deleting invoice: ' . $e->getMessage());
+        }
     }
 }
