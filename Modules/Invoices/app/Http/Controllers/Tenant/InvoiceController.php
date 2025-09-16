@@ -107,7 +107,97 @@ class InvoiceController extends Controller
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
 
+    // edit
+    public function edit(Invoice $invoice)
+    {
+        $clients = Client::all();
+        $projects = Project::all(['id', 'name']);
+        $companySettings = CompanySettings::first();
 
+        $products = $invoice->items->map(function($item) {
+        return [
+            'id'          => $item->id,
+            'project_id'  => $item->project_id,
+            'description' => $item->description,
+            'quantity'    => $item->quantity,
+            'price'       => $item->unit_price,
+            'project_name'=> $item->project->name ?? '',
+        ];
+    });
+
+        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings','products'));
+    }
+    //to update
+    public function update(Request $request, Invoice $invoice)
+    {
+
+        $request->validate([
+            'title' => 'required',
+            'description' => 'nullable',
+            'client_id' => 'required',
+            'currency' => 'required',
+            'invoice_number' => 'required',
+            'po_so_number' => 'nullable',
+            'invoice_date' => 'required',
+            'due_date' => 'required',
+            'subtotal' => 'required',
+            'total' => 'required',
+            'notes' => 'nullable',
+            'instructions' => 'nullable',
+            'footer' => 'nullable',
+        ]);
+
+        $invoice->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'client_id' => $request->client_id,
+            'currency' => $request->currency,
+            'invoice_number' => $request->invoice_number,
+            'po_so_number' => $request->po_so_number,
+            'invoice_date' => $request->invoice_date,
+            'due_date' => $request->due_date,
+            'subtotal' => $request->subtotal,
+            'total' => $request->total,
+            'notes' => $request->notes,
+            'instructions' => $request->instructions,
+            'footer' => $request->footer,
+        ]);
+
+        if ($request->has('products')) {
+            $existingItemIds = [];
+
+            foreach ($request->products as $productData) {
+                if (isset($productData['id'])) {
+
+                    $item = $invoice->items()->find($productData['id']);
+                    if ($item) {
+                        $item->update([
+                            'project_id' => $productData['project_id'],
+                            'description' => $productData['description'],
+                            'unit_price' => $productData['price'],
+                            'quantity' => $productData['quantity'],
+                            'total' => $productData['price'] * $productData['quantity'],
+                        ]);
+                        $existingItemIds[] = $item->id;
+                    }
+                } else {
+
+                    $item = $invoice->items()->create([
+                        'project_id' => $productData['project_id'],
+                        'description' => $productData['description'],
+                        'unit_price' => $productData['price'],
+                        'quantity' => $productData['quantity'],
+                        'total' => $productData['price'] * $productData['quantity'],
+                    ]);
+                    $existingItemIds[] = $item->id;
+                }
+            }
+
+            $invoice->items()->whereNotIn('id', $existingItemIds)->delete();
+        }
+
+        return redirect()->route('invoice.index')->with('success', 'Invoice updated successfully.');
+    }
 
     public function approve(Invoice $invoice)
     {
