@@ -16,14 +16,14 @@
 
             <div class="flex justify-between mb-4">
                 <h3 class="text-lg font-semibold">
-                    @if (auth()->user()->role->name === 'admin')
+                    @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager'))
                         Employees
                     @else
                         My Profile
                     @endif
                 </h3>
                 <div class="flex space-x-2">
-                    @if (auth()->user()->role->name === 'admin')
+                    @if (auth()->user()->hasRole('admin'))
                     <form action="{{ route('employees.export') }}" method="GET" class="flex items-center">
                         @foreach (request()->all() as $key => $value)
                             @if ($key !== '_token' && $value)
@@ -49,8 +49,8 @@
                 </div>
             </div>
 
-            <!-- Filter Form - Only show for admin -->
-            @if (auth()->user()->role->name === 'admin')
+            <!-- Filter Form - Only show for admin and project_manager -->
+            @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager'))
             <div class=" p-4 mb-8">
                 <form action="{{ route('employees.index') }}" method="GET"
                     class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -111,7 +111,7 @@
             @endif
             <!-- Employees Table -->
             <div class="overflow-x-auto rounded-lg shadow-lg">
-                <div class="overflow-x-auto"> <
+                <div class="overflow-x-auto">
                 <table class="min-w-full table-auto border-collapse border border-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -119,7 +119,7 @@
                             </th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Name</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">User Email</th>
-                            @if (auth()->user()->role->name === 'admin')
+                            @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager'))
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Department</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 border-b">Designation</th>
                             @endif
@@ -135,7 +135,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->employee_code }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->full_name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->user->email ?? 'N/A' }}</td>
-                                @if (auth()->user()->role->name === 'admin')
+                                @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager'))
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->department->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800">{{ $employee->designation->name ?? 'N/A' }}</td>
                                 @endif
@@ -152,7 +152,7 @@
                                         class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
                                         View
                                     </a>
-                                    @if (auth()->user()->role->name === 'admin')
+                                    @if (auth()->user()->hasRole('admin'))
                                     <a href="{{ route('employees.edit', $employee) }}"
                                         class="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition">
                                         Edit
@@ -180,7 +180,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ auth()->user()->role->name === 'admin' ? '8' : '5' }}" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="{{ auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager') ? '8' : '5' }}" class="px-6 py-4 text-center text-gray-500">
                                     No employees available.
                                 </td>
                             </tr>
@@ -189,8 +189,8 @@
                 </table>
             </div>
 
-            <!-- Pagination - Only show for admin -->
-            @if (auth()->user()->role->name === 'admin')
+            <!-- Pagination - Only show for admin and project_manager -->
+            @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('project_manager'))
             <div class="mt-4">
                 {{ $employees->links() }}
                 </div>
