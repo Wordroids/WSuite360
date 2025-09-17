@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Tasks\Http\Controllers\Tenant;
 
-use App\Models\Task;
+use App\Http\Controllers\Controller;
+use Modules\Tasks\Models\Task;
 use App\Models\Project;
 use App\Models\ProjectMembers;
 use App\Models\User;
@@ -38,14 +39,14 @@ class TaskController extends Controller
 
         $tasks = $tasksQuery->with(['project', 'assignedEmployee'])->latest()->paginate(10);
 
-        return view('pages.tasks.index', compact('tasks', 'projects', 'projectId'));
+        return view('tasks::pages.tasks.index', compact('tasks', 'projects', 'projectId'));
     }
 
     public function create()
     {
         $projects = Project::all();
 
-        return view('pages.tasks.create', compact('projects'));
+        return view('tasks::pages.tasks.create', compact('projects'));
     }
 
     public function store(Request $request)
@@ -66,7 +67,7 @@ class TaskController extends Controller
     public function show(Task $task)
     {
         $task->load('members');
-        return view('pages.tasks.show', compact('task'));
+        return view('tasks::pages.tasks.show', compact('task'));
     }
 
     public function edit($id)
@@ -74,7 +75,7 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $projects = Project::all();
 
-        return view('pages.tasks.edit', compact('task', 'projects'));
+        return view('tasks::pages.tasks.edit', compact('task', 'projects'));
     }
 
     public function update(Request $request, $id)

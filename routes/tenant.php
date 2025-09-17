@@ -302,7 +302,6 @@ Route::middleware([
 
         // Routes For admin and ProjectManger Role
         Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
-            Route::resource('tasks', TaskController::class);
             Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
             Route::resource('projects', ProjectController::class);
         });
@@ -327,17 +326,5 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::middleware('auth')->group(function () {
-        Route::prefix('tasks/{task}/users')->group(function () {
-            // Web route for the initial view
-            Route::get('/', [TaskUserController::class, 'index'])->name('tasks.users.index');
 
-            // API-style routes for AJAX calls
-            Route::get('/list', [TaskUserController::class, 'getTaskUsers'])->name('tasks.users.list');
-            Route::get('/available', [TaskUserController::class, 'getAvailableUsers'])->name('tasks.users.available');
-            Route::post('/', [TaskUserController::class, 'store'])->name('tasks.users.store');
-            Route::put('/{user}', [TaskUserController::class, 'update'])->name('tasks.users.update');
-            Route::delete('/{user}', [TaskUserController::class, 'destroy'])->name('tasks.users.destroy');
-        });
-    });
 });
