@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Tasks\Http\Controllers\Tenant;
 
-use App\Models\Task;
+use App\Http\Controllers\Controller;
+use Modules\Tasks\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class TaskUserController extends Controller
     public function index(Task $task)
     {
         $availableUsers = User::whereNotIn('id', $task->members()->pluck('users.id'))->get();
-        return view('pages.tasks.users.index', [
+        return view('tasks::pages.tasks.users.index', [
             'task' => $task,
             'availableUsers' => $availableUsers
         ]);
