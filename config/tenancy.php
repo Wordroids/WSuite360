@@ -193,6 +193,6 @@ return [
      */
     'seeder_parameters' => [
         '--class' => 'DatabaseSeeder', // root seeder class
-        // '--force' => true,
+        '--force' => true,
     ],
 ];
