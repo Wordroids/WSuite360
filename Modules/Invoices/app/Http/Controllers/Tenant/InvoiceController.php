@@ -8,12 +8,12 @@ use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\Enums\Format;
 
 // External models
-use App\Models\Client;
 use App\Models\CompanySettings;
 use App\Models\Project;
 
 // Module models
 use Modules\Invoices\Models\Invoice;
+use Modules\Clients\Models\Client;
 use Modules\Invoices\Models\InvoicePayment;
 
 class InvoiceController extends Controller
@@ -343,7 +343,7 @@ class InvoiceController extends Controller
             $invoice->items()->delete();
             $invoice->payments()->delete();
 
-            
+
             $invoice->delete();
 
             return redirect()->route('invoice.index')

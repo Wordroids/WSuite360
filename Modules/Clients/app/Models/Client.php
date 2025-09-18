@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Clients\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
+use App\Models\Project;
+use App\Models\ProjectSubscription;
 class Client extends Model
 {
     /** @use HasFactory<\Database\Factories\ClientFactory> */
