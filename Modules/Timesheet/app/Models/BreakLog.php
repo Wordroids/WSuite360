@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Timesheet\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Timesheet\Models\TimeLogApproval;
 
 class BreakLog extends Model
 {

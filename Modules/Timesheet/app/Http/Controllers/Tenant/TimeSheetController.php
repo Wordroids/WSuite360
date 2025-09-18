@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
 
+namespace Modules\Timesheet\Http\Controllers\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\TimeLog;
-use App\Models\Project;
+
+
+// Module models
+use  Modules\Timesheet\Models\TimeLog;
+
+use App\Http\Controllers\Controller;
 
 class TimeSheetController extends Controller
 {
@@ -15,7 +19,7 @@ class TimeSheetController extends Controller
     // Calendar View - Displays time logs in a calendar format
     public function calendarView()
     {
-        return view('timesheet.calendarView');
+        return view('timesheet::pages.timesheet.calendarView');
     }
 
     // List View - Displays timesheet entries
@@ -30,7 +34,7 @@ class TimeSheetController extends Controller
 
         $timeLogs = [];
 
-        return view('timesheet.listView', compact('projects', 'timeLogs'));
+        return view('timesheet::pages.timesheet.listView', compact('projects', 'timeLogs'));
     }
 
     // Charts View - Displays time tracking analytics
@@ -47,7 +51,7 @@ class TimeSheetController extends Controller
             'data' => $timeLogs->pluck('total_time')->map(fn($t) => round($t / 60, 1))->toArray(),
         ];
 
-        return view('timesheet.chartsView', compact('chartData'));
+        return view('timesheet::pages.timesheet.chartsView', compact('chartData'));
     }
 
     // Add time entry form
@@ -55,7 +59,7 @@ class TimeSheetController extends Controller
     {
         $user = Auth::user();
         $projects = $user ? $user->projects : collect();
-        return view('timesheet.add', compact('projects'));
+        return view('timesheet::pages.timesheet.add', compact('projects'));
     }
 
     // Store new time log
@@ -84,7 +88,7 @@ class TimeSheetController extends Controller
     {
 
 
-        return view('timesheet.view');
+        return view('timesheet::pages.timesheet.view');
     }
 
     //to view the detailed timesheet report
@@ -92,13 +96,13 @@ class TimeSheetController extends Controller
     {
 
 
-        return view('timesheet.detailedReport');
+        return view('timesheet::pages.timesheet.detailedReport');
     }
     //to view the weekly timesheet report
     public function  weeklyReport()
     {
 
 
-        return view('timesheet.weeklyReport');
+        return view('timesheet::pages.timesheet.weeklyReport');
     }
 }
