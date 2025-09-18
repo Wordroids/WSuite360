@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
 
-use App\Models\Client;
+namespace Modules\Clients\Http\Controllers\Tenant;
+
+use App\Http\Controllers\Controller;
+
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Modules\Clients\Models\Client;
 class ClientController extends Controller
 {
     /**
@@ -17,7 +19,7 @@ class ClientController extends Controller
     public function index()
     {
         $clients = Client::paginate(10);
-        return view('pages.clients.index', compact('clients'));
+        return view('clients::pages.clients.index', compact('clients'));
     }
 
     /**
@@ -25,7 +27,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('pages.clients.create');
+        return view('clients::pages.clients.create');
     }
     /**
      * Store a newly created resource in storage.
@@ -76,7 +78,7 @@ class ClientController extends Controller
                 ->orderBy('created_at', 'desc');
         }]);
 
-        return view('pages.clients.show', [
+        return view('clients::pages.clients.show', [
             'client' => $client
         ]);
     }
@@ -87,7 +89,7 @@ class ClientController extends Controller
     public function edit($id)
     {
         $client = Client::findOrFail($id);
-        return view('pages.clients.edit', compact('client'));
+        return view('clients::pages.clients.edit', compact('client'));
     }
 
     /**
