@@ -1,4 +1,5 @@
 {
     "Invoices": true,
-    "Tasks": true
+    "Tasks": true,
+    "Timesheet": true
 }

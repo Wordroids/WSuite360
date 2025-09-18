@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+
+namespace Modules\Timesheet\Http\Controllers\Tenant;
 
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\Controller;
 class TimeLogApprovalController extends Controller
 {
     /**

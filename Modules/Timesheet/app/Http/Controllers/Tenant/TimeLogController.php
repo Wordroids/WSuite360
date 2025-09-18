@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\TimeLog;
+namespace Modules\Timesheet\Http\Controllers\Tenant;
+
+
+use Modules\Tasks\Models\Task;
+use Modules\Timesheet\Models\TimeLog;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\Controller;
 class TimeLogController extends Controller
 {
     /**
@@ -15,7 +17,7 @@ class TimeLogController extends Controller
     {
         // Get all time logs for the logged-in employee
         $timeLogs = TimeLog::where('employee_id', auth()->id())->orderBy('date', 'desc')->get();
-        return view('pages.time_logs.index', compact('timeLogs'));
+        return view('timesheet::pages.time_logs.index', compact('timeLogs'));
     }
 
 
@@ -24,7 +26,7 @@ class TimeLogController extends Controller
     {
         // Fetch only tasks assigned to the logged-in user
         $tasks = Task::where('assigned_to', auth()->id())->get();
-        return view('pages.time_logs.create', compact('tasks'));
+        return view('timesheet::pages.time_logs.create', compact('tasks'));
     }
 
     public function store(Request $request)
@@ -74,24 +76,24 @@ class TimeLogController extends Controller
         if ($timeLog->isLocked()) {
             return redirect()->back()->with('error', 'This time log has been approved and cannot be edited.');
         }
-    
+
         // Validation rules
         $request->validate([
             'task_id' => 'required|exists:tasks,id',
             'time_spent' => 'required|integer|min:1',
             'billable' => 'required|boolean',
         ]);
-    
+
         // Update time log
         $timeLog->update([
             'task_id' => $request->task_id,
             'time_spent' => $request->time_spent,
             'billable' => $request->billable,
         ]);
-    
+
         return redirect()->route('time_logs.index')->with('success', 'Time log updated successfully.');
     }
-    
+
 
     /**
      * Remove the specified resource from storage.

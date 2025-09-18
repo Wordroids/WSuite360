@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Timesheet\Models;
 
+use Modules\Tasks\Models\Task;
+use App\Models\User;
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

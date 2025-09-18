@@ -1,21 +1,22 @@
 <?php
-namespace App\Http\Controllers;
 
-use App\Models\BreakLog;
+namespace Modules\Timesheet\Http\Controllers\Tenant;
+
+use Modules\Timesheet\Models\BreakLog;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\Controller;
 class BreakLogController extends Controller
 {
     public function index()
     {
         // Get all break logs for the logged-in employee
         $breakLogs = BreakLog::where('employee_id', auth()->id())->orderBy('date', 'desc')->get();
-        return view('pages.break_logs.index', compact('breakLogs'));
+        return view('timesheet::pages.break_logs.index', compact('breakLogs'));
     }
 
     public function create()
     {
-        return view('pages.break_logs.create');
+        return view('timesheet::pages.break_logs.create');
     }
 
     public function store(Request $request)
@@ -42,7 +43,7 @@ class BreakLogController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        return view('pages.break_logs.edit', compact('breakLog'));
+        return view('timesheet::pages.break_logs.edit', compact('breakLog'));
     }
 
     public function update(Request $request, BreakLog $breakLog)
