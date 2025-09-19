@@ -4,7 +4,7 @@ namespace Modules\Tasks\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use Modules\Tasks\Models\Task;
-use App\Models\Project;
+use Modules\Projects\Models\Project;
 use App\Models\ProjectMembers;
 use App\Models\User;
 use Illuminate\Http\Request;

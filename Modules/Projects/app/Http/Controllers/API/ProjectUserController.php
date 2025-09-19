@@ -1,11 +1,11 @@
 <?php
-
-namespace App\Http\Controllers\API;
+namespace Modules\Projects\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Project;
+
 use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Projects\Models\Project;
 
 class ProjectUserController extends Controller
 {

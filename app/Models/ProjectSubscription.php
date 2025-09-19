@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Clients\Models\Client;
+use Modules\Projects\Models\Project;
 class ProjectSubscription extends Model
 {
       use HasFactory;

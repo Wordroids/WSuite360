@@ -2,7 +2,7 @@
 
 namespace Modules\Invoices\Models;
 
-use App\Models\Client;
+use Modules\Clients\Models\Client;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

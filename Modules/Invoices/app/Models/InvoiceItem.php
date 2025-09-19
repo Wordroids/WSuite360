@@ -2,9 +2,8 @@
 
 namespace Modules\Invoices\Models;
 
-use App\Models\Project;
 use Illuminate\Database\Eloquent\Model;
-
+use Modules\Projects\Models\Project;
 class InvoiceItem extends Model
 {
 
