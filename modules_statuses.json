@@ -2,5 +2,6 @@
     "Invoices": true,
     "Tasks": true,
     "Timesheet": true,
-    "Clients": true
+    "Clients": true,
+    "Projects": true
 }
