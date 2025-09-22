@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Leave\Http\Controllers\Tenant;
 
-use App\Models\Department;
-use App\Models\LeaveApplication;
-use App\Models\LeaveType;
-use App\Models\EmployeeProfile;
+
+use App\Http\Controllers\Controller;
+use Modules\Employees\Models\Department;
+use Modules\Leave\Models\LeaveApplication;
+use Modules\Leave\Models\LeaveType;
+use Modules\Employees\Models\EmployeeProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -49,7 +51,7 @@ class LeaveApplicationController extends Controller
         }
         $leaveTypes = LeaveType::all();
 
-        return view('pages.leave-applications.index', [
+        return view('leave::pages.leave-applications.index', [
             'leaveApplications' => $leaveApplications,
             'employees' => $employees,
             'leaveTypes' => $leaveTypes
@@ -76,7 +78,7 @@ class LeaveApplicationController extends Controller
         $employees = EmployeeProfile::active()->get();
         }
 
-        return view('pages.leave-applications.create', compact('leaveTypes', 'employees'));
+        return view('leave::pages.leave-applications.create', compact('leaveTypes', 'employees'));
     }
 
     public function store(Request $request)
@@ -129,7 +131,7 @@ class LeaveApplicationController extends Controller
                 abort(403, 'Unauthorized action.');
             }
         }
-        return view('pages.leave-applications.show', compact('leaveApplication'));
+        return view('leave::pages.leave-applications.show', compact('leaveApplication'));
     }
 
     public function approve(LeaveApplication $leaveApplication)
@@ -249,7 +251,7 @@ class LeaveApplicationController extends Controller
             return $pdf->download('leave-history-report-' . now()->format('Y-m-d') . '.pdf');
         }
 
-        return view('pages.leave-applications.report', [
+        return view('leave::pages.leave-applications.report', [
             'leaveApplications' => $leaveApplications,
             'departments' => $departments,
             'leaveTypes' => $leaveTypes,
@@ -375,7 +377,7 @@ class LeaveApplicationController extends Controller
             return $pdf->download($filename);
         }
 
-        return view('pages.leave-applications.leave-balance', [
+        return view('leave::pages.leave-applications.leave-balance', [
             'employees' => $employees,
             'departments' => $departments,
             'leaveTypes' => $leaveTypes,

@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Leave\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Leave\Models\LeaveType;
+use Modules\Employees\Models\EmployeeProfile;
+use App\Models\User;
 
 class LeaveApplication extends Model
 {

@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Models;
-
+namespace Modules\Leave\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Modules\Employees\Models\EmployeeProfile;
 class LeaveBalance extends Model
 {
     use HasFactory;

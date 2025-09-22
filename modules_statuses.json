@@ -4,5 +4,6 @@
     "Timesheet": true,
     "Clients": true,
     "Projects": true,
-    "Employees": true
+    "Employees": true,
+    "Leave": true
 }
