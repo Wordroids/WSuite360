@@ -1,24 +1,25 @@
 <?php
 
-// app/Http/Controllers/DesignationController.php
-namespace App\Http\Controllers;
+namespace Modules\Employees\Http\Controllers\Tenant;
 
-use App\Models\Department;
-use App\Models\Designation;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use App\Http\Controllers\Controller;
+use Modules\Employees\Models\Department;
+use Modules\Employees\Models\Designation;
 class DesignationController extends Controller
 {
     public function index(Department $department)
     {
         $designations = $department->designations()->withCount('employees')->paginate(10);
-        return view('pages.departments.designations.index', compact('department', 'designations'));
+        return view('employees::pages.departments.designations.index', compact('department', 'designations'));
     }
 
     public function create(Department $department)
     {
-        return view('pages.departments.designations.create', compact('department'));
+        return view('employees::pages.departments.designations.create', compact('department'));
     }
 
     public function store(Request $request, Department $department)
@@ -41,7 +42,7 @@ class DesignationController extends Controller
 
     public function edit(Department $department, Designation $designation)
     {
-        return view('pages.departments.designations.edit', compact('department', 'designation'));
+        return view('employees::pages.departments.designations.edit', compact('department', 'designation'));
     }
 
     public function update(Request $request, Department $department, Designation $designation)

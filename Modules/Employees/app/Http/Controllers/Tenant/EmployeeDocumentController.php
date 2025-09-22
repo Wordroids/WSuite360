@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Employees\Http\Controllers\Tenant;
 
-use App\Models\EmployeeDocument;
-use App\Models\EmployeeProfile;
+use App\Http\Controllers\Controller;
+use Modules\Employees\Models\EmployeeDocument;
+use Modules\Employees\Models\EmployeeProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,12 +15,12 @@ class EmployeeDocumentController extends Controller
     {
         $documents = $employee->documents()->paginate(10);
 
-        return view('pages.employees.documents.index', compact('employee', 'documents'));
+        return view('employees::pages.employees.documents.index', compact('employee', 'documents'));
     }
 
     public function create(EmployeeProfile $employee)
     {
-        return view('pages.employees.documents.create', compact('employee'));
+        return view('employees::pages.employees.documents.create', compact('employee'));
     }
 
     public function store(Request $request, EmployeeProfile $employee)
