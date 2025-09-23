@@ -2,12 +2,13 @@
 
 namespace Modules\Tasks\Models;
 
-use App\Models\Project;
-use App\Models\TimeLog;
+
+
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Modules\Projects\Models\Project;
+use Modules\Timesheet\Models\TimeLog;
 class Task extends Model
 {
     use HasFactory;

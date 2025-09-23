@@ -18,20 +18,14 @@ use App\Http\Controllers\LeaveTypeController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use App\Http\Controllers\BreakLogApprovalController;
-use App\Http\Controllers\BreakLogController;
-use App\Http\Controllers\ClientController;
+
+
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ProjectUserController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\TimeEntryApprovalController;
-use App\Http\Controllers\TimeLogController;
-use App\Http\Controllers\TimeLogApprovalController;
-use App\Http\Controllers\TimeSheetController;
+
 use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\TaskUserController;
+
 use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
@@ -124,11 +118,11 @@ Route::middleware([
 
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
-         });
+    });
 
-        // HR Management Routes
+    // HR Management Routes
 
-        Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
+    Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
         Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
         Route::get('/employees/get-designations', [EmployeeController::class, 'getDesignations'])
             ->name('employees.get-designations');
@@ -138,37 +132,37 @@ Route::middleware([
         Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
-            // Employee Routes
-           Route::get('employees/export', [EmployeeController::class, 'exportPdf'])
-                ->name('employees.export');
-            Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
-                ->name('employees.deactivate.form');
-            Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])
-                ->name('employees.deactivate');
-            Route::post('employees/{employee}/reactivate', [EmployeeController::class, 'reactivate'])
-                ->name('employees.reactivate');
+        // Employee Routes
+        Route::get('employees/export', [EmployeeController::class, 'exportPdf'])
+            ->name('employees.export');
+        Route::get('employees/{employee}/deactivate', [EmployeeController::class, 'deactivateForm'])
+            ->name('employees.deactivate.form');
+        Route::post('employees/{employee}/deactivate', [EmployeeController::class, 'deactivate'])
+            ->name('employees.deactivate');
+        Route::post('employees/{employee}/reactivate', [EmployeeController::class, 'reactivate'])
+            ->name('employees.reactivate');
 
-            // Employee Document Routes
-            Route::prefix('employees/{employee}/documents')->group(function () {
-                Route::get('/', [EmployeeDocumentController::class, 'index'])->name('employees.documents.index');
-                Route::get('/create', [EmployeeDocumentController::class, 'create'])->name('employees.documents.create');
-                Route::post('/', [EmployeeDocumentController::class, 'store'])->name('employees.documents.store');
-                Route::get('/{document}', [EmployeeDocumentController::class, 'show'])->name('employees.documents.show');
-                Route::delete('/{document}', [EmployeeDocumentController::class, 'destroy'])->name('employees.documents.destroy');
-            });
-            // Department Routes
-            Route::resource('departments', DepartmentController::class);
-            Route::prefix('departments/{department}')->group(function () {
-                Route::resource('designations', DesignationController::class)
-                    ->except(['show'])
-                    ->names([
-                        'index' => 'departments.designations.index',
-                        'create' => 'departments.designations.create',
-                        'store' => 'departments.designations.store',
-                        'edit' => 'departments.designations.edit',
-                        'update' => 'departments.designations.update',
-                        'destroy' => 'departments.designations.destroy',
-                    ]);
+        // Employee Document Routes
+        Route::prefix('employees/{employee}/documents')->group(function () {
+            Route::get('/', [EmployeeDocumentController::class, 'index'])->name('employees.documents.index');
+            Route::get('/create', [EmployeeDocumentController::class, 'create'])->name('employees.documents.create');
+            Route::post('/', [EmployeeDocumentController::class, 'store'])->name('employees.documents.store');
+            Route::get('/{document}', [EmployeeDocumentController::class, 'show'])->name('employees.documents.show');
+            Route::delete('/{document}', [EmployeeDocumentController::class, 'destroy'])->name('employees.documents.destroy');
+        });
+        // Department Routes
+        Route::resource('departments', DepartmentController::class);
+        Route::prefix('departments/{department}')->group(function () {
+            Route::resource('designations', DesignationController::class)
+                ->except(['show'])
+                ->names([
+                    'index' => 'departments.designations.index',
+                    'create' => 'departments.designations.create',
+                    'store' => 'departments.designations.store',
+                    'edit' => 'departments.designations.edit',
+                    'update' => 'departments.designations.update',
+                    'destroy' => 'departments.designations.destroy',
+                ]);
         });
     });
     Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
@@ -211,19 +205,19 @@ Route::middleware([
             Route::post('/card-process', [ProjectCardPaymentController::class, 'process'])->name('payments.card-process');
         });
 
-      
+
 
         //Activity log
         Route::get('/logs', [ActivityLogController::class, 'logs'])->name('pages.activity_log.logs');
 
 
-       Route::get('employee/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+        Route::get('employee/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
 
 
         //Leave Management routes
         Route::get('leave-applications/leave-balance', [LeaveApplicationController::class, 'leaveBalanceReport'])
             ->name('leave-applications.leave-balance');
-      // Only admin and HR managers can manage leave types and generate reports
+        // Only admin and HR managers can manage leave types and generate reports
         Route::middleware(['role:admin,hr_manager'])->group(function () {
 
             Route::get('leave-applications/report', [LeaveApplicationController::class, 'report'])
@@ -244,7 +238,7 @@ Route::middleware([
 
 
             // Project member assingment
-            Route::resource('projects.users', ProjectUserController::class)->only(['index', 'store', 'destroy']);
+
         });
 
 
@@ -260,15 +254,6 @@ Route::middleware([
         //Comany Settings
         Route::get('/company-settings', [CompanySettingController::class, 'companySettings'])->name('company.settings');
         Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');
-
-
-
-
-        // Routes For admin and ProjectManger Role
-        Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
-            Route::post('projects/{project}/assign', [ProjectController::class, 'assignEmployee'])->name('projects.assign');
-            Route::resource('projects', ProjectController::class);
-        });
     });
 });
 
@@ -280,7 +265,7 @@ Route::middleware([
     Route::middleware('auth')->group(function () {
         Route::middleware('role:project_manager,admin')->group(function () {
             Route::apiResource('users', APIUserController::class)->names([]);
-            Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
+            //  Route::apiResource('projects.users', APIProjectUserController::class)->names([]);
         });
     });
 });
@@ -289,6 +274,4 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->group(function () {
-
-});
+])->group(function () {});

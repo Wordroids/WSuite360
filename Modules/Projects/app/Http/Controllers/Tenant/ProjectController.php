@@ -1,14 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Projects\Http\Controllers\Tenant;
 
-use App\Models\Project;
+use App\Http\Controllers\Controller;
+
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Models\Client;
+
 use App\Models\ProjectMembers;
 use App\Models\User;
 use Illuminate\Http\Request;
+
+use Modules\Projects\Models\Project;
+use Modules\Clients\Models\Client;
 
 class ProjectController extends Controller
 {
@@ -30,13 +34,13 @@ class ProjectController extends Controller
         else {
             $projects = collect(); // Empty collection
         }
-        return view('pages.projects.index', compact('projects'));
+        return view('projects::pages.projects.index', compact('projects'));
     }
 
     public function create()
     {
         $clients = Client::all();
-        return view('pages.projects.create', compact('clients'));
+        return view('projects::pages.projects.create', compact('clients'));
     }
 
     public function store(Request $request)
@@ -80,13 +84,13 @@ class ProjectController extends Controller
         // Get unassigned employees (role: employee)
         $unassignedEmployees = User::whereNotIn('id', $assignedEmployees->pluck('user_id'))->get();
 
-        return view('pages.projects.show', compact('project', 'employees', 'developers', 'projectManagers', 'unassignedEmployees'));
+        return view('projects::pages.projects.show', compact('project', 'employees', 'developers', 'projectManagers', 'unassignedEmployees'));
     }
 
     public function edit(Project $project)
     {
         $clients = Client::all();
-        return view('pages.projects.edit', compact('project', 'clients'));
+        return view('projects::pages.projects.edit', compact('project', 'clients'));
     }
 
     public function update(Request $request, Project $project)
