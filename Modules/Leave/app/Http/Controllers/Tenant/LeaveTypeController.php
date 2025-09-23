@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Leave\Http\Controllers\Tenant;
 
-use App\Models\LeaveType;
+
+use App\Http\Controllers\Controller;
+use Modules\Leave\Models\LeaveType;
 use Illuminate\Http\Request;
 
 class LeaveTypeController extends Controller
@@ -10,12 +12,12 @@ class LeaveTypeController extends Controller
     public function index()
     {
         $leaveTypes = LeaveType::latest()->paginate(10);
-        return view('pages.leave-types.index', compact('leaveTypes'));
+        return view('leave::pages.leave-types.index', compact('leaveTypes'));
     }
 
     public function create()
     {
-        return view('pages.leave-types.create');
+        return view('leave::pages.leave-types.create');
     }
 
     public function store(Request $request)
@@ -35,7 +37,7 @@ class LeaveTypeController extends Controller
 
     public function edit(LeaveType $leaveType)
     {
-        return view('pages.leave-types.edit', compact('leaveType'));
+        return view('leave::pages.leave-types.edit', compact('leaveType'));
     }
 
     public function update(Request $request, LeaveType $leaveType)

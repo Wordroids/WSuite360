@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
-use App\Models\LeaveApplication;
-use App\Models\LeaveBalance;
+use Modules\Leave\Models\LeaveApplication;
+use Modules\Leave\Models\LeaveBalance;
 
 use Modules\Employees\Models\Department;
 use Modules\Employees\Models\EmployeeDocument;
