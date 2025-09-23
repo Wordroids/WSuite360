@@ -211,13 +211,7 @@ Route::middleware([
             Route::post('/card-process', [ProjectCardPaymentController::class, 'process'])->name('payments.card-process');
         });
 
-        // Admin routes
-        Route::middleware('role:admin')->group(function () {
-
-            // Clients Routes
-            Route::resource('clients', ClientController::class);
-        });
-        Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+      
 
         //Activity log
         Route::get('/logs', [ActivityLogController::class, 'logs'])->name('pages.activity_log.logs');
@@ -268,7 +262,7 @@ Route::middleware([
         Route::post('/company-settings/update', [CompanySettingController::class, 'update'])->name('company.settings.update');
 
 
-        
+
 
         // Routes For admin and ProjectManger Role
         Route::middleware(['auth', 'role:admin,project_manager'])->group(function () {
