@@ -1,20 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Subscriptions\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProjectSubscription as AppModelsProjectSubscription;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Subscription;
-use App\Models\ProjectSubscription;
+
 use Stripe\Exception\ApiErrorException;
+
+use Modules\Subscriptions\Models\ProjectSubscription;
+
 class PaymentController extends Controller
 {
 
     public function index()
     {
 
-        return view('pages.payments.index');
+        return view('subscriptions::pages.payments.index');
     }
 
       // to cancel subscription
