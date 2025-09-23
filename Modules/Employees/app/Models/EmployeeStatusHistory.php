@@ -1,9 +1,9 @@
 <?php
-
-namespace App\Models;
+namespace Modules\Employees\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 class EmployeeStatusHistory extends Model
 {
     use HasFactory;

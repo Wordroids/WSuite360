@@ -1,18 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Employees\Http\Controllers\Tenant;
 
-use App\Models\Department;
-use App\Models\Designation;
-use App\Models\EmployeeStatusHistory;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
-use App\Models\EmployeeProfile;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+
+
+use Modules\Employees\Models\Department;
+use Modules\Employees\Models\EmployeeProfile;
+use Modules\Employees\Models\EmployeeStatusHistory;
+use Modules\Employees\Models\Designation;
 
 class EmployeeController extends Controller
 {
@@ -63,14 +67,14 @@ class EmployeeController extends Controller
         $departments = Department::all();
         $designations = Designation::all();
 
-        return view('pages.employees.index', compact('employees', 'departments', 'designations'));
+        return view('employees::pages.employees.index', compact('employees', 'departments', 'designations'));
     }
     //To Create
     public function create()
     {
         $departments = Department::all();
         $designations = Designation::all();
-        return view('pages.employees.create', compact('departments', 'designations'));
+        return view('employees::pages.employees.create', compact('departments', 'designations'));
     }
 
     // To fetch designations
@@ -145,7 +149,7 @@ class EmployeeController extends Controller
         }
 
         if ($user->hasRole('admin')) {
-            return view('pages.employees.show', compact('employee'));
+            return view('employees::pages.employees.show', compact('employee'));
         } else {
             // Non-admin users can only view their own profile
             if (!$user->employeeProfile) {
@@ -156,7 +160,7 @@ class EmployeeController extends Controller
             abort(403, 'Access denied. You can only view your own profile.');
             }
 
-            return view('pages.employees.show', compact('employee'));
+            return view('employees::pages.employees.show', compact('employee'));
         }
     }
     //To edit
@@ -165,7 +169,7 @@ class EmployeeController extends Controller
         $departments = Department::all();
         $designations = Designation::all();
         $employee->load('user');
-        return view('pages.employees.edit', compact('employee', 'departments','designations'));
+        return view('employees::pages.employees.edit', compact('employee', 'departments','designations'));
     }
 
     public function update(Request $request, EmployeeProfile $employee)
@@ -229,7 +233,7 @@ class EmployeeController extends Controller
 
     public function deactivateForm(EmployeeProfile $employee)
     {
-        return view('pages.employees.deactivate', compact('employee'));
+        return view('employees::pages.employees.deactivate', compact('employee'));
     }
 
     public function deactivate(Request $request, EmployeeProfile $employee)
@@ -297,7 +301,7 @@ class EmployeeController extends Controller
         $employees = $query->get();
 
         // Load the view
-        $pdf = PDF::loadView('pages.employees.report', [
+        $pdf = PDF::loadView('employees::pages.employees.report', [
             'employees' => $employees
         ]);
 

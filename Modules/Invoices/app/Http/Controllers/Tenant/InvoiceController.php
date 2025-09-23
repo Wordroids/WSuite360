@@ -9,10 +9,11 @@ use Spatie\LaravelPdf\Enums\Format;
 
 // External models
 use App\Models\CompanySettings;
-use App\Models\Project;
+
 
 // Module models
 use Modules\Invoices\Models\Invoice;
+use Modules\Projects\Models\Project;
 use Modules\Clients\Models\Client;
 use Modules\Invoices\Models\InvoicePayment;
 

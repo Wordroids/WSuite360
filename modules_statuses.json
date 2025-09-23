@@ -3,5 +3,6 @@
     "Tasks": true,
     "Timesheet": true,
     "Clients": true,
-    "Projects": true
+    "Projects": true,
+    "Employees": true
 }

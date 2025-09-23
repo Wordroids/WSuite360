@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models\Traits;
+namespace Modules\Employees\Models\Traits;
 
-use App\Models\EmployeeProfile;
+
+use Modules\Employees\Models\EmployeeProfile;
 
 trait HasEmployeeProfile
 {

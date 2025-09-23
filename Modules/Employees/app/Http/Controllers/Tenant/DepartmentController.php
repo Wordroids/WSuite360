@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Employees\Http\Controllers\Tenant;
 
-use App\Models\Department;
+use Modules\Employees\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use App\Http\Controllers\Controller;
 class DepartmentController extends Controller
 {
     public function index()
     {
 
         $departments = Department::withCount('employees')->paginate(10);
-        return view('pages.departments.index', compact('departments'));
+        return view('employees::pages.departments.index', compact('departments'));
     }
 
     public function create()
     {
-        return view('pages.departments.create');
+        return view('employees::pages.departments.create');
     }
 
     public function store(Request $request)
@@ -36,12 +36,12 @@ class DepartmentController extends Controller
     public function show(Department $department)
     {
         $departments = Department::withCount('employees')->get();
-        return view('pages.departments.show', compact('department'));
+        return view('employees::pages.departments.show', compact('department'));
     }
 
     public function edit(Department $department)
     {
-        return view('pages.departments.edit', compact('department'));
+        return view('employees::pages.departments.edit', compact('department'));
     }
 
     public function update(Request $request, Department $department)
