@@ -16,6 +16,8 @@ use Modules\Invoices\Models\Invoice;
 use Modules\Projects\Models\Project;
 use Modules\Clients\Models\Client;
 use Modules\Invoices\Models\InvoicePayment;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendInvoiceMail;
 
 class InvoiceController extends Controller
 {
@@ -362,6 +364,85 @@ class InvoiceController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('invoice.index')
                 ->with('error', 'Error deleting invoice: ' . $e->getMessage());
+        }
+    }
+    
+    public function sendInvoice(Request $request, Invoice $invoice)
+    {
+        try {
+            \Log::info('=== STARTING INVOICE SEND PROCESS ===');
+            \Log::info('Invoice ID: ' . $invoice->id);
+            \Log::info('Invoice Status: ' . $invoice->status);
+            \Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
+
+            // Check if invoice can be sent
+            $allowedStatuses = ['overdue', 'sent', 'partialy-paid', 'draft'];
+            if (!in_array($invoice->status, $allowedStatuses)) {
+                \Log::warning('Invoice cannot be sent with status: ' . $invoice->status);
+                return back()->with('error', 'Invoice cannot be sent with current status.');
+            }
+
+            // Validate client email
+            if (!$invoice->client || !filter_var($invoice->client->email, FILTER_VALIDATE_EMAIL)) {
+                \Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
+                return back()->with('error', 'Valid client email address is required.');
+            }
+
+            // Test email configuration
+            \Log::info('Mail Configuration Check:');
+            \Log::info('Default Mailer: ' . config('mail.default'));
+            \Log::info('SMTP Host: ' . config('mail.mailers.smtp.host'));
+            \Log::info('SMTP Port: ' . config('mail.mailers.smtp.port'));
+            \Log::info('SMTP Username: ' . config('mail.mailers.smtp.username'));
+
+            // Generate PDF
+            \Log::info('Generating PDF...');
+            $invoice->load(['client', 'items.project', 'payments']);
+            $payments = $invoice->payments;
+            $due = $invoice->total - $payments->sum('amount');
+            $invoice->due = $due;
+
+            $company = CompanySettings::first();
+            if (!$company) {
+                \Log::error('Company settings not found');
+                return back()->with('error', 'Company settings not configured.');
+            }
+
+            // Generate PDF content
+            $pdfContent = Pdf::view('invoices::pdf.pdf', [
+                'invoice' => $invoice,
+                'company' => $company,
+                'payments' => $payments,
+            ])->format(Format::A4)->output();
+
+            \Log::info('PDF generated successfully. Size: ' . strlen($pdfContent) . ' bytes');
+
+            // Send email with detailed logging
+            \Log::info('Attempting to send email to: ' . $invoice->client->email);
+
+            Mail::to($invoice->client->email)
+                ->send(new SendInvoiceMail($invoice, $company, $pdfContent));
+
+            // Check for failures
+            if (count(Mail::failures()) > 0) {
+                \Log::error('Email failed to send. Failures: ' . implode(', ', Mail::failures()));
+                return back()->with('error', 'Failed to send email.');
+            }
+
+            \Log::info('Email sent successfully!');
+
+            // Update invoice
+            $invoice->status = 'sent';
+            $invoice->sent_at = now();
+            $invoice->save();
+
+            \Log::info('Invoice status updated to "sent"');
+
+            return back()->with('success', 'Invoice sent successfully to ' . $invoice->client->email);
+        } catch (\Exception $e) {
+            \Log::error('SEND INVOICE ERROR: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Failed to send invoice: ' . $e->getMessage());
         }
     }
 }

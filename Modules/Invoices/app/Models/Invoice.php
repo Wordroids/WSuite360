@@ -6,7 +6,7 @@ use Modules\Clients\Models\Client;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Invoice extends Model
 {
     /** @use HasFactory<\Database\Factories\InvoiceFactory> */
