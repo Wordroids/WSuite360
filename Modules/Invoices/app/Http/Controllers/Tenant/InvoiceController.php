@@ -395,33 +395,17 @@ class InvoiceController extends Controller
             \Log::info('SMTP Port: ' . config('mail.mailers.smtp.port'));
             \Log::info('SMTP Username: ' . config('mail.mailers.smtp.username'));
 
-            // Generate PDF
-            \Log::info('Generating PDF...');
-            $invoice->load(['client', 'items.project', 'payments']);
-            $payments = $invoice->payments;
-            $due = $invoice->total - $payments->sum('amount');
-            $invoice->due = $due;
-
             $company = CompanySettings::first();
             if (!$company) {
                 \Log::error('Company settings not found');
                 return back()->with('error', 'Company settings not configured.');
             }
 
-            // Generate PDF content
-            $pdfContent = Pdf::view('invoices::pdf.pdf', [
-                'invoice' => $invoice,
-                'company' => $company,
-                'payments' => $payments,
-            ])->format(Format::A4)->output();
-
-            \Log::info('PDF generated successfully. Size: ' . strlen($pdfContent) . ' bytes');
-
             // Send email with detailed logging
             \Log::info('Attempting to send email to: ' . $invoice->client->email);
 
             Mail::to($invoice->client->email)
-                ->send(new SendInvoiceMail($invoice, $company, $pdfContent));
+                ->send(new SendInvoiceMail($invoice, $company));
 
             // Check for failures
             if (count(Mail::failures()) > 0) {

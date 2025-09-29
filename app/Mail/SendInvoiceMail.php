@@ -14,16 +14,14 @@ class SendInvoiceMail extends Mailable implements ShouldQueue
 
     public $invoice;
     public $company;
-    public $pdfContent;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Invoice $invoice, $company, $pdfContent)
+    public function __construct(Invoice $invoice, $company)
     {
         $this->invoice = $invoice;
         $this->company = $company;
-        $this->pdfContent = $pdfContent;
     }
 
     /**
@@ -31,14 +29,7 @@ class SendInvoiceMail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $filename = 'invoice-' . $this->invoice->invoice_number . '.pdf';
-
         return $this->subject('Invoice #' . $this->invoice->invoice_number . ' from ' . $this->company->company_name)
-                    ->view('invoices::emails.invoice-sent')
-                    ->attachData($this->pdfContent, $filename, [
-                        'mime' => 'application/pdf',
-                    ]);
+            ->view('invoices::emails.invoice-sent');
     }
-
-
 }
