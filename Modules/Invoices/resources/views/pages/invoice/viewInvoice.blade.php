@@ -110,7 +110,7 @@
                     <div class="md:col-span-1"></div>
                     <div class="md:col-span-2 flex justify-end items-center gap-3">
 
-                        <form method="POST" action="{{ route('invoice.markAsSent', $invoice->id) }}">
+                        <form method="POST" action="{{ route('invoice.send', $invoice->id) }}">
                             @csrf
                             <button type="submit"
                                 class="bg-orange-400 text-white px-4 py-2 rounded hover:bg-orange-500">
