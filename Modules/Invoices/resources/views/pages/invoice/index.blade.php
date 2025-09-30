@@ -9,7 +9,7 @@
         </div>
 
         <!-- Filters -->
-        <form method="GET" action="{{ route('invoice.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <form method="GET" action="{{ route('invoice.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
             <div>
                 <label for="filter_client" class="block text-sm font-medium text-gray-700 mb-1">Client</label>
                 <select id="filter_client" name="client"
@@ -23,15 +23,35 @@
                 </select>
             </div>
             <div>
-                <label for="filter_date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label for="filter_date" class="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
                 <input type="date" id="filter_date" name="date" value="{{ request('date') }}"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
-            <div class="flex items-end">
+            <div>
+                <label for="filter_status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="filter_status" name="status"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">All Statuses</option>
+                    <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                    <option value="sent" {{ request('status') == 'sent' ? 'selected' : '' }}>Sent</option>
+                    <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                    <option value="overdue" {{ request('status') == 'overdue' ? 'selected' : '' }}>Overdue</option>
+                    <option value="partialy-paid" {{ request('status') == 'partialy-paid' ? 'selected' : '' }}>
+                        Partially Paid</option>
+                </select>
+            </div>
+
+            <div class="flex items-end space-x-2">
                 <button type="submit"
-                    class="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">
+                    class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
                     Apply Filters
                 </button>
+                @if (request()->hasAny(['client', 'date', 'status']))
+                    <a href="{{ route('invoice.index') }}"
+                        class="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition">
+                        Clear
+                    </a>
+                @endif
             </div>
         </form>
 

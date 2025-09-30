@@ -1,3 +1,10 @@
 {
-    "Invoices": true
+    "Invoices": true,
+    "Tasks": true,
+    "Timesheet": true,
+    "Clients": true,
+    "Projects": true,
+    "Employees": true,
+    "Leave": true,
+    "Subscriptions": true
 }

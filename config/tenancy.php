@@ -195,4 +195,11 @@ return [
         '--class' => 'DatabaseSeeder', // root seeder class
         '--force' => true,
     ],
+
+    'tenant_mail' => [
+    'from' => [
+        'address' => env('TENANT_MAIL_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')),
+        'name' => env('TENANT_MAIL_FROM_NAME', env('MAIL_FROM_NAME')),
+    ],
+],
 ];

@@ -6,26 +6,41 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\Enums\Format;
+use Illuminate\Support\Facades\Log;
+use App\Mail\SendReceiptMail;
 
 // External models
-use App\Models\Client;
 use App\Models\CompanySettings;
-use App\Models\Project;
+
 
 // Module models
 use Modules\Invoices\Models\Invoice;
+use Modules\Projects\Models\Project;
+use Modules\Clients\Models\Client;
 use Modules\Invoices\Models\InvoicePayment;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendInvoiceMail;
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::with('client')
-            ->when($request->client, fn($q) => $q->where('client_id', $request->client))
-            ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
-            ->latest()
-            ->paginate(10);
+        $query = Invoice::with('client');
 
+        // Apply filters
+        if ($request->has('client') && $request->client) {
+            $query->where('client_id', $request->client);
+        }
+
+        if ($request->has('date') && $request->date) {
+            $query->whereDate('invoice_date', $request->date);
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $invoices = $query->latest()->paginate(10);
         $clients = Client::all();
 
         return view('invoices::pages.invoice.index', compact('invoices', 'clients'));
@@ -107,7 +122,97 @@ class InvoiceController extends Controller
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
 
+    // edit
+    public function edit(Invoice $invoice)
+    {
+        $clients = Client::all();
+        $projects = Project::all(['id', 'name']);
+        $companySettings = CompanySettings::first();
 
+        $products = $invoice->items->map(function ($item) {
+            return [
+                'id'          => $item->id,
+                'project_id'  => $item->project_id,
+                'description' => $item->description,
+                'quantity'    => $item->quantity,
+                'price'       => $item->unit_price,
+                'project_name' => $item->project->name ?? '',
+            ];
+        });
+
+        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings', 'products'));
+    }
+    //to update
+    public function update(Request $request, Invoice $invoice)
+    {
+
+        $request->validate([
+            'title' => 'required',
+            'description' => 'nullable',
+            'client_id' => 'required',
+            'currency' => 'required',
+            'invoice_number' => 'required',
+            'po_so_number' => 'nullable',
+            'invoice_date' => 'required',
+            'due_date' => 'required',
+            'subtotal' => 'required',
+            'total' => 'required',
+            'notes' => 'nullable',
+            'instructions' => 'nullable',
+            'footer' => 'nullable',
+        ]);
+
+        $invoice->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'client_id' => $request->client_id,
+            'currency' => $request->currency,
+            'invoice_number' => $request->invoice_number,
+            'po_so_number' => $request->po_so_number,
+            'invoice_date' => $request->invoice_date,
+            'due_date' => $request->due_date,
+            'subtotal' => $request->subtotal,
+            'total' => $request->total,
+            'notes' => $request->notes,
+            'instructions' => $request->instructions,
+            'footer' => $request->footer,
+        ]);
+
+        if ($request->has('products')) {
+            $existingItemIds = [];
+
+            foreach ($request->products as $productData) {
+                if (isset($productData['id'])) {
+
+                    $item = $invoice->items()->find($productData['id']);
+                    if ($item) {
+                        $item->update([
+                            'project_id' => $productData['project_id'],
+                            'description' => $productData['description'],
+                            'unit_price' => $productData['price'],
+                            'quantity' => $productData['quantity'],
+                            'total' => $productData['price'] * $productData['quantity'],
+                        ]);
+                        $existingItemIds[] = $item->id;
+                    }
+                } else {
+
+                    $item = $invoice->items()->create([
+                        'project_id' => $productData['project_id'],
+                        'description' => $productData['description'],
+                        'unit_price' => $productData['price'],
+                        'quantity' => $productData['quantity'],
+                        'total' => $productData['price'] * $productData['quantity'],
+                    ]);
+                    $existingItemIds[] = $item->id;
+                }
+            }
+
+            $invoice->items()->whereNotIn('id', $existingItemIds)->delete();
+        }
+
+        return redirect()->route('invoice.index')->with('success', 'Invoice updated successfully.');
+    }
 
     public function approve(Invoice $invoice)
     {
@@ -203,35 +308,35 @@ class InvoiceController extends Controller
     }*/
 
     public function downloadPdf(Request $request, Invoice $invoice)
-{
-    $invoice->load(['client', 'items.project', 'payments']);
-    $payments = $invoice->payments;
-    $due = $invoice->total - $payments->sum('amount');
-    $invoice->due = $due;
+    {
+        $invoice->load(['client', 'items.project', 'payments']);
+        $payments = $invoice->payments;
+        $due = $invoice->total - $payments->sum('amount');
+        $invoice->due = $due;
 
-    $company = CompanySettings::first();
+        $company = CompanySettings::first();
 
-    // Convert logo to base64 if it exists
-    if ($company && $company->logo) {
-        $imagePath = storage_path('app/public/' . $company->logo);
-        if (file_exists($imagePath)) {
-            $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $imageData = file_get_contents($imagePath);
-            $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-            $company->base64_logo = $base64Image;
+        // Convert logo to base64 if it exists
+        if ($company && $company->logo) {
+            $imagePath = storage_path('app/public/' . $company->logo);
+            if (file_exists($imagePath)) {
+                $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
+                $imageData = file_get_contents($imagePath);
+                $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+                $company->base64_logo = $base64Image;
+            }
         }
-    }
 
-    // Use the correct namespace for Spatie's Laravel-PDF
-    return Pdf::view('invoices::pdf.pdf', [
-        'invoice' => $invoice,
-        'company' => $company,
-        'payments' => $payments,
-    ])
-    ->format(Format::A4)
-    ->name('invoice-' . $invoice->invoice_number . '.pdf')
-    ->download();
-}
+        // Use the correct namespace for Spatie's Laravel-PDF
+        return Pdf::view('invoices::pdf.pdf', [
+            'invoice' => $invoice,
+            'company' => $company,
+            'payments' => $payments,
+        ])
+            ->format(Format::A4)
+            ->name('invoice-' . $invoice->invoice_number . '.pdf')
+            ->download();
+    }
 
     public function showPDF(Request $request, Invoice $invoice)
     {
@@ -253,7 +358,7 @@ class InvoiceController extends Controller
             $invoice->items()->delete();
             $invoice->payments()->delete();
 
-            
+
             $invoice->delete();
 
             return redirect()->route('invoice.index')
@@ -261,6 +366,128 @@ class InvoiceController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('invoice.index')
                 ->with('error', 'Error deleting invoice: ' . $e->getMessage());
+        }
+    }
+
+    public function sendInvoice(Request $request, Invoice $invoice)
+    {
+        try {
+            Log::info('=== STARTING INVOICE SEND PROCESS ===');
+            Log::info('Invoice ID: ' . $invoice->id);
+            Log::info('Invoice Status: ' . $invoice->status);
+            Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
+
+            // Check if invoice can be sent
+            $allowedStatuses = ['overdue', 'sent', 'partialy-paid', 'draft'];
+            if (!in_array($invoice->status, $allowedStatuses)) {
+                Log::warning('Invoice cannot be sent with status: ' . $invoice->status);
+                return back()->with('error', 'Invoice cannot be sent with current status.');
+            }
+
+            // Validate client email
+            if (!$invoice->client || !filter_var($invoice->client->email, FILTER_VALIDATE_EMAIL)) {
+                Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
+                return back()->with('error', 'Valid client email address is required.');
+            }
+
+            // Test email configuration
+            Log::info('Mail Configuration Check:');
+            Log::info('Default Mailer: ' . config('mail.default'));
+            Log::info('SMTP Host: ' . config('mail.mailers.smtp.host'));
+            Log::info('SMTP Port: ' . config('mail.mailers.smtp.port'));
+            Log::info('SMTP Username: ' . config('mail.mailers.smtp.username'));
+
+            $company = CompanySettings::first();
+            if (!$company) {
+                Log::error('Company settings not found');
+                return back()->with('error', 'Company settings not configured.');
+            }
+
+            // Send email with detailed logging
+            Log::info('Attempting to send email to: ' . $invoice->client->email);
+
+            Mail::to($invoice->client->email)
+                ->send(new SendInvoiceMail($invoice, $company));
+
+            // Check for failures
+            if (count(Mail::failures()) > 0) {
+                Log::error('Email failed to send. Failures: ' . implode(', ', Mail::failures()));
+                return back()->with('error', 'Failed to send email.');
+            }
+
+            Log::info('Email sent successfully!');
+
+            // Update invoice
+            $invoice->status = 'sent';
+            $invoice->sent_at = now();
+            $invoice->save();
+
+            Log::info('Invoice status updated to "sent"');
+
+            return back()->with('success', 'Invoice sent successfully to ' . $invoice->client->email);
+        } catch (\Exception $e) {
+            Log::error('SEND INVOICE ERROR: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Failed to send invoice: ' . $e->getMessage());
+        }
+    }
+
+    //to send payment receipt
+    public function sendReceipt(Request $request, Invoice $invoice, $paymentId)
+    {
+        try {
+            Log::info('=== STARTING RECEIPT SEND PROCESS ===');
+            Log::info('Invoice ID: ' . $invoice->id);
+            Log::info('Payment ID: ' . $paymentId);
+
+
+            $payment = InvoicePayment::where('invoice_id', $invoice->id)
+                ->where('id', $paymentId)
+                ->firstOrFail();
+
+            Log::info('Payment found: ' . $payment->id);
+            Log::info('Payment Amount: ' . $payment->amount);
+            Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
+
+            // Validate client email
+            if (!$invoice->client || !filter_var($invoice->client->email, FILTER_VALIDATE_EMAIL)) {
+                Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
+                return back()->with('error', 'Valid client email address is required.');
+            }
+
+            $company = CompanySettings::first();
+            if (!$company) {
+                Log::error('Company settings not found');
+                return back()->with('error', 'Company settings not configured.');
+            }
+
+            // Convert logo to base64 for email
+            if ($company && $company->logo) {
+                $imagePath = storage_path('app/public/' . $company->logo);
+                if (file_exists($imagePath)) {
+                    $company->base64_logo = 'data:image/' . pathinfo($imagePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($imagePath));
+                }
+            }
+
+            // Send receipt email
+            Log::info('Attempting to send receipt to: ' . $invoice->client->email);
+
+            Mail::to($invoice->client->email)
+                ->send(new SendReceiptMail($invoice, $payment, $company));
+
+           
+            if (count(Mail::failures()) > 0) {
+                Log::error('Receipt email failed to send. Failures: ' . implode(', ', Mail::failures()));
+                return back()->with('error', 'Failed to send receipt email.');
+            }
+
+            Log::info('Receipt email sent successfully!');
+
+            return back()->with('success', 'Payment receipt sent successfully to ' . $invoice->client->email);
+        } catch (\Exception $e) {
+            Log::error('SEND RECEIPT ERROR: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Failed to send receipt: ' . $e->getMessage());
         }
     }
 }
