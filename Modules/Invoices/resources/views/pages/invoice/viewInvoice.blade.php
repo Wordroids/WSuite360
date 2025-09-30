@@ -163,13 +163,17 @@
 
                         @forelse($invoice->payments->sortByDesc('payment_date') as $index => $payment)
                             <p class="text-sm text-blue-950 mb-2 text-justify whitespace-normal leading-relaxed">
-
                                 {{ $index + 1 }}.
                                 {{ \Carbon\Carbon::parse($payment->payment_date)->format('F d, Y') }} –
                                 A payment of {{ $invoice->currency }}{{ number_format($payment->amount, 2) }}
                                 was made using {{ strtolower($payment->payment_method) }}.
-                                <a href="{{ route('invoice.receipt', [$invoice->id, $payment->id]) }}"
-                                    class="text-orange-500 hover:underline ml-1">
+
+                            <form method="POST"
+                                action="{{ route('invoice.sendReceipt', [$invoice->id, $payment->id]) }}"
+                                class="inline">
+                                @csrf
+                                <button type="submit"
+                                    class="text-orange-500 hover:underline ml-1 bg-transparent border-none cursor-pointer">
                                     send receipt
                                 </a>
                                 <span class="text-gray-500">.</span>
@@ -178,11 +182,9 @@
                                     edit payment
                                 </a>
                             </p>
-
                         @empty
                             <p class="text-sm text-gray-500">No payments recorded yet.</p>
                         @endforelse
-
 
                     </div>
                 </div>

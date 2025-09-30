@@ -20,4 +20,5 @@ Route::middleware('auth')->group(function () {
 	Route::post('/invoices/{invoice}/record-payment', [InvoiceController::class, 'recordPayment'])->name('invoice.recordxPayment');
 	Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
 	Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
+    Route::post('/invoices/{invoice}/send-receipt/{payment}', [InvoiceController::class, 'sendReceipt'])->name('invoice.sendReceipt');
 });
