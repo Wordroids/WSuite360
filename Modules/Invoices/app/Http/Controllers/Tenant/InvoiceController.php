@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\Enums\Format;
+use Illuminate\Support\Facades\Log;
+use App\Mail\SendReceiptMail;
 
 // External models
 use App\Models\CompanySettings;
@@ -366,67 +368,126 @@ class InvoiceController extends Controller
                 ->with('error', 'Error deleting invoice: ' . $e->getMessage());
         }
     }
-    
+
     public function sendInvoice(Request $request, Invoice $invoice)
     {
         try {
-            \Log::info('=== STARTING INVOICE SEND PROCESS ===');
-            \Log::info('Invoice ID: ' . $invoice->id);
-            \Log::info('Invoice Status: ' . $invoice->status);
-            \Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
+            Log::info('=== STARTING INVOICE SEND PROCESS ===');
+            Log::info('Invoice ID: ' . $invoice->id);
+            Log::info('Invoice Status: ' . $invoice->status);
+            Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
 
             // Check if invoice can be sent
             $allowedStatuses = ['overdue', 'sent', 'partialy-paid', 'draft'];
             if (!in_array($invoice->status, $allowedStatuses)) {
-                \Log::warning('Invoice cannot be sent with status: ' . $invoice->status);
+                Log::warning('Invoice cannot be sent with status: ' . $invoice->status);
                 return back()->with('error', 'Invoice cannot be sent with current status.');
             }
 
             // Validate client email
             if (!$invoice->client || !filter_var($invoice->client->email, FILTER_VALIDATE_EMAIL)) {
-                \Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
+                Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
                 return back()->with('error', 'Valid client email address is required.');
             }
 
             // Test email configuration
-            \Log::info('Mail Configuration Check:');
-            \Log::info('Default Mailer: ' . config('mail.default'));
-            \Log::info('SMTP Host: ' . config('mail.mailers.smtp.host'));
-            \Log::info('SMTP Port: ' . config('mail.mailers.smtp.port'));
-            \Log::info('SMTP Username: ' . config('mail.mailers.smtp.username'));
+            Log::info('Mail Configuration Check:');
+            Log::info('Default Mailer: ' . config('mail.default'));
+            Log::info('SMTP Host: ' . config('mail.mailers.smtp.host'));
+            Log::info('SMTP Port: ' . config('mail.mailers.smtp.port'));
+            Log::info('SMTP Username: ' . config('mail.mailers.smtp.username'));
 
             $company = CompanySettings::first();
             if (!$company) {
-                \Log::error('Company settings not found');
+                Log::error('Company settings not found');
                 return back()->with('error', 'Company settings not configured.');
             }
 
             // Send email with detailed logging
-            \Log::info('Attempting to send email to: ' . $invoice->client->email);
+            Log::info('Attempting to send email to: ' . $invoice->client->email);
 
             Mail::to($invoice->client->email)
                 ->send(new SendInvoiceMail($invoice, $company));
 
             // Check for failures
             if (count(Mail::failures()) > 0) {
-                \Log::error('Email failed to send. Failures: ' . implode(', ', Mail::failures()));
+                Log::error('Email failed to send. Failures: ' . implode(', ', Mail::failures()));
                 return back()->with('error', 'Failed to send email.');
             }
 
-            \Log::info('Email sent successfully!');
+            Log::info('Email sent successfully!');
 
             // Update invoice
             $invoice->status = 'sent';
             $invoice->sent_at = now();
             $invoice->save();
 
-            \Log::info('Invoice status updated to "sent"');
+            Log::info('Invoice status updated to "sent"');
 
             return back()->with('success', 'Invoice sent successfully to ' . $invoice->client->email);
         } catch (\Exception $e) {
-            \Log::error('SEND INVOICE ERROR: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('SEND INVOICE ERROR: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Failed to send invoice: ' . $e->getMessage());
+        }
+    }
+
+    //to send payment receipt
+    public function sendReceipt(Request $request, Invoice $invoice, $paymentId)
+    {
+        try {
+            Log::info('=== STARTING RECEIPT SEND PROCESS ===');
+            Log::info('Invoice ID: ' . $invoice->id);
+            Log::info('Payment ID: ' . $paymentId);
+
+
+            $payment = InvoicePayment::where('invoice_id', $invoice->id)
+                ->where('id', $paymentId)
+                ->firstOrFail();
+
+            Log::info('Payment found: ' . $payment->id);
+            Log::info('Payment Amount: ' . $payment->amount);
+            Log::info('Client Email: ' . ($invoice->client->email ?? 'No email'));
+
+            // Validate client email
+            if (!$invoice->client || !filter_var($invoice->client->email, FILTER_VALIDATE_EMAIL)) {
+                Log::error('Invalid client email: ' . ($invoice->client->email ?? 'null'));
+                return back()->with('error', 'Valid client email address is required.');
+            }
+
+            $company = CompanySettings::first();
+            if (!$company) {
+                Log::error('Company settings not found');
+                return back()->with('error', 'Company settings not configured.');
+            }
+
+            // Convert logo to base64 for email
+            if ($company && $company->logo) {
+                $imagePath = storage_path('app/public/' . $company->logo);
+                if (file_exists($imagePath)) {
+                    $company->base64_logo = 'data:image/' . pathinfo($imagePath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($imagePath));
+                }
+            }
+
+            // Send receipt email
+            Log::info('Attempting to send receipt to: ' . $invoice->client->email);
+
+            Mail::to($invoice->client->email)
+                ->send(new SendReceiptMail($invoice, $payment, $company));
+
+           
+            if (count(Mail::failures()) > 0) {
+                Log::error('Receipt email failed to send. Failures: ' . implode(', ', Mail::failures()));
+                return back()->with('error', 'Failed to send receipt email.');
+            }
+
+            Log::info('Receipt email sent successfully!');
+
+            return back()->with('success', 'Payment receipt sent successfully to ' . $invoice->client->email);
+        } catch (\Exception $e) {
+            Log::error('SEND RECEIPT ERROR: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Failed to send receipt: ' . $e->getMessage());
         }
     }
 }
