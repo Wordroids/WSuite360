@@ -21,12 +21,22 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $invoices = Invoice::with('client')
-            ->when($request->client, fn($q) => $q->where('client_id', $request->client))
-            ->when($request->date, fn($q) => $q->whereDate('date', $request->date))
-            ->latest()
-            ->paginate(10);
+        $query = Invoice::with('client');
 
+        // Apply filters
+        if ($request->has('client') && $request->client) {
+            $query->where('client_id', $request->client);
+        }
+
+        if ($request->has('date') && $request->date) {
+            $query->whereDate('invoice_date', $request->date);
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $invoices = $query->latest()->paginate(10);
         $clients = Client::all();
 
         return view('invoices::pages.invoice.index', compact('invoices', 'clients'));
@@ -115,18 +125,18 @@ class InvoiceController extends Controller
         $projects = Project::all(['id', 'name']);
         $companySettings = CompanySettings::first();
 
-        $products = $invoice->items->map(function($item) {
-        return [
-            'id'          => $item->id,
-            'project_id'  => $item->project_id,
-            'description' => $item->description,
-            'quantity'    => $item->quantity,
-            'price'       => $item->unit_price,
-            'project_name'=> $item->project->name ?? '',
-        ];
-    });
+        $products = $invoice->items->map(function ($item) {
+            return [
+                'id'          => $item->id,
+                'project_id'  => $item->project_id,
+                'description' => $item->description,
+                'quantity'    => $item->quantity,
+                'price'       => $item->unit_price,
+                'project_name' => $item->project->name ?? '',
+            ];
+        });
 
-        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings','products'));
+        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings', 'products'));
     }
     //to update
     public function update(Request $request, Invoice $invoice)
@@ -294,35 +304,35 @@ class InvoiceController extends Controller
     }*/
 
     public function downloadPdf(Request $request, Invoice $invoice)
-{
-    $invoice->load(['client', 'items.project', 'payments']);
-    $payments = $invoice->payments;
-    $due = $invoice->total - $payments->sum('amount');
-    $invoice->due = $due;
+    {
+        $invoice->load(['client', 'items.project', 'payments']);
+        $payments = $invoice->payments;
+        $due = $invoice->total - $payments->sum('amount');
+        $invoice->due = $due;
 
-    $company = CompanySettings::first();
+        $company = CompanySettings::first();
 
-    // Convert logo to base64 if it exists
-    if ($company && $company->logo) {
-        $imagePath = storage_path('app/public/' . $company->logo);
-        if (file_exists($imagePath)) {
-            $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $imageData = file_get_contents($imagePath);
-            $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
-            $company->base64_logo = $base64Image;
+        // Convert logo to base64 if it exists
+        if ($company && $company->logo) {
+            $imagePath = storage_path('app/public/' . $company->logo);
+            if (file_exists($imagePath)) {
+                $imageType = pathinfo($imagePath, PATHINFO_EXTENSION);
+                $imageData = file_get_contents($imagePath);
+                $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
+                $company->base64_logo = $base64Image;
+            }
         }
-    }
 
-    // Use the correct namespace for Spatie's Laravel-PDF
-    return Pdf::view('invoices::pdf.pdf', [
-        'invoice' => $invoice,
-        'company' => $company,
-        'payments' => $payments,
-    ])
-    ->format(Format::A4)
-    ->name('invoice-' . $invoice->invoice_number . '.pdf')
-    ->download();
-}
+        // Use the correct namespace for Spatie's Laravel-PDF
+        return Pdf::view('invoices::pdf.pdf', [
+            'invoice' => $invoice,
+            'company' => $company,
+            'payments' => $payments,
+        ])
+            ->format(Format::A4)
+            ->name('invoice-' . $invoice->invoice_number . '.pdf')
+            ->download();
+    }
 
     public function showPDF(Request $request, Invoice $invoice)
     {
