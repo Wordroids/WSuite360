@@ -62,4 +62,18 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoicePayment::class);
     }
+    
+    // Auto generate invoice ID
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($invoice) {
+            if (empty($invoice->invoice_number)) {
+                $invoice->invoice_number = 'INV-' .
+                    now()->format('Ymd') . '-' .
+                    \Illuminate\Support\Str::random(6);
+            }
+        });
+    }
 }
