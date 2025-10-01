@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
+
 class Invoice extends Model
 {
     /** @use HasFactory<\Database\Factories\InvoiceFactory> */
@@ -62,7 +63,7 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoicePayment::class);
     }
-    
+
     // Auto generate invoice ID
     protected static function boot()
     {
@@ -70,9 +71,9 @@ class Invoice extends Model
 
         static::creating(function ($invoice) {
             if (empty($invoice->invoice_number)) {
-                $invoice->invoice_number = 'INV-' .
-                    now()->format('Ymd') . '-' .
-                    \Illuminate\Support\Str::random(6);
+                $count = \Modules\Invoices\Models\Invoice::count();
+                $nextNumber = $count + 1;
+                $invoice->invoice_number = 'INV-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
             }
         });
     }
