@@ -6,5 +6,6 @@
     "Projects": true,
     "Employees": true,
     "Leave": true,
-    "Subscriptions": true
+    "Subscriptions": true,
+    "Services": true
 }
