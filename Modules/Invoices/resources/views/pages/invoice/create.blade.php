@@ -47,7 +47,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice Number</label>
-                    <input type="text" name="invoice_number" value="Auto-generated" 
+                    <input type="text" name="invoice_number" value="Auto-generated"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring">
                 </div>
                 <div>
@@ -69,7 +69,7 @@
 
             <!-- Dynamic Product Lines -->
             <div class="bg-white border p-4 rounded-lg mb-6" x-data="{
-                products: [{ project_id: '', description: '', quantity: 0, price: 0 }],
+                products: [{ type: 'project', project_id: '', service_id: '', description: '', quantity: 0, price: 0 }],
                 subtotal: 0,
                 total: 0,
                 calculateTotals() {
@@ -78,15 +78,21 @@
                         return sum + amount;
                     }, 0);
                     this.total = this.subtotal;
+                },
+                setType(index, type) {
+                    this.products[index].type = type;
+                    this.products[index].project_id = '';
+                    this.products[index].service_id = '';
                 }
             }" x-init="calculateTotals()">
                 <h3 class="text-md font-semibold text-gray-700 mb-4">Products and Services</h3>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm text-gray-700 border overflow-auto">
+                    <table class="min-w-full text-sm text-gray-700 border">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-4 py-2 text-left">Project</th>
+                                <th class="px-4 py-2 text-left">Type</th>
+                                <th class="px-4 py-2 text-left">Project/Service</th>
                                 <th class="px-4 py-2 text-left">Description</th>
                                 <th class="px-4 py-2 text-left">Qty</th>
                                 <th class="px-4 py-2 text-left">Price</th>
@@ -97,27 +103,57 @@
                         <tbody>
                             <template x-for="(item, index) in products" :key="index">
                                 <tr class="border-t">
-                                    <!-- Project dropdown -->
-                                    <td class="px-2 py-2 align-top" style="overflow: hidden;">
-                                        <div x-data="{ search: '', showDropdown: false }" class="relative w-48" x-cloak>
-                                            <input type="text" x-model="search" @focus="showDropdown = true"
-                                                @input="showDropdown = true" @click.away="showDropdown = false"
-                                                placeholder="Search project..."
-                                                class="w-full border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
-
-                                            <ul x-show="showDropdown" x-transition
-                                                class="left-0 z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                                                @foreach ($projects as $project)
-                                                    <li class="px-3 py-1 hover:bg-indigo-100 cursor-pointer"
-                                                        @click="products[index].project_id = '{{ $project->id }}'; search = '{{ $project->name }}'; showDropdown = false">
-                                                        {{ $project->name }}
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-
-                                            <input type="hidden" :name="`products[${index}][project_id]`"
-                                                :value="products[index].project_id">
+                                    <!-- Type Selection -->
+                                    <td class="px-2 py-2 align-top">
+                                        <div class="flex flex-col space-y-1">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" :name="`products[${index}][type]`" value="project"
+                                                    x-model="products[index].type" @change="setType(index, 'project')"
+                                                    class="form-radio h-4 w-4 text-indigo-600">
+                                                <span class="ml-2 text-sm">Project</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" :name="`products[${index}][type]`" value="service"
+                                                    x-model="products[index].type" @change="setType(index, 'service')"
+                                                    class="form-radio h-4 w-4 text-indigo-600">
+                                                <span class="ml-2 text-sm">Service</span>
+                                            </label>
                                         </div>
+                                    </td>
+
+                                    <!-- Project/Service dropdown -->
+                                    <td class="px-2 py-2 align-top">
+                                        <template x-if="products[index].type === 'project'">
+                                            <div>
+                                                <select :name="`products[${index}][project_id]`"
+                                                    x-model="products[index].project_id"
+                                                    class="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
+                                                    <option value="">Select Project</option>
+                                                    @foreach ($projects as $project)
+                                                        <option value="{{ $project->id }}">{{ $project->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" :name="`products[${index}][service_id]`"
+                                                    value="">
+                                            </div>
+                                        </template>
+
+                                        <template x-if="products[index].type === 'service'">
+                                            <div>
+                                                <select :name="`products[${index}][service_id]`"
+                                                    x-model="products[index].service_id"
+                                                    class="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
+                                                    <option value="">Select Service</option>
+                                                    @foreach ($services as $service)
+                                                        <option value="{{ $service->id }}">{{ $service->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" :name="`products[${index}][project_id]`"
+                                                    value="">
+                                            </div>
+                                        </template>
                                     </td>
 
                                     <!-- Description -->
@@ -165,8 +201,8 @@
                 </div>
 
                 <button type="button" class="mt-4 text-sm text-indigo-600 hover:underline hover:text-indigo-800"
-                    @click="products.push({ project_id: '', description: '', quantity: 0, price: 0 }); calculateTotals()">
-                    + Add another product
+                    @click="products.push({ type: 'project', project_id: '', service_id: '', description: '', quantity: 0, price: 0 }); calculateTotals()">
+                    + Add another product/service
                 </button>
 
                 <!-- Totals -->
@@ -176,13 +212,13 @@
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <label class="text-gray-700 font-medium">Subtotal:</label>
-                            <span x-text="subtotal.toFixed(2)"></span>
+                            <span x-text="'LKR ' + subtotal.toFixed(2)"></span>
                             <input type="hidden" name="subtotal" :value="subtotal.toFixed(2)">
                         </div>
 
                         <div class="flex justify-between font-semibold text-lg border-t pt-2">
                             <label class="text-gray-800">Total:</label>
-                            <span x-text="total.toFixed(2)"></span>
+                            <span x-text="'LKR ' + total.toFixed(2)"></span>
                             <input type="hidden" name="total" :value="total.toFixed(2)">
                         </div>
                     </div>
@@ -213,6 +249,18 @@
             </div>
         </form>
     </div>
+
+    <style>
+
+        .relative .absolute {
+            z-index: 1000 !important;
+        }
+
+       
+        tr {
+            position: relative;
+        }
+    </style>
 </x-app-layout>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

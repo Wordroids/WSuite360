@@ -4,12 +4,14 @@ namespace Modules\Invoices\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Projects\Models\Project;
+use Modules\Services\Models\Service;
 class InvoiceItem extends Model
 {
 
     protected $fillable = [
         'invoice_id',
         'project_id',
+        'service_id',
         'description',
         'unit_price',
         'quantity',
@@ -30,5 +32,9 @@ class InvoiceItem extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }
