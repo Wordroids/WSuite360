@@ -1,146 +1,159 @@
-<div class="grid grid-cols-4 bg-white p-5">
-
-    <div class="col-span-4 bg-white">
-        <h3 class="text-md font-semibold text-gray-800 mb-3">Invoice Preview</h3>
-
-        <div class="max-w-4xl mx-auto py-10 px-6">
-
+<div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="grid grid-cols-4 items-start mb-6">
-                <div>
-                    @if ($company->logo)
-                        <img src="{{ tenant_asset($company->logo) }}" class="w-40" alt="Company Logo">
-                    @endif
-                </div>
-                <div class="col-span-2 mt-8">
-                    <h2 class="text-3xl text-blue-950 font-black">{{ $company->name }}</h2>
-                    <p class="text-gray-400 font-bold">{{ $company->address }}</p>
-                </div>
-                <div class="text-right mt-8">
-                    <h1 class="text-lg font-bold">Contact Information</h1>
-                    <p class="text-gray-400">{{ $company->email }}</p>
-                    <p class="text-gray-400">{{ $company->phone }}</p>
-                </div>
-            </div>
-
-            <hr>
-
-            <!-- Client & Total -->
-            <div class="grid grid-cols-2 my-6">
-                <div>
-                    <h1 class="text-2xl text-blue-950 font-black">
-                        {{ $invoice->title ?? 'Invoice' }}
-                    </h1>
-                    <p class="text-gray-400">{{ $invoice->description }}</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-gray-400">Amount Due ({{ $invoice->currency }})</p>
-                    <p class="text-2xl text-blue-950 font-black">
-                        {{ $invoice->currency }} {{ number_format($invoice->due, 2) }}
-                    </p>
-                </div>
-            </div>
-
-            <!-- Billing & Invoice Details -->
-            <div class="grid md:grid-cols-2 gap-20 mt-6">
-                <div class="grid grid-cols-3 text-sm gap-y-1">
-                    <div class="text-gray-400">Bill to</div>
-                    <div class="col-span-2 font-bold">: {{ $invoice->client->name }}</div>
-
-                    <div class="text-gray-400">Email</div>
-                    <div class="col-span-2 font-bold">: {{ $invoice->client->email }}</div>
-
-                    <div class="text-gray-400">Phone</div>
-                    <div class="col-span-2 font-bold">: {{ $invoice->client->phone }}</div>
-
-                    <div class="text-gray-400">Address</div>
-                    <div class="col-span-2 font-bold">: {{ $invoice->client->address }}</div>
-                </div>
-
-                <div class="grid grid-cols-3 text-sm gap-y-1">
-                    <div class="text-gray-400 col-span-2">Invoice No:</div>
-                    <div class="font-bold text-right">{{ $invoice->invoice_number }}</div>
-
-                    <div class="text-gray-400 col-span-2">PO/SO Number:</div>
-                    <div class="font-bold text-right">{{ $invoice->po_so_number ?? '-' }}</div>
-
-                    <div class="text-gray-400 col-span-2">Invoice Date:</div>
-                    <div class="font-bold text-right">{{ $invoice->invoice_date->format('Y-m-d') }}</div>
-
-                    <div class="text-gray-400 col-span-2">Due Date:</div>
-                    <div class="font-bold text-right">{{ $invoice->due_date->format('Y-m-d') }}</div>
-                </div>
-            </div>
-
-            <!-- Items Table -->
-            <div class="mt-10">
-                <table class="w-full border-separate border-spacing-2 text-sm">
-                    <thead>
-                        <tr>
-                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Item</th>
-                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Quantity</th>
-                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Price ({{ $invoice->currency }})</th>
-                            <th class="bg-blue-100 text-left px-4 py-2 rounded">Amount ({{ $invoice->currency }})</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($invoice->items as $item)
-                            <tr>
-                                <td class="px-4 py-2 border-b">{{ $item->project->name ?? '-' }}</td>
-                                <td class="px-4 py-2 border-b">{{ $item->quantity }}</td>
-                                <td class="px-4 py-2 border-b">{{ number_format($item->unit_price, 2) }}</td>
-                                <td class="px-4 py-2 border-b">
-                                    {{ number_format($item->quantity * $item->unit_price, 2) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <!-- Totals -->
-            <div class="mt-6 text-right space-y-2 text-sm text-blue-950">
-                <div class="flex justify-end gap-4">
-                    <p class="font-semibold">Sub Total :</p>
-                    <p class="font-semibold">LKR{{ number_format($invoice->subtotal, 2) }}</p>
-                </div>
-                <div class="flex justify-end gap-4">
-                    <p class="font-semibold">Tax :</p>
-                    <p class="font-semibold">LKR{{ number_format($invoice->tax_amount, 2) }}</p>
-                </div>
-                <div class="flex justify-end gap-4">
-                    <p class="font-semibold">Discount :</p>
-                    <p class="font-semibold">-LKR{{ number_format($invoice->discount_amount, 2) }}</p>
-                </div>
-                <div class="flex justify-end gap-4">
-                    <p class="font-semibold">Total :</p>
-                    <p class="font-semibold">LKR{{ number_format($invoice->total, 2) }}</p>
-                </div>
-                <div class="flex justify-end gap-4 text-lg font-bold mt-3 border-t pt-3">
-                    <p>Grand total (LKR) :</p>
-                    <p>LKR{{ number_format($invoice->total * $invoice->conversion_rate, 2) }}</p>
-                </div>
-
-                @foreach ($invoice->payments as $payment)
-                    <div class="flex justify-end gap-4 text-base font-semibold">
-                        <p>Payment on {{ \Carbon\Carbon::parse($payment->payment_date)->format('F d, Y') }} using
-                            {{ $payment->payment_method }} payment :</p>
-                        <p>LKR{{ number_format($payment->amount, 2) }}</p>
-                    </div>
-                @endforeach
-            </div>
-
-
-            <!-- Notes , instructions and Footer Notes  -->
-            <div class="mt-10">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Notes</h3>
-                <p class="text-gray-600">{{ $invoice->notes ?? 'No additional notes.' }}</p>
-                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Payment Instructions</h3>
-                <p class="text-gray-600">{{ $invoice->instructions ?? 'No payment instructions provided.' }}</p>
-                <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">Footer Notes</h3>
-                <p class="text-gray-600">{{ $invoice->footer ?? 'No footer notes provided.' }}</p>
-            </div>
-
+    <div class="flex justify-between items-start mb-8">
+        <div>
+            @if($company && $company->logo)
+                <img src="{{ tenant_asset($company->logo) }}" alt="Company Logo" class="h-16 mb-4">
+            @endif
+            <h1 class="text-2xl font-bold text-gray-800">INVOICE</h1>
+        </div>
+        <div class="text-right">
+            <div class="text-lg font-bold text-gray-800">#<span id="preview-invoice-number">{{ $invoice->invoice_number ?? 'Auto-generated' }}</span></div>
+            <div class="text-sm text-gray-600">Date: {{ ($invoice->invoice_date ?? now())->format('M d, Y') }}</div>
+            <div class="text-sm text-gray-600">Due Date: {{ ($invoice->due_date ?? now()->addDays(30))->format('M d, Y') }}</div>
+            @if($invoice->po_so_number ?? false)
+                <div class="text-sm text-gray-600">PO/SO: {{ $invoice->po_so_number }}</div>
+            @endif
         </div>
     </div>
 
+    <!-- From/To Sections -->
+    <div class="grid grid-cols-2 gap-8 mb-8">
+        <div>
+            <h3 class="font-semibold text-gray-700 mb-2">From:</h3>
+            @if($company)
+                <div class="text-gray-800">
+                    <div class="font-semibold">{{ $company->company_name ?? 'Your Company Name' }}</div>
+                    @if($company->address)<div>{{ $company->address }}</div>@endif
+                    @if($company->city || $company->state || $company->zip_code)
+                        <div>{{ implode(', ', array_filter([$company->city, $company->state, $company->zip_code])) }}</div>
+                    @endif
+                    @if($company->phone)<div>Phone: {{ $company->phone }}</div>@endif
+                    @if($company->email)<div>Email: {{ $company->email }}</div>@endif
+                </div>
+            @else
+                <div class="text-gray-500">Company information not set</div>
+            @endif
+        </div>
+        <div>
+            <h3 class="font-semibold text-gray-700 mb-2">To:</h3>
+            @if($client)
+                <div class="text-gray-800">
+                    <div class="font-semibold">{{ $client->name }}</div>
+                    @if($client->address)<div>{{ $client->address }}</div>@endif
+                    @if($client->city || $client->state || $client->zip_code)
+                        <div>{{ implode(', ', array_filter([$client->city, $client->state, $client->zip_code])) }}</div>
+                    @endif
+                    @if($client->phone)<div>Phone: {{ $client->phone }}</div>@endif
+                    @if($client->email)<div>Email: {{ $client->email }}</div>@endif
+                </div>
+            @else
+                <div class="text-gray-500 italic">No client selected</div>
+            @endif
+        </div>
+    </div>
 
+    <!-- Summary -->
+    @if($invoice->title || $invoice->description)
+    <div class="mb-6 p-4 bg-gray-50 rounded">
+        @if($invoice->title)
+            <h3 class="font-semibold text-gray-800 mb-2">{{ $invoice->title }}</h3>
+        @endif
+        @if($invoice->description)
+            <p class="text-gray-600 text-sm">{{ $invoice->description }}</p>
+        @endif
+    </div>
+    @endif
+
+    <!-- Items Table -->
+    <div class="mb-8">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 px-4 py-2 text-left font-semibold text-gray-700">Description</th>
+                    <th class="border border-gray-300 px-4 py-2 text-center font-semibold text-gray-700">Qty</th>
+                    <th class="border border-gray-300 px-4 py-2 text-right font-semibold text-gray-700">Price</th>
+                    <th class="border border-gray-300 px-4 py-2 text-right font-semibold text-gray-700">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(count($items) > 0)
+                    @foreach($items as $item)
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="text-gray-800">{{ $item->description }}</div>
+                                @if($item->project)
+                                    <div class="text-xs text-gray-500">Project: {{ $item->project->name }}</div>
+                                @elseif($item->service)
+                                    <div class="text-xs text-gray-500">Service: {{ $item->service->name }}</div>
+                                @endif
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">{{ $item->quantity }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-right">{{ $invoice->currency ?? 'LKR' }} {{ number_format($item->unit_price, 2) }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-right">{{ $invoice->currency ?? 'LKR' }} {{ number_format($item->total, 2) }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="4" class="border border-gray-300 px-4 py-4 text-center text-gray-500 italic">
+                            No items added
+                        </td>
+                    </tr>
+                @endif
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="border border-gray-300 px-4 py-2 text-right font-semibold">Subtotal:</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right font-semibold">
+                        {{ $invoice->currency ?? 'LKR' }} {{ number_format($invoice->subtotal ?? 0, 2) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="border border-gray-300 px-4 py-2 text-right font-semibold text-lg">Total:</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right font-semibold text-lg">
+                        {{ $invoice->currency ?? 'LKR' }} {{ number_format($invoice->total ?? 0, 2) }}
+                    </td>
+                </tr>
+                @if($due > 0)
+                <tr>
+                    <td colspan="3" class="border border-gray-300 px-4 py-2 text-right font-semibold">Amount Due:</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right font-semibold text-red-600">
+                        {{ $invoice->currency ?? 'LKR' }} {{ number_format($due, 2) }}
+                    </td>
+                </tr>
+                @endif
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Notes & Instructions -->
+    <div class="grid grid-cols-2 gap-8 text-sm">
+        @if($invoice->notes)
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-2">Notes:</h4>
+            <p class="text-gray-600 whitespace-pre-line">{{ $invoice->notes }}</p>
+        </div>
+        @endif
+
+        @if($invoice->instructions)
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-2">Payment Instructions:</h4>
+            <p class="text-gray-600 whitespace-pre-line">{{ $invoice->instructions }}</p>
+        </div>
+        @endif
+    </div>
+
+    <!-- Footer -->
+    @if($invoice->footer)
+    <div class="mt-8 pt-4 border-t border-gray-300">
+        <p class="text-center text-gray-500 text-sm">{{ $invoice->footer }}</p>
+    </div>
+    @endif
+
+    <!-- Preview Notice -->
+    <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded text-center">
+        <p class="text-yellow-700 text-sm">
+            <strong>Preview Only</strong> - This is a preview of how your invoice will look. Changes are not saved until you submit the form.
+        </p>
+    </div>
 </div>

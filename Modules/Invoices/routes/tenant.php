@@ -32,7 +32,5 @@ Route::middleware('auth')->group(function () {
         'services' => $services
     ]);
 });
-
+Route::post('/invoices/preview-create', [InvoiceController::class, 'previewCreate'])->name('invoice.preview.create');
 });
-
-
