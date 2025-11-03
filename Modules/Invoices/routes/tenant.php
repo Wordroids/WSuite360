@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Invoices\Http\Controllers\Tenant\InvoiceController;
+use Modules\Projects\Models\Project;
+use Modules\Services\Models\Service;
 
 Route::middleware('auth')->group(function () {
 	Route::get('/invoices/{invoice}/preview-pdf', [InvoiceController::class, 'showPDF'])->name('invoice.preview');
@@ -21,4 +23,16 @@ Route::middleware('auth')->group(function () {
 	Route::get('/invoices/{invoice}/payments/{payment}/receipt', [InvoiceController::class, 'receipt'])->name('invoice.receipt');
 	Route::get('/invoices/{invoice}/payments/{payment}/edit', [InvoiceController::class, 'editPayment'])->name('invoice.editPayment');
     Route::post('/invoices/{invoice}/send-receipt/{payment}', [InvoiceController::class, 'sendReceipt'])->name('invoice.sendReceipt');
+    Route::get('/api/clients/{client}/projects-services', function ($clientId) {
+    $projects = Project::where('client_id', $clientId)->get(['id', 'name']);
+    $services = Service::where('client_id', $clientId)->get(['id', 'name']);
+
+    return response()->json([
+        'projects' => $projects,
+        'services' => $services
+    ]);
 });
+
+});
+
+
