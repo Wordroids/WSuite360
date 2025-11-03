@@ -47,7 +47,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice Number</label>
-                    <input type="text" name="invoice_number"
+                    <input type="text" name="invoice_number" value="Auto-generated" 
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring">
                 </div>
                 <div>
