@@ -1,13 +1,13 @@
 <x-app-layout>
     <div class="container mx-auto py-10 px-4">
-        <form action="{{ route('invoices.store') }}" method="POST">
+        <form id="invoiceForm" action="{{ route('invoices.store') }}" method="POST">
             @csrf
 
             <!-- Header: Save draft & Preview -->
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">New Invoice</h2>
                 <div class="space-x-4">
-                    <a href="#" class="text-sm text-blue-600 underline">Preview</a>
+                    <button type="button" onclick="openPreview()" class="text-sm text-blue-600 underline">Preview</button>
                     <button type="submit" name="status" value="draft" class="text-sm text-green-600 underline">Save
                         draft</button>
                 </div>
@@ -47,7 +47,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice Number</label>
-                    <input type="text" name="invoice_number"
+                    <input type="text" name="invoice_number" value="Auto-generated"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring">
                 </div>
                 <div>
@@ -69,7 +69,7 @@
 
             <!-- Dynamic Product Lines -->
             <div class="bg-white border p-4 rounded-lg mb-6" x-data="{
-                products: [{ project_id: '', description: '', quantity: 0, price: 0 }],
+                products: [{ type: 'project', project_id: '', service_id: '', description: '', quantity: 0, price: 0 }],
                 subtotal: 0,
                 total: 0,
                 calculateTotals() {
@@ -78,15 +78,21 @@
                         return sum + amount;
                     }, 0);
                     this.total = this.subtotal;
+                },
+                setType(index, type) {
+                    this.products[index].type = type;
+                    this.products[index].project_id = '';
+                    this.products[index].service_id = '';
                 }
             }" x-init="calculateTotals()">
                 <h3 class="text-md font-semibold text-gray-700 mb-4">Products and Services</h3>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm text-gray-700 border overflow-auto">
+                    <table class="min-w-full text-sm text-gray-700 border">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-4 py-2 text-left">Project</th>
+                                <th class="px-4 py-2 text-left">Type</th>
+                                <th class="px-4 py-2 text-left">Project/Service</th>
                                 <th class="px-4 py-2 text-left">Description</th>
                                 <th class="px-4 py-2 text-left">Qty</th>
                                 <th class="px-4 py-2 text-left">Price</th>
@@ -97,27 +103,57 @@
                         <tbody>
                             <template x-for="(item, index) in products" :key="index">
                                 <tr class="border-t">
-                                    <!-- Project dropdown -->
-                                    <td class="px-2 py-2 align-top" style="overflow: hidden;">
-                                        <div x-data="{ search: '', showDropdown: false }" class="relative w-48" x-cloak>
-                                            <input type="text" x-model="search" @focus="showDropdown = true"
-                                                @input="showDropdown = true" @click.away="showDropdown = false"
-                                                placeholder="Search project..."
-                                                class="w-full border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
-
-                                            <ul x-show="showDropdown" x-transition
-                                                class="left-0 z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                                                @foreach ($projects as $project)
-                                                    <li class="px-3 py-1 hover:bg-indigo-100 cursor-pointer"
-                                                        @click="products[index].project_id = '{{ $project->id }}'; search = '{{ $project->name }}'; showDropdown = false">
-                                                        {{ $project->name }}
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-
-                                            <input type="hidden" :name="`products[${index}][project_id]`"
-                                                :value="products[index].project_id">
+                                    <!-- Type Selection -->
+                                    <td class="px-2 py-2 align-top">
+                                        <div class="flex flex-col space-y-1">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" :name="`products[${index}][type]`" value="project"
+                                                    x-model="products[index].type" @change="setType(index, 'project')"
+                                                    class="form-radio h-4 w-4 text-indigo-600">
+                                                <span class="ml-2 text-sm">Project</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" :name="`products[${index}][type]`" value="service"
+                                                    x-model="products[index].type" @change="setType(index, 'service')"
+                                                    class="form-radio h-4 w-4 text-indigo-600">
+                                                <span class="ml-2 text-sm">Service</span>
+                                            </label>
                                         </div>
+                                    </td>
+
+                                    <!-- Project/Service dropdown -->
+                                    <td class="px-2 py-2 align-top">
+                                        <template x-if="products[index].type === 'project'">
+                                            <div>
+                                                <select :name="`products[${index}][project_id]`"
+                                                    x-model="products[index].project_id"
+                                                    class="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
+                                                    <option value="">Select Project</option>
+                                                    @foreach ($projects as $project)
+                                                        <option value="{{ $project->id }}">{{ $project->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" :name="`products[${index}][service_id]`"
+                                                    value="">
+                                            </div>
+                                        </template>
+
+                                        <template x-if="products[index].type === 'service'">
+                                            <div>
+                                                <select :name="`products[${index}][service_id]`"
+                                                    x-model="products[index].service_id"
+                                                    class="w-full border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring focus:ring-indigo-300">
+                                                    <option value="">Select Service</option>
+                                                    @foreach ($services as $service)
+                                                        <option value="{{ $service->id }}">{{ $service->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" :name="`products[${index}][project_id]`"
+                                                    value="">
+                                            </div>
+                                        </template>
                                     </td>
 
                                     <!-- Description -->
@@ -165,8 +201,8 @@
                 </div>
 
                 <button type="button" class="mt-4 text-sm text-indigo-600 hover:underline hover:text-indigo-800"
-                    @click="products.push({ project_id: '', description: '', quantity: 0, price: 0 }); calculateTotals()">
-                    + Add another product
+                    @click="products.push({ type: 'project', project_id: '', service_id: '', description: '', quantity: 0, price: 0 }); calculateTotals()">
+                    + Add another product/service
                 </button>
 
                 <!-- Totals -->
@@ -176,13 +212,13 @@
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <label class="text-gray-700 font-medium">Subtotal:</label>
-                            <span x-text="subtotal.toFixed(2)"></span>
+                            <span x-text="'LKR ' + subtotal.toFixed(2)"></span>
                             <input type="hidden" name="subtotal" :value="subtotal.toFixed(2)">
                         </div>
 
                         <div class="flex justify-between font-semibold text-lg border-t pt-2">
                             <label class="text-gray-800">Total:</label>
-                            <span x-text="total.toFixed(2)"></span>
+                            <span x-text="'LKR ' + total.toFixed(2)"></span>
                             <input type="hidden" name="total" :value="total.toFixed(2)">
                         </div>
                     </div>
@@ -213,6 +249,125 @@
             </div>
         </form>
     </div>
-</x-app-layout>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl h-5/6 overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold">Invoice Preview</h3>
+                <button onclick="closePreview()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto h-full">
+                <div id="previewContent">
+                    <!-- Preview content  -->
+                </div>
+            </div>
+            <div class="flex justify-end p-4 border-t">
+                <button onclick="closePreview()" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Close</button>
+                <button type="submit" form="invoiceForm" class="bg-orange-500 text-white px-4 py-2 rounded">Save
+                    Invoice</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        .relative .absolute {
+            z-index: 1000 !important;
+        }
+
+       
+        tr {
+            position: relative;
+        }
+    </style>
+
+    <script>
+        function openPreview() {
+            console.log('Preview button clicked');
+
+            document.getElementById('previewContent').innerHTML = '<div class="text-center py-8">Loading preview...</div>';
+            document.getElementById('previewModal').classList.remove('hidden');
+
+            const form = document.getElementById('invoiceForm');
+            const formData = new FormData(form);
+
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+
+                if (key.includes('[')) {
+                    const matches = key.match(/^(\w+)\[(\d+)\]\[(\w+)\]$/);
+                    if (matches) {
+                        const [, arrayName, index, fieldName] = matches;
+                        if (!data[arrayName]) data[arrayName] = [];
+                        if (!data[arrayName][index]) data[arrayName][index] = {};
+                        data[arrayName][index][fieldName] = value;
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            console.log('Sending data to server:', data);
+
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            fetch('{{ route('invoice.preview.create') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    signal: controller.signal
+                })
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success response:', data);
+                    if (data.success) {
+                        document.getElementById('previewContent').innerHTML = data.html;
+                    } else {
+                        document.getElementById('previewContent').innerHTML =
+                            '<div class="text-center py-8 text-red-600">Error: ' + (data.error || 'Unknown error') +
+                            '</div>';
+                    }
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    console.error('Fetch error:', error);
+                    if (error.name === 'AbortError') {
+                        document.getElementById('previewContent').innerHTML =
+                            '<div class="text-center py-8 text-red-600">Request timeout - server took too long to respond</div>';
+                    } else {
+                        document.getElementById('previewContent').innerHTML =
+                            '<div class="text-center py-8 text-red-600">Network error: ' + error.message + '</div>';
+                    }
+                });
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+
+
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePreview();
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</x-app-layout>

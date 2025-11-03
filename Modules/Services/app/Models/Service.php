@@ -1,17 +1,13 @@
 <?php
 
-namespace Modules\Projects\Models;
-
-use Modules\Clients\Models\Client;
+namespace Modules\Services\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
-use App\Models\User;
+use Modules\Clients\Models\Client;
 use Modules\Subscriptions\Models\ProjectSubscription;
 
-
-class Project extends Model
+class Service extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -25,25 +21,13 @@ class Project extends Model
         'budget',
         'priority',
     ];
-
-    /**
-     * Relationship with Client model.
-     */
-    public function client()
+     public function client()
     {
         return $this->belongsTo(Client::class);
     }
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'project_users')->withPivot('role')->withTimestamps();
-    }
-    public function members()
-    {
-        return $this->belongsToMany(User::class, 'project_users', 'project_id', 'user_id');
-    }
 
-    public function subscriptions()
+      public function subscriptions()
     {
         return $this->hasMany(ProjectSubscription::class);
     }

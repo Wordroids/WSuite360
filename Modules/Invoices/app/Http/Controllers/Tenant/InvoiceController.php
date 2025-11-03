@@ -20,7 +20,7 @@ use Modules\Clients\Models\Client;
 use Modules\Invoices\Models\InvoicePayment;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendInvoiceMail;
-
+use Modules\Services\Models\Service;
 class InvoiceController extends Controller
 {
     public function index(Request $request)
@@ -50,7 +50,7 @@ class InvoiceController extends Controller
     public function viewInvoice(Request $request)
     {
 
-        $invoice = Invoice::with(['client', 'items.project'])->findOrFail($request->id);
+        $invoice = Invoice::with(['client', 'items.project','items.service'])->findOrFail($request->id);
         $payments = $invoice->payments()->latest()->get();
         $due = $invoice->total - $payments->sum('amount');
         $invoice->due = $due;
@@ -64,8 +64,9 @@ class InvoiceController extends Controller
     {
         $clients = Client::all();
         $projects = Project::all(['id', 'name']);
+        $services = Service::all(['id', 'name']);
         $companySettings = CompanySettings::first();
-        return view('invoices::pages.invoice.create', compact('clients', 'projects', 'companySettings'));
+        return view('invoices::pages.invoice.create', compact('clients', 'projects','services', 'companySettings'));
     }
 
     public function store(Request $request)
@@ -77,7 +78,7 @@ class InvoiceController extends Controller
             'description' => 'nullable',
             'client_id' => 'required',
             'currency' => 'required',
-            'invoice_number' => 'required',
+           // 'invoice_number' => 'required',
             'po_so_number' => 'nullable',
             'invoice_date' => 'required',
             'due_date' => 'required',
@@ -94,7 +95,7 @@ class InvoiceController extends Controller
             'description' => $request->description,
             'client_id' => $request->client_id,
             'currency' => $request->currency,
-            'invoice_number' => $request->invoice_number,
+           // 'invoice_number' => $request->invoice_number,
             'po_so_number' => $request->po_so_number,
             'invoice_date' => $request->invoice_date,
             'due_date' => $request->due_date,
@@ -109,15 +110,19 @@ class InvoiceController extends Controller
         // If there are items in the request, associate them with the invoice
         if ($request->has('products')) {
             foreach ($request->products as $product) {
+            $projectId = !empty($product['project_id']) ? $product['project_id'] : null;
+            $serviceId = !empty($product['service_id']) ? $product['service_id'] : null;
+
                 $invoice->items()->create([
-                    'project_id' => $product['project_id'],
-                    'description' => $product['description'],
-                    'unit_price' => $product['price'],
-                    'quantity' => $product['quantity'],
-                    'total' => $product['price'] * $product['quantity'],
-                ]);
-            }
+                'project_id' => $projectId,
+                'service_id' => $serviceId,
+                'description' => $product['description'],
+                'unit_price' => $product['price'],
+                'quantity' => $product['quantity'],
+                'total' => $product['price'] * $product['quantity'],
+            ]);
         }
+   }
 
         return redirect()->route('invoice.index')->with('success', 'Invoice created successfully.');
     }
@@ -127,20 +132,23 @@ class InvoiceController extends Controller
     {
         $clients = Client::all();
         $projects = Project::all(['id', 'name']);
+        $services = Service::all(['id', 'name']);
         $companySettings = CompanySettings::first();
 
         $products = $invoice->items->map(function ($item) {
             return [
                 'id'          => $item->id,
                 'project_id'  => $item->project_id,
+                'service_id'  => $item->service_id,
                 'description' => $item->description,
                 'quantity'    => $item->quantity,
                 'price'       => $item->unit_price,
-                'project_name' => $item->project->name ?? '',
+                'project_name' => $item->project->name ??($item->service->name ?? ''),
+                'type' => $item->project_id ? 'project' : 'service',
             ];
         });
 
-        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects', 'companySettings', 'products'));
+        return view('invoices::pages.invoice.edit', compact('invoice', 'clients', 'projects','services', 'companySettings', 'products'));
     }
     //to update
     public function update(Request $request, Invoice $invoice)
@@ -182,31 +190,34 @@ class InvoiceController extends Controller
             $existingItemIds = [];
 
             foreach ($request->products as $productData) {
-                if (isset($productData['id'])) {
+            $projectId = !empty($productData['project_id']) ? $productData['project_id'] : null;
+            $serviceId = !empty($productData['service_id']) ? $productData['service_id'] : null;
 
+                if (isset($productData['id'])) {
                     $item = $invoice->items()->find($productData['id']);
                     if ($item) {
                         $item->update([
-                            'project_id' => $productData['project_id'],
-                            'description' => $productData['description'],
-                            'unit_price' => $productData['price'],
-                            'quantity' => $productData['quantity'],
-                            'total' => $productData['price'] * $productData['quantity'],
-                        ]);
-                        $existingItemIds[] = $item->id;
-                    }
-                } else {
-
-                    $item = $invoice->items()->create([
-                        'project_id' => $productData['project_id'],
-                        'description' => $productData['description'],
-                        'unit_price' => $productData['price'],
-                        'quantity' => $productData['quantity'],
-                        'total' => $productData['price'] * $productData['quantity'],
+                           'project_id' => $projectId,
+                           'service_id' => $serviceId,
+                           'description' => $productData['description'],
+                           'unit_price' => $productData['price'],
+                           'quantity' => $productData['quantity'],
+                          'total' => $productData['price'] * $productData['quantity'],
                     ]);
                     $existingItemIds[] = $item->id;
                 }
+            } else {
+                $item = $invoice->items()->create([
+                    'project_id' => $projectId,
+                    'service_id' => $serviceId,
+                    'description' => $productData['description'],
+                    'unit_price' => $productData['price'],
+                    'quantity' => $productData['quantity'],
+                    'total' => $productData['price'] * $productData['quantity'],
+                ]);
+                $existingItemIds[] = $item->id;
             }
+        }
 
             $invoice->items()->whereNotIn('id', $existingItemIds)->delete();
         }
@@ -309,7 +320,7 @@ class InvoiceController extends Controller
 
     public function downloadPdf(Request $request, Invoice $invoice)
     {
-        $invoice->load(['client', 'items.project', 'payments']);
+        $invoice->load(['client', 'items.project','items.service', 'payments']);
         $payments = $invoice->payments;
         $due = $invoice->total - $payments->sum('amount');
         $invoice->due = $due;
@@ -340,7 +351,7 @@ class InvoiceController extends Controller
 
     public function showPDF(Request $request, Invoice $invoice)
     {
-        $invoice->load(['client', 'items.project']);
+        $invoice->load(['client', 'items.project','items.service', 'payments']);
         $payments = $invoice->payments()->latest()->get();
         $due = $invoice->total - $payments->sum('amount');
         $invoice->due = $due;
@@ -475,7 +486,6 @@ class InvoiceController extends Controller
             Mail::to($invoice->client->email)
                 ->send(new SendReceiptMail($invoice, $payment, $company));
 
-           
             if (count(Mail::failures()) > 0) {
                 Log::error('Receipt email failed to send. Failures: ' . implode(', ', Mail::failures()));
                 return back()->with('error', 'Failed to send receipt email.');
@@ -488,6 +498,101 @@ class InvoiceController extends Controller
             Log::error('SEND RECEIPT ERROR: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Failed to send receipt: ' . $e->getMessage());
+        }
+    }
+
+    //to preview
+    public function previewCreate(Request $request)
+    {
+        try {
+            \Log::info('Preview create called with data:', $request->all());
+
+
+            $company = CompanySettings::first();
+
+
+            $invoiceData = [
+                'title' => $request->title ?? 'Untitled Invoice',
+                'description' => $request->description,
+                'invoice_number' => $request->invoice_number ?? 'Auto-generated',
+                'po_so_number' => $request->po_so_number,
+                'invoice_date' => $request->invoice_date ? \Carbon\Carbon::parse($request->invoice_date) : now(),
+                'due_date' => $request->due_date ? \Carbon\Carbon::parse($request->due_date) : now()->addDays(30),
+                'currency' => $request->currency ?? 'LKR',
+                'subtotal' => $request->subtotal ?? 0,
+                'total' => $request->total ?? 0,
+                'notes' => $request->notes,
+                'instructions' => $request->instructions,
+                'footer' => $request->footer,
+                'status' => 'draft',
+            ];
+
+            \Log::info('Invoice data prepared:', $invoiceData);
+
+
+            $client = null;
+            if ($request->client_id) {
+                $client = Client::find($request->client_id);
+                \Log::info('Client found:', ['client' => $client ? $client->toArray() : 'Not found']);
+            }
+
+
+            $items = [];
+            if ($request->products && is_array($request->products)) {
+                \Log::info('Processing products:', $request->products);
+                foreach ($request->products as $index => $product) {
+                    if (!empty($product['description']) || !empty($product['project_id']) || !empty($product['service_id'])) {
+                        $project = null;
+                        $service = null;
+
+                        if (!empty($product['project_id'])) {
+                            $project = Project::find($product['project_id']);
+                        }
+                        if (!empty($product['service_id'])) {
+                            $service = Service::find($product['service_id']);
+                        }
+
+                        $items[] = (object)[
+                            'description' => $product['description'] ?? 'No description',
+                            'quantity' => $product['quantity'] ?? 0,
+                            'unit_price' => $product['price'] ?? 0,
+                            'total' => ($product['quantity'] ?? 0) * ($product['price'] ?? 0),
+                            'project' => $project,
+                            'service' => $service,
+                        ];
+                    }
+                }
+            }
+
+            \Log::info('Items prepared:', ['count' => count($items)]);
+
+
+            $due = $invoiceData['total'];
+
+           
+            $html = view('invoices::pages.invoice.partials.preview', [
+                'invoice' => (object)$invoiceData,
+                'company' => $company,
+                'client' => $client,
+                'items' => $items,
+                'due' => $due,
+                'payments' => collect(),
+            ])->render();
+
+            \Log::info('Preview HTML generated successfully');
+
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Preview error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error generating preview: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
