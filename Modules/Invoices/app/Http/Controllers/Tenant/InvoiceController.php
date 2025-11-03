@@ -500,4 +500,99 @@ class InvoiceController extends Controller
             return back()->with('error', 'Failed to send receipt: ' . $e->getMessage());
         }
     }
+
+    //to preview
+    public function previewCreate(Request $request)
+    {
+        try {
+            \Log::info('Preview create called with data:', $request->all());
+
+
+            $company = CompanySettings::first();
+
+
+            $invoiceData = [
+                'title' => $request->title ?? 'Untitled Invoice',
+                'description' => $request->description,
+                'invoice_number' => $request->invoice_number ?? 'Auto-generated',
+                'po_so_number' => $request->po_so_number,
+                'invoice_date' => $request->invoice_date ? \Carbon\Carbon::parse($request->invoice_date) : now(),
+                'due_date' => $request->due_date ? \Carbon\Carbon::parse($request->due_date) : now()->addDays(30),
+                'currency' => $request->currency ?? 'LKR',
+                'subtotal' => $request->subtotal ?? 0,
+                'total' => $request->total ?? 0,
+                'notes' => $request->notes,
+                'instructions' => $request->instructions,
+                'footer' => $request->footer,
+                'status' => 'draft',
+            ];
+
+            \Log::info('Invoice data prepared:', $invoiceData);
+
+
+            $client = null;
+            if ($request->client_id) {
+                $client = Client::find($request->client_id);
+                \Log::info('Client found:', ['client' => $client ? $client->toArray() : 'Not found']);
+            }
+
+
+            $items = [];
+            if ($request->products && is_array($request->products)) {
+                \Log::info('Processing products:', $request->products);
+                foreach ($request->products as $index => $product) {
+                    if (!empty($product['description']) || !empty($product['project_id']) || !empty($product['service_id'])) {
+                        $project = null;
+                        $service = null;
+
+                        if (!empty($product['project_id'])) {
+                            $project = Project::find($product['project_id']);
+                        }
+                        if (!empty($product['service_id'])) {
+                            $service = Service::find($product['service_id']);
+                        }
+
+                        $items[] = (object)[
+                            'description' => $product['description'] ?? 'No description',
+                            'quantity' => $product['quantity'] ?? 0,
+                            'unit_price' => $product['price'] ?? 0,
+                            'total' => ($product['quantity'] ?? 0) * ($product['price'] ?? 0),
+                            'project' => $project,
+                            'service' => $service,
+                        ];
+                    }
+                }
+            }
+
+            \Log::info('Items prepared:', ['count' => count($items)]);
+
+
+            $due = $invoiceData['total'];
+
+           
+            $html = view('invoices::pages.invoice.partials.preview', [
+                'invoice' => (object)$invoiceData,
+                'company' => $company,
+                'client' => $client,
+                'items' => $items,
+                'due' => $due,
+                'payments' => collect(),
+            ])->render();
+
+            \Log::info('Preview HTML generated successfully');
+
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Preview error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error generating preview: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
