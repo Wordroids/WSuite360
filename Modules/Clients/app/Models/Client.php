@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Modules\Projects\Models\Project;
 use Modules\Subscriptions\Models\ProjectSubscription ;
-
+use Modules\Services\Models\Service;
 class Client extends Model
 {
     /** @use HasFactory<\Database\Factories\ClientFactory> */
@@ -28,4 +28,10 @@ class Client extends Model
     {
         return $this->hasMany(ProjectSubscription::class);
     }
+
+     public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
 }

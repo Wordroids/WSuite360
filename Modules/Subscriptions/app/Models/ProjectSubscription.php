@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Clients\Models\Client;
 use Modules\Projects\Models\Project;
+use Modules\Services\Models\Service;
 class ProjectSubscription extends Model
 {
       use HasFactory;
@@ -30,5 +31,10 @@ class ProjectSubscription extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }
